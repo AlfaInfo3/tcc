@@ -1,0 +1,116 @@
+generator client {
+  provider = "prisma-client-js"
+  engineType = "library"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Book {
+  id          String   @id @default(cuid())
+  title       String
+  author      String?
+  coverUrl    String?
+  description String?
+  genres      String[]
+  publishedAt Int?
+  quantity    Int      @default(1)
+  createdAt   DateTime @default(now())
+
+  reservations Reservation[]
+  loans       Loan[]
+}
+
+model Student {
+  id        String   @id @default(cuid())
+  name      String
+  class     String
+  codeHash  String
+  normalizedName String? // Added for intelligent matching
+  createdAt DateTime @default(now())
+
+  reservations Reservation[]
+  loans       Loan[]
+  profile     StudentProfile?
+
+  @@index([codeHash])
+}
+
+model StudentProfile {
+  id        String   @id @default(cuid())
+  studentId String   @unique
+  username  String   @unique
+  password  String   // hashed
+  xp        Int      @default(0)
+  level     Int      @default(1)
+  streak    Int      @default(0)
+  
+  student   Student  @relation(fields: [studentId], references: [id])
+  badges    StudentBadge[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Badge {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  icon        String
+  xpRequired  Int      @default(0)
+  
+  users       StudentBadge[]
+}
+
+model StudentBadge {
+  id        String   @id @default(cuid())
+  profileId String
+  badgeId   String
+  earnedAt  DateTime @default(now())
+  
+  profile   StudentProfile @relation(fields: [profileId], references: [id])
+  badge     Badge          @relation(fields: [badgeId], references: [id])
+
+  @@unique([profileId, badgeId])
+}
+
+model Reservation {
+  id        String   @id @default(cuid())
+  bookId    String
+  studentId String
+  status    String   @default("reserved")
+  createdAt DateTime @default(now())
+
+  book    Book    @relation(fields: [bookId], references: [id])
+  student Student @relation(fields: [studentId], references: [id])
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  password     String   // hashed password
+  name         String
+  role         String   @default("admin") // admin, super_admin
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("admin_users")
+}
+
+model Loan {
+  id          String   @id @default(cuid())
+  bookId      String
+  studentId   String
+  status      String   @default("active") // active, returned, overdue
+  loanType    String   @default("local") // local, online
+  loanDate    DateTime @default(now())
+  dueDate     DateTime
+  returnDate  DateTime?
+  createdAt   DateTime @default(now())
+
+  book    Book    @relation(fields: [bookId], references: [id])
+  student Student @relation(fields: [studentId], references: [id])
+}
