@@ -6,7 +6,17 @@ import { usePathname } from 'next/navigation';
 export default function AdminNavbar() {
   const pathname = usePathname();
 
+  if (pathname === '/admin/auth') return null;
+
   const isActive = (path: string) => pathname.startsWith(path);
+
+  const handleLogout = async () => {
+    // Delete cookie logic would typically be an API call or server action
+    // For now, we just redirect to auth which clears context if implemented fully
+    // But since cookie is httpOnly, we need an API route to clear it.
+    await fetch('/api/admin/auth/logout', { method: 'POST' });
+    window.location.href = '/admin/auth';
+  };
 
   return (
     <nav className="bg-white shadow-sm border-b">
@@ -70,10 +80,12 @@ export default function AdminNavbar() {
           </div>
           
           <div className="flex items-center">
-             <button className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 text-sm">
+             <button 
+                onClick={handleLogout}
+                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 text-sm"
+             >
                 Sair
              </button>
-             {/* Note: Logout logic to be implemented or handled by Auth flow */}
           </div>
         </div>
       </div>
