@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
                     level: { 
                         set: Math.floor((profile.xp + 50) / 100) + 1 
                     },
-                    lastActivityDate: new Date() // if we had this field, but schema has updatedAt
+
                 }
             });
             // We could check badges here too
