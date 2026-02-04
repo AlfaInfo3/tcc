@@ -84,8 +84,8 @@ export default async function AdminStudentsPage() {
                     <td className="px-6 py-4 whitespace-nowrap">
                         {hasProfile ? (
                             <div className="flex flex-col">
-                                <span className="font-bold text-indigo-600">{student.profile.xp} XP</span>
-                                <span className="text-xs text-gray-400">Nível {student.profile.level}</span>
+                                <span className="font-bold text-indigo-600">{student.profile?.xp} XP</span>
+                                <span className="text-xs text-gray-400">Nível {student.profile?.level}</span>
                             </div>
                         ) : (
                             <span className="text-xs text-gray-400 italic">Sem perfil</span>
