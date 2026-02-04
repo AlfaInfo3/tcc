@@ -36,7 +36,7 @@ export default async function AdminBooksPage() {
                  coverUrl: book.coverUrl || '',
                  publishedAt: book.publishedAt || undefined,
                  description: book.description || undefined,
-                 genre: book.genre || undefined,
+                 genres: book.genres || [],
                  createdAt: book.createdAt.toISOString()
              }} 
              adminMode 
