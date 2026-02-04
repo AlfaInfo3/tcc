@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcrypt';
+import { cookies } from 'next/headers';
 
 export async function POST(request: NextRequest) {
   try {
@@ -51,9 +52,18 @@ export async function POST(request: NextRequest) {
     // Em um sistema real, você geraria um JWT real aqui
     // Por enquanto, estamos usando um token fixo para demonstração
     // Mas o importante é que agora estamos autenticando contra o banco de dados
+    // Set Cookie
+    const cookieStore = await cookies();
+    cookieStore.set('admin_token', adminUser.id, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        path: '/',
+        maxAge: 60 * 60 * 24 * 7 // 7 days
+    });
+
     return NextResponse.json({
       success: true,
-      token: 'fake-jwt-token',
+      token: 'fake-jwt-token', // Keep for compatibility if frontend uses it
       userId: adminUser.id,
       userName: adminUser.name,
       message: 'Login realizado com sucesso'

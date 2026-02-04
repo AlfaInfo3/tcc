@@ -37,7 +37,7 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600 px-4">
       <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
         <div className="flex flex-col items-center mb-6">
           <div className="bg-blue-100 p-3 rounded-full mb-3">
