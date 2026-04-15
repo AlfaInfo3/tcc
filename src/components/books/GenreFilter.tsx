@@ -29,8 +29,8 @@ export function GenreFilter({ genres }: GenreFilterProps) {
         onClick={() => handleSelect(null)}
         className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
           !currentGenre
-            ? 'bg-blue-600 text-white'
-            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            ? 'bg-primary text-primary-foreground shadow-sm'
+            : 'bg-muted text-muted-foreground hover:bg-muted/80'
         }`}
       >
         Todos
@@ -41,8 +41,8 @@ export function GenreFilter({ genres }: GenreFilterProps) {
           onClick={() => handleSelect(genre)}
           className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
             currentGenre === genre
-              ? 'bg-blue-600 text-white'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              ? 'bg-primary text-primary-foreground shadow-sm'
+              : 'bg-muted text-muted-foreground hover:bg-muted/80'
           }`}
         >
           {genre}

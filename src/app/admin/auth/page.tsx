@@ -1,8 +1,11 @@
 'use client';
 
+import Image from 'next/image';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Lock } from 'lucide-react';
+import layout from './layout';
+
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('');
@@ -37,43 +40,43 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-500 to-indigo-600 px-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="max-w-md w-full rounded-lg shadow-md p-8 border border-border">
         <div className="flex flex-col items-center mb-6">
-          <div className="bg-blue-100 p-3 rounded-full mb-3">
-            <Lock className="w-6 h-6 text-blue-600" />
+          <div className="bg-primary/10 p-3 rounded-full mb-3">
+            <Image src="/logo/LaurentãoLogo.svg" width={120} height={120} alt='Image da logo do laurentino'></Image>
           </div>
-          <h1 className="text-2xl font-bold text-gray-800">Acesso Administrativo</h1>
-          <p className="text-gray-500 text-sm">Biblioteca TCC Master</p>
+          <h1 className="text-2xl font-bold text-foreground">Acesso Administrativo</h1>
+          <p className="text-muted-foreground text-sm">Sistema De informação Bibliotecária Laurentino</p>
         </div>
 
         {error && (
-          <div className="mb-4 bg-red-50 text-red-600 text-sm p-3 rounded-md border border-red-200">
+          <div className="mb-4 bg-destructive/10 text-destructive text-sm p-3 rounded-md border border-destructive/20">
             {error}
           </div>
         )}
 
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Email</label>
             <input
               type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="admin@escola.com"
+              className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
+              placeholder="Email"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Senha</label>
             <input
               type="password"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
               placeholder="••••••••"
             />
           </div>
@@ -81,16 +84,17 @@ export default function AdminLoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className={`w-full py-2 px-4 rounded-md text-white font-medium transition-colors ${
+            className={`w-full py-2 px-4 rounded-md text-primary-foreground font-medium transition-colors ${
               loading 
-                ? 'bg-blue-400 cursor-not-allowed' 
-                : 'bg-blue-600 hover:bg-blue-700'
+                ? 'bg-primary/70 cursor-not-allowed' 
+                : 'bg-primary hover:bg-primary/90'
             }`}
           >
             {loading ? 'Entrando...' : 'Entrar'}
           </button>
         </form>
       </div>
-    </div>
+      </div>
+   
   );
 }

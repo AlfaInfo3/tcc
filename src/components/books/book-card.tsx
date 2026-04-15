@@ -1,5 +1,8 @@
+"use client";
 import Link from 'next/link';
 import { Book } from '@/types/book';
+import { ModernBookCover, BookHeader, BookTitle, BookDescription } from '@/cuicui/other/books/modern-book-cover/modern-book-cover';
+import { Book as BookIcon } from 'lucide-react';
 
 interface BookCardProps {
   book: Omit<Book, 'id'> & { id: string | number };
@@ -7,93 +10,100 @@ interface BookCardProps {
   adminMode?: boolean;
 }
 
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+// ... other imports
+
 export function BookCard({ book, onReserve, adminMode }: BookCardProps) {
+  const router = useRouter();
+  const [isNavigating, setIsNavigating] = useState(false);
   const isAvailable = book.quantity > 0;
-  const quantityDisplay = book.quantity;
-
-  const detailHref = adminMode ? `/admin/livros/${book.id}` : `/livros/${book.id}`;
   
+  // Determine color based on genre or random? For now defaulting to a mapping or random.
+  // Simple mapping based on first letter of title for consistency
+  const colors = ["neutral", "blue", "amber", "red", "green", "purple", "slate", "zinc"] as const;
+  const colorIndex = book.title.charCodeAt(0) % colors.length;
+  const bookColor = colors[colorIndex];
+
+  const handleCardClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+      e.preventDefault();
+      setIsNavigating(true);
+      setTimeout(() => {
+          router.push(href);
+      }, 500); // Wait for animation (400ms) + buffer
+  };
+
+  const href = adminMode ? `/admin/livros/${book.id}` : `/livros/${book.id}`;
+
   return (
-    <div className="border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow relative group">
-      {/* Title */}
-      <h3 className="font-semibold text-lg relative z-0">{book.title}</h3>
-      
-      <p className="text-gray-600 relative z-0">por {book.author}</p>
-      
-      {/* Image */}
-      <div className="relative mt-2 overflow-hidden rounded">
-         {book.coverUrl && (
-            <img 
-                src={book.coverUrl} 
-                alt={book.title} 
-                className="w-full h-48 object-cover transition-transform group-hover:scale-105" 
-            />
-         )}
-      </div>
-      
-      {/* Genre & Desc */}
-      <div className="mt-2 min-h-[60px] relative z-0">
-          <div className="flex flex-wrap gap-1 mb-1">
-            {book.genres && book.genres.map((g, i) => (
-                <span key={i} className="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-0.5 rounded-full">
-                    {g}
-                </span>
-            ))}
-          </div>
-          {book.description && (
-            <p className="text-xs text-gray-500 line-clamp-3" title={book.description}>
-                {book.description}
-            </p>
-          )}
-      </div>
-
-      <div className="mt-4 space-y-2 relative z-10">
-        <div className="flex justify-between items-center">
-          <span className={`px-2 py-1 rounded-full text-xs ${
-            isAvailable ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-          }`}>
-            {isAvailable ? 'Disponível' : 'Indisponível'}
-          </span>
-
-          <span className="text-sm text-gray-600">
-            Qtd: {quantityDisplay}
-          </span>
+    <div className="flex flex-col items-center group h-full">
+      <Link href={href} onClick={(e) => handleCardClick(e, href)} className="shrink-0">
+        <div className="relative transform transition-transform duration-300 group-hover:-translate-y-2">
+            <ModernBookCover
+                size="md"
+                color={bookColor}
+                coverImage={book.coverUrl}
+                forceRotate={isNavigating}
+            >
+                <BookHeader>
+                    <BookIcon size={20} />
+                </BookHeader>
+                <BookTitle>{book.title}</BookTitle>
+                <BookDescription>{book.author}</BookDescription>
+            </ModernBookCover>
+            
+            {/* Avaialbility Badge (Floating) */}
+            <div className={`absolute top-0 right-0 px-2 py-1 rounded-full text-[10px] font-bold shadow-md z-30 ${
+                isAvailable ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+            }`}>
+                {isAvailable ? 'Disp.' : 'Indisp.'}
+            </div>
         </div>
+      </Link>
 
-        {onReserve && (
-          <button
-            onClick={(e) => {
-               // Prevent card click
-               e.stopPropagation();
-               onReserve(book.id);
-            }}
-            disabled={!isAvailable}
-            className={`w-full py-2 rounded text-sm relative z-20 ${
-              isAvailable
-                ? 'bg-blue-500 text-white hover:bg-blue-600'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            }`}
-          >
-            {isAvailable ? 'Reservar' : 'Indisponível'}
-          </button>
-        )}
+      <div className="mt-4 w-full max-w-[160px] flex flex-col flex-1 text-center">
+         <h3 className="font-bold text-sm leading-tight line-clamp-2 text-foreground h-10 flex items-center justify-center mb-1" title={book.title}>
+            {book.title}
+         </h3>
+         <p className="text-xs text-muted-foreground truncate mb-2">{book.author}</p>
 
-        {adminMode && (
-          <Link
-            href={`/admin/livros/${book.id}`}
-            className="block w-full text-center py-2 rounded text-sm bg-gray-100 text-gray-700 hover:bg-gray-200 mt-2 relative z-20"
-          >
-            Editar
-          </Link>
-        )}
+         {/* Genre Badges (Only displaying the first selected/available one to save vertical space based on user feedback) */}
+         {book.genres && book.genres.length > 0 && (
+            <div className="flex flex-wrap items-center justify-center gap-1.5 mb-2 h-5">
+                <span className="px-2 py-0.5 rounded-full bg-secondary text-[10px] font-medium text-secondary-foreground truncate max-w-full border border-border/50">
+                    {book.genres[0]}
+                </span>
+                {book.genres.length > 1 && (
+                    <span className="text-[10px] text-muted-foreground">+{book.genres.length - 1}</span>
+                )}
+            </div>
+         )}
+
+         <div className="mt-auto pt-2">
+            {onReserve && (
+                <button
+                    onClick={() => onReserve(book.id)}
+                    disabled={!isAvailable}
+                    className={`w-full py-1.5 rounded-md text-xs font-medium transition-colors ${
+                    isAvailable
+                        ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                        : 'bg-muted text-muted-foreground cursor-not-allowed'
+                    }`}
+                >
+                    {isAvailable ? 'Reservar' : 'Indisponível'}
+                </button>
+            )}
+            
+            {adminMode && (
+                <Link
+                    href={`/admin/livros/${book.id}`}
+                    className="block w-full py-1.5 rounded-md text-xs font-medium bg-secondary text-secondary-foreground hover:bg-secondary/80 mt-2"
+                >
+                    Editar
+                </Link>
+            )}
+         </div>
       </div>
-
-      {/* Stretched Link covering the entire card (except buttons z-20) */}
-      <Link 
-        href={detailHref} 
-        className="absolute inset-0 z-10" 
-        aria-label={`Ver detalhes de ${book.title}`} 
-      />
     </div>
   );
 }

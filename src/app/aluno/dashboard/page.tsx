@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Trophy, Book, Star, Flame, LogOut, Calendar } from 'lucide-react';
 import { calculateLevel, getLevelProgress } from '@/lib/gamification';
+import { BookRow } from '@/components/books/book-row';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -42,20 +43,20 @@ export default function DashboardPage() {
   const progress = getLevelProgress(profile.xp);
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20 md:pb-12">
+    <div className="min-h-screen bg-muted/30 pb-20 md:pb-12">
       {/* Top Bar - Responsive */}
-      <div className="bg-white shadow-sm p-4 sticky top-0 z-30">
+      <div className="bg-card shadow-sm p-4 sticky top-0 z-30 border-b border-border">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
             <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center font-bold text-blue-700 shadow-inner">
+                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center font-bold text-primary shadow-inner">
                     {profile.level}
                 </div>
                 <div className="leading-tight">
-                    <h1 className="font-bold text-gray-800 text-sm md:text-base line-clamp-1">{profile.username}</h1>
-                    <p className="text-xs text-gray-500 line-clamp-1">{student.name}</p>
+                    <h1 className="font-bold text-foreground text-sm md:text-base line-clamp-1">{profile.username}</h1>
+                    <p className="text-xs text-muted-foreground line-clamp-1">{student.name}</p>
                 </div>
             </div>
-            <button onClick={handleLogout} className="text-gray-400 hover:text-red-500 p-2">
+            <button onClick={handleLogout} className="text-muted-foreground hover:text-destructive p-2">
                 <LogOut size={20} />
             </button>
         </div>
@@ -67,7 +68,7 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             
             {/* Main Progress Card */}
-            <div className="md:col-span-2 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
+            <div className="md:col-span-2 bg-gradient-to-r from-primary to-blue-600 rounded-2xl p-6 text-primary-foreground shadow-lg relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-4 opacity-10">
                     <Trophy size={120} />
                 </div>
@@ -99,33 +100,33 @@ export default function DashboardPage() {
 
             {/* Stats - Compact on Mobile */}
             <div className="grid grid-cols-2 gap-4">
-                <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center justify-center hover:shadow-md transition">
-                    <Book className="text-blue-500 mb-2 w-8 h-8" />
-                    <span className="text-3xl font-bold text-gray-800">{history.totalReads}</span>
-                    <span className="text-xs text-gray-500 font-medium">Lidos</span>
+                <div className="bg-card p-4 rounded-xl shadow-sm border border-border flex flex-col items-center justify-center hover:shadow-md transition">
+                    <Book className="text-primary mb-2 w-8 h-8" />
+                    <span className="text-3xl font-bold text-foreground">{history.totalReads}</span>
+                    <span className="text-xs text-muted-foreground font-medium">Lidos</span>
                 </div>
-                <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center justify-center hover:shadow-md transition">
+                <div className="bg-card p-4 rounded-xl shadow-sm border border-border flex flex-col items-center justify-center hover:shadow-md transition">
                     <Star className="text-yellow-500 mb-2 w-8 h-8" fill="currentColor" />
-                    <span className="text-3xl font-bold text-gray-800">{profile.badges.length}</span>
-                    <span className="text-xs text-gray-500 font-medium">Conquistas</span>
+                    <span className="text-3xl font-bold text-foreground">{profile.badges.length}</span>
+                    <span className="text-xs text-muted-foreground font-medium">Conquistas</span>
                 </div>
             </div>
         </div>
 
         {/* Quests Section */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h2 className="font-bold text-gray-800 text-lg mb-4 flex items-center gap-2">
+        <div className="bg-card rounded-2xl shadow-sm border border-border p-6">
+            <h2 className="font-bold text-foreground text-lg mb-4 flex items-center gap-2">
                 <Star className="text-purple-500" />
                 Missões Diárias
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {quests?.map((quest: any) => (
-                    <div key={quest.id} className={`p-4 rounded-xl border-l-4 ${quest.completed ? 'border-green-500 bg-green-50' : 'border-gray-200 bg-gray-50'} flex justify-between items-center`}>
+                    <div key={quest.id} className={`p-4 rounded-xl border-l-4 ${quest.completed ? 'border-green-500 bg-green-500/10' : 'border-border bg-muted/50'} flex justify-between items-center`}>
                         <div>
-                            <h3 className="font-bold text-sm text-gray-800">{quest.title}</h3>
-                            <p className="text-xs text-gray-500">{quest.desc}</p>
-                            <div className="mt-2 w-24 bg-gray-200 rounded-full h-1.5">
-                                <div className={`h-1.5 rounded-full ${quest.completed ? 'bg-green-500' : 'bg-blue-500'}`} style={{width: `${(quest.progress/quest.total)*100}%`}}></div>
+                            <h3 className="font-bold text-sm text-foreground">{quest.title}</h3>
+                            <p className="text-xs text-muted-foreground">{quest.desc}</p>
+                            <div className="mt-2 w-24 bg-muted rounded-full h-1.5">
+                                <div className={`h-1.5 rounded-full ${quest.completed ? 'bg-green-500' : 'bg-primary'}`} style={{width: `${(quest.progress/quest.total)*100}%`}}></div>
                             </div>
                         </div>
                         <div className="text-right">
@@ -137,62 +138,35 @@ export default function DashboardPage() {
             </div>
         </div>
 
-        {/* Recommendations Section - Horizontal Scroll */}
+        {/* Recommendations Section - Netflix Style */}
         {recommendations && recommendations.length > 0 && (
-             <div>
-                <h2 className="font-bold text-gray-800 text-lg mb-4 flex items-center gap-2">
-                    <Book className="text-blue-500" />
-                    Recomendados para Você
-                </h2>
-                <div className="flex gap-4 overflow-x-auto pb-4 px-1 snap-x">
-                    {recommendations.map((book: any) => (
-                        <div key={book.id} className="min-w-[140px] w-[140px] bg-white rounded-xl shadow-sm overflow-hidden flex-shrink-0 snap-start border border-gray-100 hover:shadow-md transition">
-                            <div className="h-40 bg-gray-200 relative">
-                                {book.coverUrl ? (
-                                    <img src={book.coverUrl} alt={book.title} className="w-full h-full object-cover" />
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-gray-400 bg-gray-100">
-                                        <Book size={32} />
-                                    </div>
-                                )}
-                            </div>
-                            <div className="p-3">
-                                <h3 className="font-bold text-sm text-gray-800 line-clamp-2 h-10 leading-tight">{book.title}</h3>
-                                <p className="text-xs text-gray-500 truncate mt-1">{book.author}</p>
-                                <a href={`/livros/${book.id}`} className="mt-2 block text-center text-xs bg-blue-50 text-blue-600 py-1 rounded hover:bg-blue-100 font-medium">
-                                    Ver Detalhes
-                                </a>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-             </div>
+             <BookRow title="Recomendados para Você" books={recommendations} />
         )}
 
         {/* Current Activity & History Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-                <div className="p-4 border-b bg-gray-50">
-                    <h2 className="font-bold text-gray-800">📖 Lendo Agora</h2>
+            <div className="bg-card rounded-xl shadow-sm overflow-hidden border border-border">
+                <div className="p-4 border-b border-border bg-muted/30">
+                    <h2 className="font-bold text-foreground">📖 Lendo Agora</h2>
                 </div>
                 {history.currentLoansCount === 0 ? (
-                    <div className="p-8 text-center text-gray-500 text-sm">
+                    <div className="p-8 text-center text-muted-foreground text-sm">
                         Nenhuma leitura ativa.
                         <br />
-                        <a href="/livros" className="text-blue-600 underline mt-2 inline-block font-medium">Explorar Biblioteca</a>
+                        <a href="/livros" className="text-primary underline mt-2 inline-block font-medium">Explorar Biblioteca</a>
                     </div>
                 ) : (
-                    <div className="divide-y">
+                    <div className="divide-y divide-border">
                         {history.currentLoans.map((loan: any) => (loan.status === 'active' &&
                             <div key={loan.id} className="p-4 flex gap-4">
                                 <div className="flex-1">
-                                    <h3 className="font-bold text-gray-800">{loan.book.title}</h3>
-                                    <p className="text-sm text-gray-500">{loan.book.author}</p>
+                                    <h3 className="font-bold text-foreground">{loan.book.title}</h3>
+                                    <p className="text-sm text-muted-foreground">{loan.book.author}</p>
                                     <div className="mt-2 text-xs flex gap-2">
-                                        <span className={`px-2 py-0.5 rounded bg-blue-100 text-blue-700 font-medium`}>
+                                        <span className={`px-2 py-0.5 rounded bg-primary/10 text-primary font-medium`}>
                                             {loan.loanType === 'online' ? 'Online' : 'Presencial'}
                                         </span>
-                                        <span className="text-gray-400 flex items-center gap-1">
+                                        <span className="text-muted-foreground flex items-center gap-1">
                                             <Calendar size={12} />
                                             {new Date(loan.dueDate).toLocaleDateString()}
                                         </span>
@@ -204,31 +178,31 @@ export default function DashboardPage() {
                 )}
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-                <div className="p-4 border-b bg-gray-50 flex justify-between items-center">
-                    <h2 className="font-bold text-gray-800">📜 Histórico</h2>
+            <div className="bg-card rounded-xl shadow-sm overflow-hidden border border-border">
+                <div className="p-4 border-b border-border bg-muted/30 flex justify-between items-center">
+                    <h2 className="font-bold text-foreground">📜 Histórico</h2>
                 </div>
-                <div className="divide-y">
+                <div className="divide-y divide-border">
                     {[...history.loans, ...history.reservations]
                         .sort((a: any, b: any) => new Date(b.createdAt || b.loanDate).getTime() - new Date(a.createdAt || a.loanDate).getTime())
                         .slice(0, 5)
                         .map((item: any, idx: number) => (
-                        <div key={idx} className="p-3 flex justify-between items-center text-sm hover:bg-gray-50 transition">
+                        <div key={idx} className="p-3 flex justify-between items-center text-sm hover:bg-muted/30 transition">
                             <div className="flex items-center gap-3">
                                 <div className={`w-2 h-2 rounded-full ${
                                     item.status === 'active' ? 'bg-green-500' :
-                                    item.status === 'returned' ? 'bg-gray-400' : 'bg-yellow-400'
+                                    item.status === 'returned' ? 'bg-muted-foreground' : 'bg-yellow-400'
                                 }`}></div>
                                 <div>
-                                    <p className="font-medium text-gray-800 line-clamp-1">{item.book.title}</p>
-                                    <p className="text-xs text-gray-500">
+                                    <p className="font-medium text-foreground line-clamp-1">{item.book.title}</p>
+                                    <p className="text-xs text-muted-foreground">
                                         {item.status === 'active' ? 'Emprestado' : 
                                         item.status === 'returned' ? 'Devolvido' : 
                                         item.status === 'reserved' ? 'Solicitado' : item.status}
                                     </p>
                                 </div>
                             </div>
-                            <div className="text-xs text-gray-400 whitespace-nowrap">
+                            <div className="text-xs text-muted-foreground whitespace-nowrap">
                                 {new Date(item.createdAt || item.loanDate).toLocaleDateString()}
                             </div>
                         </div>

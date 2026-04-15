@@ -3,6 +3,9 @@
 import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { BubblyInput, BubblyButton } from '@/components/aluno/bubbly-form';
+import { OwlMascot } from '@/components/aluno/owl-mascot';
+import { User, Lock } from 'lucide-react';
 
 function LoginForm() {
   const router = useRouter();
@@ -42,62 +45,74 @@ function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
-        <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-gray-800">Bem-vindo de volta! 👋</h1>
-            <p className="text-gray-500 text-sm">Entre para ver suas medalhas.</p>
+    <div className="min-h-screen bg-[#f7f7f7] flex flex-col">
+      {/* Top decorative area */}
+      <div className="bg-gradient-to-br from-primary to-primary-light pt-8 pb-16 px-4 text-center relative overflow-hidden">
+        <div className="absolute top-4 right-8 w-24 h-24 bg-white/10 rounded-full blur-xl" />
+        <div className="absolute bottom-2 left-6 w-16 h-16 bg-white/10 rounded-full blur-lg" />
+
+        <div className="relative z-10">
+          <div className="float-animate inline-block mb-4">
+            <OwlMascot size={100} />
+          </div>
+          <h1 className="text-3xl font-black text-white mb-2">Bem-vindo de volta!</h1>
+          <p className="text-white/80 font-medium">Entre para continuar sua aventura</p>
+        </div>
+      </div>
+
+      {/* Login Card */}
+      <div className="flex-1 px-4 -mt-10 relative z-20 max-w-md mx-auto w-full pb-8">
+        <div className="card-duo bg-white p-6 space-y-5 shadow-lg slide-up">
+          {/* Success message */}
+          {registered && (
+            <div className="bg-green-50 text-green-700 p-4 rounded-2xl text-sm font-bold text-center border-2 border-green-200">
+              Conta criada com sucesso! Pode entrar.
+            </div>
+          )}
+
+          {/* Error message */}
+          {error && (
+            <div className="bg-red-50 text-danger p-4 rounded-2xl text-sm font-bold text-center border-2 border-red-200">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <BubblyInput
+              label="Usuário"
+              placeholder="Seu nome de usuário"
+              value={formData.username}
+              onChange={e => setFormData({...formData, username: e.target.value})}
+              icon={<User size={18} />}
+            />
+
+            <BubblyInput
+              label="Senha"
+              type="password"
+              placeholder="Sua senha secreta"
+              value={formData.password}
+              onChange={e => setFormData({...formData, password: e.target.value})}
+              icon={<Lock size={18} />}
+            />
+
+            <BubblyButton type="submit" loading={loading}>
+              Entrar
+            </BubblyButton>
+          </form>
         </div>
 
-        {registered && (
-            <div className="bg-green-50 text-green-600 p-3 rounded-lg text-sm mb-4 text-center">
-                Conta criada com sucesso! Pode entrar.
-            </div>
-        )}
+        {/* Sign up link */}
+        <div className="mt-6 text-center space-y-4">
+          <p className="text-sm text-muted-foreground">
+            Ainda não tem conta?{' '}
+            <Link href="/aluno/signup" className="text-primary font-bold hover:underline">
+              Criar agora
+            </Link>
+          </p>
 
-        {error && (
-            <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-4">
-                {error}
-            </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Usuário</label>
-                <input 
-                    type="text" 
-                    required
-                    className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                    value={formData.username}
-                    onChange={e => setFormData({...formData, username: e.target.value})}
-                />
-            </div>
-
-            <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Senha</label>
-                <input 
-                    type="password" 
-                    required
-                    className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                    value={formData.password}
-                    onChange={e => setFormData({...formData, password: e.target.value})}
-                />
-            </div>
-
-            <button 
-                type="submit" 
-                disabled={loading}
-                className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition"
-            >
-                {loading ? 'Entrando...' : 'Acessar Painel'}
-            </button>
-        </form>
-
-        <p className="text-center mt-6 text-sm text-gray-500">
-            Ainda não tem conta? <Link href="/aluno/signup" className="text-blue-600 hover:underline">Criar agora</Link>
-        </p>
-         <div className="text-center mt-4">
-             <Link href="/aluno" className="text-xs text-gray-400 hover:underline">Voltar</Link>
+          <Link href="/aluno" className="inline-flex items-center gap-2 text-muted-foreground text-sm font-bold hover:text-primary transition-colors">
+            <span>←</span> Voltar
+          </Link>
         </div>
       </div>
     </div>
@@ -106,7 +121,7 @@ function LoginForm() {
 
 export default function LoginPage() {
     return (
-        <Suspense fallback={<div>Carregando...</div>}>
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-4 border-primary"></div></div>}>
             <LoginForm />
         </Suspense>
     );
