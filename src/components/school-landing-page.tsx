@@ -111,7 +111,7 @@ export function SchoolLandingPage() {
                   </div>
                 </div>
               </div>
-              <div eid="e47" className="relative">
+              <div className="relative">
                 <div className="absolute -top-8 -right-8 size-80 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 blur-3xl" />
                 <div className="absolute top-1/2 -translate-y-1/2 size-64 rounded-full bg-gradient-to-l from-primary/30 to-primary/10 z-20" />
                 <Card className="relative overflow-hidden border-none shadow-2xl bg-primary rounded-md">
