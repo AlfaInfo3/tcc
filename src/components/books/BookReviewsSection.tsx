@@ -8,11 +8,8 @@ import {
   AlertCircle, 
   Loader2, 
   PenLine, 
-  User, 
-  GraduationCap, 
-  Sparkles,
-  ChevronDown,
-  Quote
+  Sparkles, 
+  X 
 } from 'lucide-react';
 
 export interface SerializedReview {
@@ -73,17 +70,17 @@ export function BookReviewsSection({
   const validate = () => {
     const newErrors: Record<string, string> = {};
     if (!studentName.trim()) {
-      newErrors.studentName = 'Informe seu nome completo';
+      newErrors.studentName = 'Informe seu nome';
     } else if (studentName.trim().length < 2) {
-      newErrors.studentName = 'O nome deve ter no mínimo 2 caracteres';
+      newErrors.studentName = 'Mínimo 2 caracteres';
     }
 
     if (rating < 1 || rating > 5) {
-      newErrors.rating = 'Selecione uma nota de 1 a 5 estrelas';
+      newErrors.rating = 'Selecione de 1 a 5 estrelas';
     }
 
     if (comment.length > 1000) {
-      newErrors.comment = 'O comentário não pode passar de 1000 caracteres';
+      newErrors.comment = 'Máximo 1000 caracteres';
     }
 
     setErrors(newErrors);
@@ -122,19 +119,19 @@ export function BookReviewsSection({
       };
 
       setReviews((prev) => [createdReview, ...prev]);
-      setSuccessMessage('Sua avaliação foi publicada com sucesso! Obrigado por compartilhar.');
+      setSuccessMessage('Avaliação publicada com sucesso! Obrigado.');
       setComment('');
       setStudentName('');
       setStudentClass('');
       setRating(5);
       
-      // Auto-hide form after success after short delay
       setTimeout(() => {
         setIsFormOpen(false);
-      }, 3000);
+        setSuccessMessage('');
+      }, 2500);
 
     } catch (err: any) {
-      setErrors({ submit: err.message || 'Falha ao enviar avaliação. Tente novamente.' });
+      setErrors({ submit: err.message || 'Falha ao enviar avaliação.' });
     } finally {
       setIsSubmitting(false);
     }
@@ -143,22 +140,24 @@ export function BookReviewsSection({
   const activeStarRating = hoveredStar !== null ? hoveredStar : rating;
 
   return (
-    <section id="avaliacoes" className="container mx-auto px-4 sm:px-6 lg:px-12 max-w-6xl mt-12 scroll-mt-24">
-      <div className="bg-white/95 backdrop-blur-md rounded-[32px] border border-white/40 shadow-2xl p-6 sm:p-10 lg:p-12 text-slate-800 space-y-10">
+    <section id="avaliacoes" className="container mx-auto px-4 sm:px-6 lg:px-12 max-w-6xl mt-8 scroll-mt-24">
+      {/* ── CONTAINER GLASSMORPHIC SEM FUNDO BRANCO ── */}
+      <div className="bg-white/[0.04] backdrop-blur-xl rounded-[28px] border border-white/15 shadow-2xl p-5 sm:p-7 lg:p-8 text-white space-y-6">
         
-        {/* ── HEADER DA SEÇÃO ─────────────────────────────── */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-black uppercase tracking-wider mb-2">
-              <Sparkles className="size-3.5 text-amber-500 fill-amber-500" />
-              Opinião dos Alunos & Leitores
+        {/* ── HEADER COMPACTO ─────────────────────────────── */}
+        <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-white/10">
+          <div className="flex items-center gap-2.5">
+            <div className="size-8 rounded-xl bg-amber-400/20 text-amber-300 border border-amber-400/30 flex items-center justify-center font-bold shrink-0">
+              <Star className="size-4 text-amber-400 fill-amber-400" />
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-              Avaliações e Resenhas
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-600 font-medium mt-1">
-              Veja a opinião de quem já leu &ldquo;{bookTitle}&rdquo; e compartilhe sua experiência literária.
-            </p>
+            <div>
+              <h2 className="text-lg sm:text-xl font-black text-white tracking-tight leading-tight">
+                Avaliações do Livro
+              </h2>
+              <p className="text-[11px] sm:text-xs text-blue-200/80 font-medium">
+                {totalReviews} {totalReviews === 1 ? 'avaliação registrada' : 'avaliações registradas'} por alunos
+              </p>
+            </div>
           </div>
 
           <button
@@ -167,325 +166,306 @@ export function BookReviewsSection({
               setIsFormOpen(!isFormOpen);
               setSuccessMessage('');
             }}
-            className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-black text-xs sm:text-sm transition-all shadow-md hover:shadow-lg self-start sm:self-auto cursor-pointer"
+            className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-black text-xs transition-all shadow-md cursor-pointer border border-blue-400/30"
           >
-            <PenLine className="size-4" />
-            <span>{isFormOpen ? 'Fechar Formulário' : 'Avaliar este Livro'}</span>
+            {isFormOpen ? (
+              <>
+                <X className="size-3.5" />
+                <span>Fechar</span>
+              </>
+            ) : (
+              <>
+                <PenLine className="size-3.5" />
+                <span>Avaliar Livro</span>
+              </>
+            )}
           </button>
         </div>
 
-        {/* ── RESUMO DAS NOTAS (RATING OVERVIEW) ───────────── */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center bg-slate-50/80 rounded-3xl p-6 sm:p-8 border border-slate-200/80">
+        {/* ── GRID DE 2 COLUNAS: LADO ESQUERDO (RESUMO) / LADO DIREITO (AVALIAÇÕES OU FORMULÁRIO) ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           
-          {/* Nota Geral em Destaque */}
-          <div className="md:col-span-4 text-center md:text-left flex flex-col items-center md:items-start justify-center border-b md:border-b-0 md:border-r border-slate-200 pb-6 md:pb-0 md:pr-8">
-            <span className="text-5xl sm:text-6xl font-black text-slate-900 tracking-tight leading-none">
-              {averageRating.toFixed(1)}
-            </span>
-            <div className="flex items-center gap-1 my-3">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <Star
-                  key={star}
-                  className={`size-5 ${
-                    star <= Math.round(averageRating)
-                      ? 'text-amber-400 fill-amber-400'
-                      : 'text-slate-300'
-                  }`}
-                />
-              ))}
-            </div>
-            <p className="text-xs font-bold text-slate-600">
-              {totalReviews === 0
-                ? 'Sem avaliações registradas ainda'
-                : `Baseado em ${totalReviews} ${totalReviews === 1 ? 'avaliação de aluno' : 'avaliações de alunos'}`}
-            </p>
-          </div>
-
-          {/* Barras de Distribuição das Estrelas */}
-          <div className="md:col-span-8 space-y-2.5">
-            {distribution.map(({ star, count, percentage }) => (
-              <div key={star} className="flex items-center gap-3 text-xs font-bold">
-                <span className="w-12 text-slate-600 flex items-center gap-1 justify-end font-mono">
-                  {star} <Star className="size-3 text-amber-500 fill-amber-500 inline" />
+          {/* ── COLUNA DA ESQUERDA: SCORE & BARRAS COMPACTAS (5 COLS) ── */}
+          <div className="lg:col-span-5 bg-white/[0.04] rounded-2xl p-5 border border-white/10 space-y-4">
+            
+            <div className="flex items-center gap-4">
+              <div className="text-center shrink-0">
+                <span className="text-4xl font-black text-white leading-none">
+                  {averageRating.toFixed(1)}
                 </span>
-                <div className="flex-1 h-3 bg-slate-200/80 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full transition-all duration-500"
-                    style={{ width: `${percentage}%` }}
-                  />
-                </div>
-                <span className="w-14 text-slate-500 text-right font-mono text-[11px]">
-                  {count} ({percentage}%)
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* ── FORMULÁRIO DE AVALIAÇÃO (ACCORDION EXPANSÍVEL) ─ */}
-        {isFormOpen && (
-          <div className="bg-gradient-to-br from-blue-50/70 via-indigo-50/40 to-slate-50 rounded-3xl border-2 border-blue-200 p-6 sm:p-8 space-y-6 shadow-inner animate-in fade-in duration-300">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
-                  <PenLine className="size-5 text-blue-600" />
-                  Deixe sua Avaliação e Opinião
-                </h3>
-                <p className="text-xs text-slate-600 font-semibold mt-0.5">
-                  Sua avaliação ajuda outros colegas a escolherem a melhor leitura escolar!
-                </p>
-              </div>
-            </div>
-
-            {successMessage && (
-              <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-black flex items-center gap-3">
-                <CheckCircle2 className="size-5 text-emerald-600 shrink-0" />
-                <span>{successMessage}</span>
-              </div>
-            )}
-
-            {errors.submit && (
-              <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-black flex items-center gap-3">
-                <AlertCircle className="size-5 text-rose-600 shrink-0" />
-                <span>{errors.submit}</span>
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-6">
-              
-              {/* Seletor Interativo de Estrelas */}
-              <div className="space-y-2">
-                <label className="block text-xs font-black uppercase tracking-wider text-slate-700">
-                  Sua Nota para este Livro:
-                </label>
-                <div className="flex flex-wrap items-center gap-3">
-                  <div className="flex items-center gap-1 bg-white px-4 py-2.5 rounded-2xl border border-slate-200 shadow-xs">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <button
-                        key={star}
-                        type="button"
-                        onClick={() => setRating(star)}
-                        onMouseEnter={() => setHoveredStar(star)}
-                        onMouseLeave={() => setHoveredStar(null)}
-                        className="p-1 rounded-lg hover:scale-125 transition-transform cursor-pointer focus:outline-hidden"
-                        aria-label={`Avaliar com ${star} estrelas`}
-                      >
-                        <Star
-                          className={`size-7 transition-colors ${
-                            star <= activeStarRating
-                              ? 'text-amber-400 fill-amber-400 drop-shadow-xs'
-                              : 'text-slate-300'
-                          }`}
-                        />
-                      </button>
-                    ))}
-                  </div>
-
-                  <span className="text-xs font-black px-3 py-1.5 rounded-xl bg-amber-100/70 text-amber-900 border border-amber-200">
-                    {RATING_LABELS[activeStarRating]}
-                  </span>
-                </div>
-              </div>
-
-              {/* Grid: Nome e Turma */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label htmlFor="review-name" className="block text-xs font-black uppercase tracking-wider text-slate-700">
-                    Seu Nome Completo <span className="text-rose-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <User className="size-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                    <input
-                      id="review-name"
-                      type="text"
-                      placeholder="Ex: Mariana Silva"
-                      value={studentName}
-                      onChange={(e) => setStudentName(e.target.value)}
-                      className={`w-full pl-10 pr-4 py-3 bg-white rounded-xl border text-xs sm:text-sm font-semibold text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 transition-all ${
-                        errors.studentName
-                          ? 'border-rose-300 focus:ring-rose-400'
-                          : 'border-slate-200 focus:ring-blue-500'
+                <div className="flex items-center justify-center gap-0.5 mt-1.5">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star
+                      key={star}
+                      className={`size-3.5 ${
+                        star <= Math.round(averageRating)
+                          ? 'text-amber-400 fill-amber-400'
+                          : 'text-white/20'
                       }`}
-                      required
                     />
+                  ))}
+                </div>
+                <span className="text-[10px] font-bold text-blue-200/70 block mt-1">
+                  de 5.0
+                </span>
+              </div>
+
+              {/* Barras de Distribuição das Estrelas */}
+              <div className="flex-1 space-y-1.5 pl-3 border-l border-white/10">
+                {distribution.map(({ star, count, percentage }) => (
+                  <div key={star} className="flex items-center gap-2 text-[11px] font-bold">
+                    <span className="w-6 text-blue-200/70 flex items-center gap-0.5 justify-end font-mono">
+                      {star}★
+                    </span>
+                    <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full transition-all duration-300"
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
+                    <span className="w-5 text-blue-200/50 text-right font-mono text-[10px]">
+                      {count}
+                    </span>
                   </div>
-                  {errors.studentName && (
-                    <p className="text-[11px] font-bold text-rose-600 mt-1">{errors.studentName}</p>
-                  )}
-                </div>
-
-                <div className="space-y-1.5">
-                  <label htmlFor="review-class" className="block text-xs font-black uppercase tracking-wider text-slate-700">
-                    Sua Turma ou Série <span className="text-slate-400 font-normal">(Opcional)</span>
-                  </label>
-                  <div className="relative">
-                    <GraduationCap className="size-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                    <input
-                      id="review-class"
-                      type="text"
-                      placeholder="Ex: 3º B Técnico em Informática"
-                      value={studentClass}
-                      onChange={(e) => setStudentClass(e.target.value)}
-                      className="w-full pl-10 pr-4 py-3 bg-white rounded-xl border border-slate-200 text-xs sm:text-sm font-semibold text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-500 transition-all"
-                    />
-                  </div>
-                </div>
+                ))}
               </div>
-
-              {/* Comentário / Resenha */}
-              <div className="space-y-1.5">
-                <div className="flex justify-between items-center">
-                  <label htmlFor="review-comment" className="block text-xs font-black uppercase tracking-wider text-slate-700">
-                    Sua Opinião sobre o Livro <span className="text-slate-400 font-normal">(Opcional)</span>
-                  </label>
-                  <span className="text-[11px] font-mono text-slate-400">
-                    {comment.length}/1000
-                  </span>
-                </div>
-                <textarea
-                  id="review-comment"
-                  rows={4}
-                  placeholder="Conte o que achou da história, personagens, aprendizados ou por que outros alunos deveriam ler..."
-                  value={comment}
-                  maxLength={1000}
-                  onChange={(e) => setComment(e.target.value)}
-                  className="w-full p-4 bg-white rounded-2xl border border-slate-200 text-xs sm:text-sm font-semibold text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-500 transition-all resize-y"
-                />
-              </div>
-
-              {/* Botão de Envio */}
-              <div className="flex items-center justify-end gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setIsFormOpen(false)}
-                  className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 font-black text-xs transition-colors cursor-pointer"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="inline-flex items-center gap-2 px-7 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-black text-xs sm:text-sm transition-all shadow-md hover:shadow-lg cursor-pointer"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="size-4 animate-spin" />
-                      <span>Publicando...</span>
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircle2 className="size-4" />
-                      <span>Publicar Avaliação</span>
-                    </>
-                  )}
-                </button>
-              </div>
-
-            </form>
-          </div>
-        )}
-
-        {/* ── LISTAGEM DAS AVALIAÇÕES EXISTENTES ───────────── */}
-        <div className="space-y-4">
-          <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
-            <MessageSquare className="size-4 text-blue-600" />
-            Opiniões dos Alunos ({totalReviews})
-          </h3>
-
-          {totalReviews === 0 ? (
-            <div className="text-center py-12 px-6 rounded-3xl bg-slate-50 border border-dashed border-slate-200 space-y-3">
-              <div className="size-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto">
-                <Star className="size-6 text-amber-500 fill-amber-500" />
-              </div>
-              <h4 className="text-base font-black text-slate-800">
-                Ainda não há avaliações para este livro
-              </h4>
-              <p className="text-xs text-slate-500 max-w-md mx-auto font-medium">
-                Você já leu esta obra? Seja o primeiro aluno a avaliar e ajude a guiar seus colegas em novas leituras!
-              </p>
-              <button
-                type="button"
-                onClick={() => setIsFormOpen(true)}
-                className="mt-2 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-black transition-all shadow-sm cursor-pointer"
-              >
-                <PenLine className="size-3.5" />
-                <span>Avaliar agora</span>
-              </button>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-4">
-              {reviews.map((rev) => {
-                const dateStr = new Date(rev.createdAt).toLocaleDateString('pt-BR', {
-                  day: '2-digit',
-                  month: 'short',
-                  year: 'numeric',
-                });
 
-                // Initials for avatar
-                const initials = rev.studentName
-                  .split(' ')
-                  .filter(Boolean)
-                  .slice(0, 2)
-                  .map((p) => p[0].toUpperCase())
-                  .join('');
+            <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[11px] font-semibold text-blue-200/60">
+              <span className="flex items-center gap-1">
+                <Sparkles className="size-3 text-amber-400" />
+                Avaliações escolares
+              </span>
+              <span>Laurentino Martins</span>
+            </div>
+          </div>
 
-                return (
-                  <div
-                    key={rev.id}
-                    className="p-5 sm:p-6 rounded-2xl bg-slate-50/70 border border-slate-200/80 hover:border-blue-200 transition-all space-y-3"
+          {/* ── COLUNA DA DIREITA: FORMULÁRIO OU LISTA DE RESENHAS (7 COLS) ── */}
+          <div className="lg:col-span-7 space-y-4">
+            
+            {/* Formulário Interativo Inline quando aberto */}
+            {isFormOpen ? (
+              <div className="bg-white/[0.06] rounded-2xl border border-white/20 p-5 space-y-4 shadow-xl animate-in fade-in duration-200">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs font-black uppercase tracking-wider text-white flex items-center gap-1.5">
+                    <PenLine className="size-3.5 text-blue-300" />
+                    Sua Avaliação para &ldquo;{bookTitle}&rdquo;
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => setIsFormOpen(false)}
+                    className="text-white/60 hover:text-white p-1 cursor-pointer"
                   >
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-                      <div className="flex items-center gap-3">
-                        <div className="size-10 rounded-xl bg-gradient-to-br from-blue-700 to-indigo-900 text-white flex items-center justify-center font-black text-xs shadow-xs">
-                          {initials || 'AL'}
-                        </div>
-                        <div>
-                          <p className="text-sm font-black text-slate-900 leading-tight">
-                            {rev.studentName}
-                          </p>
-                          <div className="flex items-center gap-2 mt-0.5">
-                            {rev.studentClass && (
-                              <span className="text-[11px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100">
-                                {rev.studentClass}
+                    <X className="size-4" />
+                  </button>
+                </div>
+
+                {successMessage && (
+                  <div className="p-3 rounded-xl bg-emerald-500/20 border border-emerald-400/40 text-emerald-200 text-xs font-bold flex items-center gap-2">
+                    <CheckCircle2 className="size-4 text-emerald-400 shrink-0" />
+                    <span>{successMessage}</span>
+                  </div>
+                )}
+
+                {errors.submit && (
+                  <div className="p-3 rounded-xl bg-rose-500/20 border border-rose-400/40 text-rose-200 text-xs font-bold flex items-center gap-2">
+                    <AlertCircle className="size-4 text-rose-400 shrink-0" />
+                    <span>{errors.submit}</span>
+                  </div>
+                )}
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  {/* Seletor de Estrelas */}
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1 bg-white/10 px-3 py-1.5 rounded-xl border border-white/15">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          type="button"
+                          onClick={() => setRating(star)}
+                          onMouseEnter={() => setHoveredStar(star)}
+                          onMouseLeave={() => setHoveredStar(null)}
+                          className="p-0.5 rounded-md hover:scale-120 transition-transform cursor-pointer"
+                        >
+                          <Star
+                            className={`size-5 transition-colors ${
+                              star <= activeStarRating
+                                ? 'text-amber-400 fill-amber-400'
+                                : 'text-white/30'
+                            }`}
+                          />
+                        </button>
+                      ))}
+                    </div>
+
+                    <span className="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                      {RATING_LABELS[activeStarRating]}
+                    </span>
+                  </div>
+
+                  {/* Nome e Turma */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <input
+                        type="text"
+                        placeholder="Seu Nome Completo *"
+                        value={studentName}
+                        onChange={(e) => setStudentName(e.target.value)}
+                        className={`w-full px-3 py-2 bg-white/10 rounded-xl border text-xs font-semibold text-white placeholder-blue-200/50 focus:outline-hidden focus:ring-2 transition-all ${
+                          errors.studentName
+                            ? 'border-rose-400 focus:ring-rose-400'
+                            : 'border-white/20 focus:ring-blue-400'
+                        }`}
+                        required
+                      />
+                      {errors.studentName && (
+                        <p className="text-[10px] font-bold text-rose-300 mt-1">{errors.studentName}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <input
+                        type="text"
+                        placeholder="Turma/Série (Ex: 3º A)"
+                        value={studentClass}
+                        onChange={(e) => setStudentClass(e.target.value)}
+                        className="w-full px-3 py-2 bg-white/10 rounded-xl border border-white/20 text-xs font-semibold text-white placeholder-blue-200/50 focus:outline-hidden focus:ring-2 focus:ring-blue-400 transition-all"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Comentário */}
+                  <div>
+                    <textarea
+                      rows={2}
+                      placeholder="Deixe uma breve opinião sobre o livro (opcional)..."
+                      value={comment}
+                      maxLength={1000}
+                      onChange={(e) => setComment(e.target.value)}
+                      className="w-full p-3 bg-white/10 rounded-xl border border-white/20 text-xs font-semibold text-white placeholder-blue-200/50 focus:outline-hidden focus:ring-2 focus:ring-blue-400 transition-all resize-y"
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-end gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => setIsFormOpen(false)}
+                      className="px-3.5 py-1.5 rounded-lg border border-white/20 text-blue-200 hover:bg-white/10 font-bold text-xs transition-colors cursor-pointer"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:opacity-60 text-white font-bold text-xs transition-all shadow-md cursor-pointer border border-blue-400/30"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="size-3.5 animate-spin" />
+                          <span>Enviando...</span>
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle2 className="size-3.5" />
+                          <span>Publicar</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            ) : null}
+
+            {/* Lista das Avaliações dos Alunos */}
+            <div className="space-y-3">
+              {totalReviews === 0 ? (
+                <div className="text-center py-6 px-4 rounded-2xl bg-white/[0.03] border border-dashed border-white/15 space-y-2">
+                  <Star className="size-5 text-amber-400 fill-amber-400 mx-auto" />
+                  <p className="text-xs font-bold text-white">
+                    Nenhuma avaliação ainda para este livro.
+                  </p>
+                  <p className="text-[11px] text-blue-200/70 font-medium">
+                    Seja o primeiro a compartilhar sua experiência de leitura!
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setIsFormOpen(true)}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold transition-all cursor-pointer mt-1"
+                  >
+                    <PenLine className="size-3" />
+                    <span>Avaliar agora</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-2.5 max-h-[300px] overflow-y-auto pr-1">
+                  {reviews.map((rev) => {
+                    const dateStr = new Date(rev.createdAt).toLocaleDateString('pt-BR', {
+                      day: '2-digit',
+                      month: 'short',
+                    });
+
+                    const initials = rev.studentName
+                      .split(' ')
+                      .filter(Boolean)
+                      .slice(0, 2)
+                      .map((p) => p[0].toUpperCase())
+                      .join('');
+
+                    return (
+                      <div
+                        key={rev.id}
+                        className="p-3.5 rounded-xl bg-white/[0.04] border border-white/10 hover:border-white/20 transition-all space-y-1.5"
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2">
+                            <div className="size-7 rounded-lg bg-blue-600 text-white flex items-center justify-center font-black text-[10px] border border-blue-400/30">
+                              {initials || 'AL'}
+                            </div>
+                            <div>
+                              <span className="text-xs font-black text-white leading-none block">
+                                {rev.studentName}
                               </span>
-                            )}
-                            <span className="text-[11px] font-semibold text-slate-400">
-                              {dateStr}
+                              <div className="flex items-center gap-1.5 text-[10px] text-blue-200/60 mt-0.5">
+                                {rev.studentClass && (
+                                  <span className="font-bold text-blue-200 bg-blue-500/20 px-1.5 py-0.2 rounded border border-blue-400/30">
+                                    {rev.studentClass}
+                                  </span>
+                                )}
+                                <span>{dateStr}</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-0.5 bg-white/10 px-2 py-1 rounded-lg border border-white/15 shrink-0">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <Star
+                                key={star}
+                                className={`size-3 ${
+                                  star <= rev.rating
+                                  ? 'text-amber-400 fill-amber-400'
+                                  : 'text-white/20'
+                                }`}
+                              />
+                            ))}
+                            <span className="text-[11px] font-black text-white ml-1">
+                              {rev.rating}.0
                             </span>
                           </div>
                         </div>
-                      </div>
 
-                      {/* Estrelas da avaliação individual */}
-                      <div className="flex items-center gap-1 bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-2xs">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <Star
-                            key={star}
-                            className={`size-3.5 ${
-                              star <= rev.rating
-                                ? 'text-amber-400 fill-amber-400'
-                                : 'text-slate-200'
-                            }`}
-                          />
-                        ))}
-                        <span className="text-xs font-black text-slate-700 ml-1">
-                          {rev.rating}.0
-                        </span>
+                        {rev.comment && (
+                          <p className="text-xs text-blue-100 font-medium italic pt-1 pl-2 border-l-2 border-blue-400/40">
+                            &ldquo;{rev.comment}&rdquo;
+                          </p>
+                        )}
                       </div>
-                    </div>
-
-                    {/* Comentário */}
-                    {rev.comment && (
-                      <div className="pt-1 text-xs sm:text-sm text-slate-700 leading-relaxed font-medium bg-white/60 p-3.5 rounded-xl border border-slate-100 flex items-start gap-2.5">
-                        <Quote className="size-4 text-blue-400 shrink-0 mt-0.5 rotate-180 opacity-60" />
-                        <p className="whitespace-pre-line italic">&ldquo;{rev.comment}&rdquo;</p>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+                    );
+                  })}
+                </div>
+              )}
             </div>
-          )}
+
+          </div>
         </div>
 
       </div>

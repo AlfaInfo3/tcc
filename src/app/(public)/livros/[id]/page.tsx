@@ -42,21 +42,33 @@ async function getBook(bookId: string) {
 }
 
 async function getRelatedBooks(currentBookId: string, genres: string[]) {
-  if (!genres || genres.length === 0) {
-    return prisma.book.findMany({
-      where: { id: { not: currentBookId } },
+  // 1. Busca primeiro por obras do mesmo gênero
+  let related: any[] = [];
+  if (genres && genres.length > 0) {
+    related = await prisma.book.findMany({
+      where: {
+        id: { not: currentBookId },
+        genres: { hasSome: genres },
+      },
       orderBy: { createdAt: 'desc' },
       take: 4,
     });
   }
-  return prisma.book.findMany({
-    where: {
-      id: { not: currentBookId },
-      genres: { hasSome: genres },
-    },
-    orderBy: { createdAt: 'desc' },
-    take: 4,
-  });
+
+  // 2. Se encontrar menos de 4, complementa com outros livros do acervo escolar
+  if (related.length < 4) {
+    const existingIds = [currentBookId, ...related.map((b) => b.id)];
+    const additional = await prisma.book.findMany({
+      where: {
+        id: { notIn: existingIds },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 4 - related.length,
+    });
+    related = [...related, ...additional];
+  }
+
+  return related;
 }
 
 export default async function BookDetailPage({
@@ -407,31 +419,37 @@ export default async function BookDetailPage({
         initialReviews={serializedReviews}
       />
 
-      {/* ── SEÇÃO: OUTRAS OBRAS RECOMENDADAS DO ACERVO ───────── */}
+      {/* ── SEÇÃO: SUGESTÕES DE LIVROS & OUTRAS OBRAS DO ACERVO ───────── */}
       {relatedBooks && relatedBooks.length > 0 && (
-        <section className="container mx-auto px-4 sm:px-6 lg:px-12 max-w-6xl mt-14">
-          <div className="flex items-center justify-between mb-6 pb-3 border-b border-white/15">
+        <section className="container mx-auto px-4 sm:px-6 lg:px-12 max-w-6xl mt-12">
+          <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-white/15 mb-6">
             <div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-200 text-[11px] font-black uppercase tracking-wider mb-1.5">
+                <BookOpen className="size-3.5 text-blue-300" />
+                Sugestões da Biblioteca
+              </div>
               <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
                 Outras Obras do Acervo
               </h2>
-              <p className="text-xs sm:text-sm text-blue-200 font-bold mt-0.5">
-                Explore mais títulos disponíveis na biblioteca do colégio
+              <p className="text-xs sm:text-sm text-blue-200/80 font-medium mt-0.5">
+                Explore mais títulos disponíveis para empréstimo e reserva no Laurentino Martins
               </p>
             </div>
 
             <Link
               href="/livros"
-              className="text-xs font-black text-blue-300 hover:text-white transition-colors inline-flex items-center gap-1"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black text-white bg-white/10 hover:bg-white/20 border border-white/20 transition-all shadow-sm"
             >
-              Ver todas as obras →
+              <span>Ver todo o catálogo</span>
+              <span>→</span>
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 items-stretch pt-2">
             {relatedBooks.map((relBook) => (
               <BookCard
                 key={relBook.id}
+                dark={true}
                 book={{
                   id: relBook.id,
                   title: relBook.title,

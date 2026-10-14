@@ -11,9 +11,10 @@ interface BookCardProps {
   book: Omit<Book, 'id'> & { id: string | number };
   onReserve?: (bookId: string | number) => void;
   adminMode?: boolean;
+  dark?: boolean;
 }
 
-export function BookCard({ book, onReserve, adminMode }: BookCardProps) {
+export function BookCard({ book, onReserve, adminMode, dark = false }: BookCardProps) {
   const router = useRouter();
   const [isNavigating, setIsNavigating] = useState(false);
   const isAvailable = book.quantity > 0;
@@ -73,10 +74,14 @@ export function BookCard({ book, onReserve, adminMode }: BookCardProps) {
       </Link>
 
       <div className="mt-3 w-full max-w-[140px] sm:max-w-[160px] flex flex-col flex-1 text-center">
-        <h3 className="font-bold text-xs sm:text-sm leading-snug line-clamp-2 text-slate-800 h-9 sm:h-10 flex items-center justify-center mb-1" title={book.title}>
+        <h3 className={`font-bold text-xs sm:text-sm leading-snug line-clamp-2 h-9 sm:h-10 flex items-center justify-center mb-1 ${
+          dark ? 'text-white' : 'text-slate-800'
+        }`} title={book.title}>
           {book.title}
         </h3>
-        <p className="text-[11px] sm:text-xs text-slate-500 truncate mb-1.5 font-medium">
+        <p className={`text-[11px] sm:text-xs truncate mb-1.5 font-medium ${
+          dark ? 'text-blue-200' : 'text-slate-500'
+        }`}>
           {book.author || 'Autor não informado'}
         </p>
 
