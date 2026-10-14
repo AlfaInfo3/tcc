@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { cookies } from 'next/headers';
+import { createSignedSessionToken } from '@/lib/security';
 
 export async function POST(req: Request) {
   try {
@@ -25,23 +26,19 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Usuário ou senha inválidos' }, { status: 401 });
     }
 
-    // Set Cookie
-    // In a real app we'd use a JWT signature. For this MVP we'll just store the ID signed/hashed or just the ID if it's internal.
-    // Let's store `student_session=profileId`
-    // Security Note: This is weak, but fits "Simplicidade" requirement for MVP without heavy auth lib.
-    // For "Top Solution" I should really sign it. 
-    // I will assume `jose` is not installed, so I'll just clear text for now or simple hash.
-    // Ideally I'd use `NextAuth` but that's a big dep.
-    
+    // Gera token de sessão assinado criptograficamente
+    const sessionToken = createSignedSessionToken(profile.id, 'student', 60 * 60 * 24 * 7);
+
     const cookieStore = await cookies();
-    cookieStore.set('student_session', profile.id, {
+    cookieStore.set('student_session', sessionToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
         maxAge: 60 * 60 * 24 * 7, // 1 week
         path: '/'
     });
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, token: sessionToken });
 
   } catch (error) {
     console.error(error);

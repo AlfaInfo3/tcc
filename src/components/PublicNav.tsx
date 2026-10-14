@@ -1,6 +1,5 @@
 "use client";
 
-import { Icon } from "@iconify/react";
 import CardNav from "@/components/CardNav";
 
 const publicItems = [
@@ -19,7 +18,8 @@ const publicItems = [
     textColor: "#ffffff",
     links: [
       { label: "Ensino", href: "/#ensino", ariaLabel: "Ensino" },
-      { label: "Turmas", href: "/#turmas", ariaLabel: "Turmas" }
+      { label: "Turmas", href: "/#turmas", ariaLabel: "Turmas" },
+      { label: "Matrículas", href: "/matriculas", ariaLabel: "Matrículas" }
     ]
   },
   {
@@ -28,8 +28,7 @@ const publicItems = [
     textColor: "#451a03",
     links: [
       { label: "Catálogo de Livros", href: "/livros", ariaLabel: "Catálogo de Livros" },
-      { label: "Contato", href: "/contato", ariaLabel: "Fale Conosco" },
-      { label: "Área do Aluno", href: "/aluno", ariaLabel: "Portal do Aluno" }
+      { label: "Contato", href: "/contato", ariaLabel: "Fale Conosco" }
     ]
   }
 ];
@@ -41,7 +40,7 @@ export function PublicNav() {
         <CardNav 
           logo={
             <div className="flex items-center justify-center p-2">
-               <img src="/logo/LaurentãoLogo.svg" alt="Logo Laurentino" className="h-14 md:h-16 w-auto" />
+               <img src="/logo/laurentao-logo.svg" alt="Logo Laurentino" className="h-14 md:h-16 w-auto" />
              </div>
           }
           items={publicItems}

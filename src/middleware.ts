@@ -1,18 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  // Verifica se o caminho atual é uma rota administrativa (mas não as páginas de autenticação)
-  const isAdminPath = request.nextUrl.pathname.startsWith('/admin/') &&
-                     !request.nextUrl.pathname.startsWith('/admin/auth') &&
-                     request.nextUrl.pathname !== '/admin/auth' &&
-                     request.nextUrl.pathname !== '/admin' &&
-                     !request.nextUrl.pathname.startsWith('/api/');
+  const { pathname } = request.nextUrl;
 
-  if (isAdminPath) {
-    // Verifica se o usuário está autenticado como administrador
+  // 1. Proteger rotas de API Administrativa (/api/admin/*)
+  if (pathname.startsWith('/api/admin/') && !pathname.startsWith('/api/admin/auth')) {
+    const token = request.cookies.get('admin_token')?.value || 
+                  request.headers.get('authorization')?.replace('Bearer ', '');
+    if (!token) {
+      return NextResponse.json(
+        { success: false, error: 'Acesso não autorizado' },
+        { status: 401 }
+      );
+    }
+  }
+
+  // 2. Proteger páginas administrativas (/admin, /admin/* exceto /admin/auth)
+  const isAdminPage = (pathname === '/admin' || pathname.startsWith('/admin/')) &&
+                      !pathname.startsWith('/admin/auth');
+
+  if (isAdminPage) {
     const token = request.cookies.get('admin_token')?.value;
 
-    // Se não houver token e não estivermos na página de autenticação, redireciona para login
     if (!token) {
       return NextResponse.redirect(new URL('/admin/auth', request.url));
     }
@@ -21,16 +30,9 @@ export function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 
-// Especifica os caminhos para os quais o middleware deve ser executado
+// Executar em todas as rotas exceto arquivos estáticos e favicon
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
 };

@@ -1,18 +1,26 @@
 import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { verifySignedSessionToken } from '@/lib/security';
 
 export async function GET(req: Request) {
   try {
     const cookieStore = await cookies();
-    const sessionId = cookieStore.get('student_session')?.value;
+    const sessionToken = cookieStore.get('student_session')?.value;
 
-    if (!sessionId) {
+    if (!sessionToken) {
         return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
     }
 
+    const verification = verifySignedSessionToken(sessionToken, 'student');
+    const profileId = verification.valid && verification.payload ? verification.payload.sub : null;
+
+    if (!profileId) {
+        return NextResponse.json({ error: 'Sessão inválida ou expirada' }, { status: 401 });
+    }
+
     const profile = await prisma.studentProfile.findUnique({
-        where: { id: sessionId },
+        where: { id: profileId },
         include: {
             badges: { include: { badge: true } },
             student: {

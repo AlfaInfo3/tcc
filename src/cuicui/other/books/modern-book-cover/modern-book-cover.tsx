@@ -2,15 +2,36 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 const radiusMap = {
-  sm: "rounded-md",
-  md: "rounded-lg",
-  lg: "rounded-xl",
+  sm: "rounded-l-none rounded-r-[3px]",
+  md: "rounded-l-none rounded-r-[4px]",
+  lg: "rounded-l-none rounded-r-[5px]",
 };
 
-const sizeMap = {
-  sm: { width: "140px", spineTranslation: "122px" },
-  md: { width: "160px", spineTranslation: "142px" },
-  lg: { width: "220px", spineTranslation: "202px" },
+const sizeConfig = {
+  sm: { 
+    width: "135px", 
+    thickness: 20, 
+    halfThickness: 10, 
+    pagesWidth: 18, 
+    pagesLeft: "calc(100% - 14px)",
+    spineLeft: "-10px",
+  },
+  md: { 
+    width: "160px", 
+    thickness: 24, 
+    halfThickness: 12, 
+    pagesWidth: 22, 
+    pagesLeft: "calc(100% - 16px)",
+    spineLeft: "-12px",
+  },
+  lg: { 
+    width: "220px", 
+    thickness: 30, 
+    halfThickness: 15, 
+    pagesWidth: 28, 
+    pagesLeft: "calc(100% - 20px)",
+    spineLeft: "-15px",
+  },
 };
 
 const colorMap = {
@@ -60,83 +81,110 @@ export const ModernBookCover = ({
   forceRotate = false,
 }: BookProps) => {
   const gradient = colorMap[color] || colorMap.zinc;
+  const cfg = sizeConfig[size] || sizeConfig.md;
 
   return (
     <div
       className={cn(
-        `z-20 group [perspective:800px] w-min [--shadowColor:#bbb] dark:[--shadowColor:#111]`,
+        `z-20 group [perspective:900px] w-min select-none`,
         className
       )}
     >
       <div
         style={{
-          width: sizeMap[size].width,
-          transition: "transform 400ms ease",
+          width: cfg.width,
+          transition: "transform 400ms cubic-bezier(0.16, 1, 0.3, 1)",
+          transformOrigin: "center center",
         }}
         className={`relative [transform-style:preserve-3d] ${
           isStatic || forceRotate
-            ? "[transform:rotateY(-30deg)]"
-            : "[transform:rotateY(0deg)] group-hover:[transform:rotateY(-30deg)] group-active:[transform:rotateY(-30deg)] group-focus-within:[transform:rotateY(-30deg)]"
+            ? "[transform:rotateY(-28deg)]"
+            : "[transform:rotateY(0deg)] group-hover:[transform:rotateY(-28deg)] group-hover/card:[transform:rotateY(-28deg)] group-active:[transform:rotateY(-28deg)] group-focus-within:[transform:rotateY(-28deg)]"
         } aspect-3/4 ${radiusMap[radius]}`}
       >
-        {/* Front Side */}
+        {/* 1. FRONT COVER */}
         <div
           className={cn(
-            "absolute inset-y-0 overflow-hidden size-full left-0 text-white flex flex-col justify-end p-6",
-            `bg-linear-to-tr ${gradient.from} ${gradient.to}`,
+            "absolute inset-0 size-full text-white flex flex-col justify-end p-5 overflow-hidden",
+            `bg-gradient-to-tr ${gradient.from} ${gradient.to}`,
             radiusMap[radius]
           )}
           style={{
-            transform: "translateZ(25px)",
-            boxShadow: "5px 5px 20px var(--shadowColor)",
-            border: "1px solid rgba(255,255,255,0.1)" // Rebarba fix
+            transform: `translateZ(${cfg.halfThickness}px)`,
+            boxShadow: "0 10px 24px -4px rgba(0, 0, 0, 0.55), 0 4px 6px -2px rgba(0, 0, 0, 0.35)",
           }}
         >
-            {coverImage ? (
-                <div className="absolute inset-0 z-1">
-                    <img src={coverImage} alt="Cover" className="w-full h-full object-fill rounded-[inherit]" />
-                    <div className="absolute inset-0 bg-gradient-to-r from-black/20 via-transparent to-transparent opacity-40" />
-                    <div className="absolute inset-0 bg-gradient-to-tr from-white/10 via-transparent to-transparent opacity-20" />
-                </div>
-            ) : (
-                <>
-                  <div
-                    className="absolute left-0 top-0 h-full w-full z-0"
-                    style={{
-                      minWidth: "8.2%", // Match user code
-                      background:
-                        "linear-gradient(90deg, hsla(0, 0%, 100%, 0), hsla(0, 0%, 100%, 0) 12%, hsla(0, 0%, 100%, .25) 29.25%, hsla(0, 0%, 100%, 0) 50.5%, hsla(0, 0%, 100%, 0) 75.25%, hsla(0, 0%, 100%, .25) 91%, hsla(0, 0%, 100%, 0)), linear-gradient(90deg, rgba(0, 0, 0, .03), rgba(0, 0, 0, .1) 12%, transparent 30%, rgba(0, 0, 0, .02) 50%, rgba(0, 0, 0, .2) 73.5%, rgba(0, 0, 0, .5) 75.25%, rgba(0, 0, 0, .15) 85.25%, transparent)",
-                      opacity: 0.2,
-                    }}
-                  />
-                  <div className="relative z-10 pl-1">{children}</div>
-                </>
-            )}
+          {coverImage ? (
+            <div className="absolute inset-0 z-1">
+              <img
+                src={coverImage}
+                alt="Cover"
+                className="w-full h-full object-fill rounded-[inherit]"
+              />
+              {/* Realistic Spine Hinge / Crease along left edge */}
+              <div 
+                className="absolute inset-y-0 left-0 w-3 pointer-events-none z-10"
+                style={{
+                  background: "linear-gradient(to right, rgba(0,0,0,0.32) 0%, rgba(0,0,0,0.08) 35%, rgba(255,255,255,0.12) 60%, transparent 100%)",
+                }}
+              />
+              {/* Soft lighting depth */}
+              <div className="absolute inset-0 bg-gradient-to-r from-black/20 via-transparent to-transparent opacity-40 pointer-events-none" />
+            </div>
+          ) : (
+            <>
+              <div
+                className="absolute left-0 top-0 h-full w-full z-0"
+                style={{
+                  minWidth: "8.2%",
+                  background:
+                    "linear-gradient(90deg, hsla(0, 0%, 100%, 0), hsla(0, 0%, 100%, 0) 12%, hsla(0, 0%, 100%, .25) 29.25%, hsla(0, 0%, 100%, 0) 50.5%, hsla(0, 0%, 100%, 0) 75.25%, hsla(0, 0%, 100%, .25) 91%, hsla(0, 0%, 100%, 0)), linear-gradient(90deg, rgba(0, 0, 0, .03), rgba(0, 0, 0, .1) 12%, transparent 30%, rgba(0, 0, 0, .02) 50%, rgba(0, 0, 0, .2) 73.5%, rgba(0, 0, 0, .5) 75.25%, rgba(0, 0, 0, .15) 85.25%, transparent)",
+                  opacity: 0.2,
+                }}
+              />
+              <div className="relative z-10 pl-1">{children}</div>
+            </>
+          )}
         </div>
 
-        {/* Spine */}
+        {/* 2. LEFT SPINE (LOMBADA) - Closes left hinge in 3D */}
         <div
-          className="absolute right-31 bg-white"
+          className="absolute inset-y-0 select-none pointer-events-none"
           style={{
-            top: "3px",
-            bottom: "3px",
-            width: "48px",
-            transform: `translateX(${sizeMap[size].spineTranslation}) rotateY(90deg)`,
-            background:
-              "linear-gradient(90deg, rgba(255,255,255,1) 50%, rgba(249,249,249,1) 50%)",
+            left: cfg.spineLeft,
+            width: `${cfg.thickness}px`,
+            transform: "rotateY(-90deg)",
+            transformOrigin: "center center",
+            background: "linear-gradient(90deg, #090e1a 0%, #1e293b 50%, #090e1a 100%)",
           }}
         />
 
-        {/* Back Side */}
+        {/* 3. RIGHT PAGES BLOCK (MIOLO DE PÁGINAS) - Recessed authentic paper block */}
+        <div
+          className="absolute select-none pointer-events-none overflow-hidden"
+          style={{
+            top: "3px",
+            bottom: "3px",
+            width: `${cfg.pagesWidth}px`,
+            left: cfg.pagesLeft,
+            transform: "rotateY(90deg)",
+            transformOrigin: "center center",
+            background: "repeating-linear-gradient(to bottom, #fcf9f2 0px, #fcf9f2 1.5px, #ebe3d3 1.5px, #ebe3d3 3px)",
+            boxShadow: "inset 2px 0 4px rgba(0,0,0,0.18), inset -2px 0 4px rgba(0,0,0,0.18)",
+            borderRadius: "1px",
+          }}
+        />
+
+        {/* 4. BACK COVER (CONTRACAPA) - Solid backing matching the book */}
         <div
           className={cn(
-             "absolute inset-y-0 overflow-hidden size-full left-0 text-white flex flex-col justify-end p-6",
-             `bg-linear-to-tr ${gradient.from} ${gradient.to}`,
-             radiusMap[radius]
+            "absolute inset-0 size-full text-white flex flex-col justify-end p-5 overflow-hidden",
+            `bg-gradient-to-tr ${gradient.from} ${gradient.to}`,
+            radiusMap[radius]
           )}
           style={{
-            transform: "translateZ(-25px)",
-            boxShadow: "-10px 0 50px 10px var(--shadowColor)",
+            transform: `translateZ(-${cfg.halfThickness}px)`,
+            boxShadow: "-12px 10px 24px rgba(0, 0, 0, 0.65)",
           }}
         />
       </div>

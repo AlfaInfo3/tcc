@@ -4,10 +4,10 @@ import bcrypt from 'bcrypt';
 const prisma = new PrismaClient();
 
 async function main() {
-  const email = 'admin@escola.com';
-  const password = 'admin'; // Senha simples para teste
+  const email = process.env.ADMIN_EMAIL || 'admin@admin.com';
+  const password = process.env.ADMIN_PASSWORD || 'admin';
   
-  console.log(`Resetando senha para usuário: ${email}`);
+  console.log(`Configurando credenciais do administrador para: ${email}`);
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -19,21 +19,19 @@ async function main() {
     },
     create: {
       email,
-      name: 'Administrador',
+      name: 'Administrador Laurentino',
       password: hashedPassword,
       role: 'super_admin',
       isActive: true
     }
   });
 
-  console.log('Sucesso! Use:');
-  console.log(`Email: ${email}`);
-  console.log(`Senha: ${password}`);
+  console.log(`Usuário administrador configurado com sucesso! ID: ${user.id}`);
 }
 
 main()
   .catch((e) => {
-    console.error(e);
+    console.error('Erro ao configurar administrador:', e);
     process.exit(1);
   })
   .finally(async () => {

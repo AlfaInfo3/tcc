@@ -1,25 +1,57 @@
 // src/app/(public)/livros/[id]/page.tsx
 import { ReserveForm } from '@/components/ReserveForm';
 import { prisma } from '@/lib/prisma';
-import { Icon } from '@iconify/react';
+import Link from 'next/link';
+import { BookCard } from '@/components/books/book-card';
+import { 
+  ArrowLeft, 
+  BookOpen, 
+  Calendar, 
+  Library, 
+  Layers, 
+  CheckCircle2, 
+  AlertCircle, 
+  Bookmark,
+  Share2,
+  BookMarked,
+  Sparkles,
+  Home
+} from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
 async function getBook(bookId: string) {
-  return prisma.book.findUnique({ where: { id: bookId } });
+  const book = await prisma.book.findUnique({
+    where: { id: bookId },
+    include: {
+      loans: {
+        where: { status: 'active' }
+      },
+      reservations: {
+        where: { status: 'reserved' }
+      }
+    }
+  });
+
+  return book;
 }
 
-async function translateToPt(text: string): Promise<string> {
-  if (!text) return text;
-  try {
-    const res = await fetch(
-      `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=pt&dt=t&q=${encodeURIComponent(text)}`
-    );
-    const data = await res.json();
-    return data[0].map((item: any) => item[0]).join('');
-  } catch {
-    return text;
+async function getRelatedBooks(currentBookId: string, genres: string[]) {
+  if (!genres || genres.length === 0) {
+    return prisma.book.findMany({
+      where: { id: { not: currentBookId } },
+      orderBy: { createdAt: 'desc' },
+      take: 4,
+    });
   }
+  return prisma.book.findMany({
+    where: {
+      id: { not: currentBookId },
+      genres: { hasSome: genres },
+    },
+    orderBy: { createdAt: 'desc' },
+    take: 4,
+  });
 }
 
 export default async function BookDetailPage({
@@ -32,161 +64,322 @@ export default async function BookDetailPage({
 
   if (!book) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="text-center space-y-4">
-          <div className="size-20 rounded-full bg-slate-100 flex items-center justify-center mx-auto">
-            <Icon icon="solar:book-broken" className="size-10 text-slate-400" />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#060F33] via-[#0B1B5C] to-[#040924] px-4 py-20 font-['Quicksand',sans-serif]">
+        <div className="text-center max-w-md bg-white/95 backdrop-blur-md p-8 rounded-3xl border border-white/20 shadow-2xl space-y-5 text-slate-800">
+          <div className="size-16 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto shadow-inner">
+            <BookOpen className="size-8" />
           </div>
-          <h1 className="text-2xl font-black text-slate-800">Livro não encontrado</h1>
-          <a
+          <div className="space-y-2">
+            <h1 className="text-2xl font-black text-slate-900">Livro não encontrado</h1>
+            <p className="text-sm text-slate-600">
+              O título solicitado não foi localizado em nosso acervo ou pode ter sido desativado temporariamente.
+            </p>
+          </div>
+          <Link
             href="/livros"
-            className="inline-flex items-center gap-2 text-[#1e40af] font-bold hover:underline"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black text-xs transition-all shadow-md hover:shadow-lg"
           >
-            <Icon icon="solar:arrow-left-linear" className="size-4" />
-            Voltar ao catálogo
-          </a>
+            <ArrowLeft className="size-4" />
+            Voltar ao Catálogo
+          </Link>
         </div>
       </div>
     );
   }
 
-  const translatedTitle = await translateToPt(book.title);
-  const translatedDesc = book.description ? await translateToPt(book.description) : null;
-  const isAvailable = book.quantity > 0;
+  // Calculate copies available (subtract active loans and active reservations)
+  const activeLoansCount = book.loans ? book.loans.length : 0;
+  const activeResCount = (book as any).reservations ? (book as any).reservations.length : 0;
+  const availableCopies = Math.max(0, book.quantity - activeLoansCount - activeResCount);
+  const isAvailable = availableCopies > 0;
+
+  // Related books
+  const relatedBooks = await getRelatedBooks(book.id, book.genres);
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans">
-      {/* ── HERO BACKGROUND ─────────────────────────────────────── */}
-      <div className="relative overflow-hidden bg-[#1e40af] pt-32 pb-44 sm:pt-40 sm:pb-48">
-        {/* blurred cover backdrop */}
-        {book.coverUrl && (
-          <img
-            src={book.coverUrl}
-            alt=""
-            aria-hidden
-            className="absolute inset-0 w-full h-full object-cover opacity-20 blur-2xl scale-110"
-          />
-        )}
-        <div className="absolute inset-0 bg-linear-to-b from-blue-950/80 to-blue-900/95" />
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-linear-to-t from-slate-50 to-transparent z-10" />
+    <div className="min-h-screen bg-gradient-to-br from-[#060F33] via-[#0B1B5C] to-[#040924] font-['Quicksand',sans-serif] text-slate-800 pt-8 sm:pt-12 pb-24 antialiased">
+      
+      {/* ── BREADCRUMB & VOLTAR ─────────────────────────────── */}
+      <div className="container mx-auto px-4 sm:px-6 lg:px-12 max-w-6xl mb-6">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs font-bold text-blue-200">
+            <Link href="/" className="hover:text-white transition-colors flex items-center gap-1">
+              <Home size={13} />
+              <span>Início</span>
+            </Link>
+            <span className="text-blue-400">/</span>
+            <Link href="/livros" className="hover:text-white transition-colors">
+              Acervo de Livros
+            </Link>
+            <span className="text-blue-400">/</span>
+            <span className="text-white font-black truncate max-w-[200px] sm:max-w-xs">
+              {book.title}
+            </span>
+          </nav>
 
-        {/* Back link */}
-        <div className="container mx-auto px-6 lg:px-12 relative z-10">
-          <a
+          <Link
             href="/livros"
-            className="inline-flex items-center gap-2 text-white/70 hover:text-white font-semibold text-sm transition-colors mb-8"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black text-white bg-white/10 hover:bg-white/20 border border-white/20 transition-all shadow-md backdrop-blur-md"
           >
-            <Icon icon="solar:arrow-left-linear" className="size-4" />
-            Voltar ao catálogo
-          </a>
+            <ArrowLeft className="size-3.5" />
+            <span>Voltar ao Acervo</span>
+          </Link>
         </div>
       </div>
 
-      {/* ── MAIN CONTENT CARD (pulls up into hero) ──────────────── */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-12 -mt-36 relative z-20 pb-20">
-        <div className="max-w-5xl mx-auto">
-          <div className="bg-white rounded-3xl shadow-2xl border border-slate-100">
-            <div className="flex flex-col md:flex-row gap-0">
+      {/* ── CARD PRINCIPAL DA OBRA ─────────────────────────── */}
+      <div className="container mx-auto px-4 sm:px-6 lg:px-12 max-w-6xl">
+        <div className="bg-white/95 backdrop-blur-md rounded-[32px] border border-white/40 shadow-2xl overflow-hidden">
+          
+          {/* Header Superior da Ficha */}
+          <div className="px-6 sm:px-10 py-5 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3 bg-slate-50/70">
+            <div className="flex items-center gap-2.5 text-xs font-black text-blue-900">
+              <div className="size-7 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-bold">
+                <Library size={15} />
+              </div>
+              <span>Acervo Escolar · Colégio Estadual Laurentino Martins</span>
+            </div>
 
-              {/* COVER */}
-              <div className="md:w-56 lg:w-64 shrink-0 flex items-center justify-center p-6 md:p-8 bg-slate-50 rounded-t-3xl md:rounded-l-3xl md:rounded-tr-none border-b md:border-b-0 md:border-r border-slate-100">
-                <div className="w-36 md:w-full aspect-[2/3] rounded-2xl overflow-hidden shadow-2xl ring-1 ring-black/10 bg-slate-200">
-                  {book.coverUrl ? (
-                    <img
-                      src={book.coverUrl.replace('zoom=1', 'zoom=2').replace('&edge=curl', '')}
-                      alt={translatedTitle}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <Icon icon="solar:book-2-bold-duotone" className="size-16 text-slate-400" />
-                    </div>
-                  )}
+            {/* Status Badge */}
+            <div className="inline-flex items-center gap-2">
+              {isAvailable ? (
+                <span className="inline-flex items-center gap-1.5 text-emerald-800 bg-emerald-50 px-3 py-1 rounded-full text-xs font-black border border-emerald-200 shadow-2xs">
+                  <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+                  Disponível para Reserva · {availableCopies} {availableCopies === 1 ? 'exemplar pronto' : 'exemplares prontos'}
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 text-rose-800 bg-rose-50 px-3 py-1 rounded-full text-xs font-black border border-rose-200 shadow-2xs">
+                  <AlertCircle className="size-3.5 text-rose-500" />
+                  Todos os exemplares emprestados
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Grid Principal: Capa + Detalhes */}
+          <div className="p-6 sm:p-10 lg:p-12">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 items-start">
+              
+              {/* ── COLUNA DA ESQUERDA: CAPA COM EFEITO LIVRO ── */}
+              <div className="md:col-span-5 lg:col-span-4 flex flex-col items-center">
+                <div className="relative group w-48 sm:w-56 md:w-full max-w-[270px] aspect-[2/3]">
+                  {/* Sombra de Elevação */}
+                  <div className="absolute inset-0 rounded-r-2xl rounded-l-sm bg-slate-950/20 shadow-[0_25px_50px_-12px_rgba(6,15,51,0.35)]" />
+                  
+                  {/* Livro com Lombada Tridimensional */}
+                  <div className="relative w-full h-full rounded-r-2xl rounded-l-xs overflow-hidden border border-slate-200/80 bg-slate-900 flex flex-col shadow-xl">
+                    {/* Brilho da Lombada */}
+                    <div className="absolute left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-black/30 via-white/20 to-transparent z-10 pointer-events-none" />
+                    
+                    {book.coverUrl ? (
+                      <img
+                        src={book.coverUrl}
+                        alt={`Capa do livro ${book.title}`}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex flex-col justify-between p-6 bg-gradient-to-br from-blue-900 to-slate-900 text-white">
+                        <BookOpen className="size-8 text-blue-300 opacity-80" />
+                        <div>
+                          <p className="font-black text-lg leading-tight mb-2 line-clamp-3">{book.title}</p>
+                          <p className="text-xs text-blue-200 font-medium">{book.author || 'Autor não informado'}</p>
+                        </div>
+                        <span className="text-[10px] uppercase font-bold tracking-widest text-blue-300">Laurentino</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Borda das páginas laterais */}
+                  <div className="absolute -right-2 top-2.5 bottom-2.5 w-2 bg-gradient-to-r from-slate-200 to-slate-100 rounded-r-sm -z-10 shadow-xs" />
+                </div>
+
+                {/* Código de Catalogação Escolar */}
+                <div className="mt-5 text-center space-y-1">
+                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+                    Tombo / Código no Acervo
+                  </span>
+                  <span className="text-xs font-mono font-black text-slate-800 bg-slate-100 px-3.5 py-1 rounded-lg inline-block border border-slate-200">
+                    LIB-{book.id.slice(-6).toUpperCase()}
+                  </span>
                 </div>
               </div>
 
-              {/* INFO */}
-              <div className="flex-1 p-6 sm:p-8 lg:p-10 flex flex-col gap-6">
-
-                {/* Status badge */}
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-wider ${
-                      isAvailable
-                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                        : 'bg-red-50 text-red-700 border border-red-200'
-                    }`}
-                  >
-                    <span className={`size-1.5 rounded-full ${isAvailable ? 'bg-emerald-500' : 'bg-red-500'}`} />
-                    {isAvailable ? `Disponível · ${book.quantity} cópias` : 'Indisponível'}
-                  </span>
-                </div>
-
-                {/* Title & Author */}
-                <div className="space-y-1">
-                  <h1 className="text-3xl sm:text-4xl font-black text-slate-900 leading-tight">
-                    {translatedTitle}
+              {/* ── COLUNA DA DIREITA: INFORMAÇÕES EDITORIAIS ─── */}
+              <div className="md:col-span-7 lg:col-span-8 space-y-6">
+                
+                {/* Título & Autor */}
+                <div className="space-y-2">
+                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight leading-tight">
+                    {book.title}
                   </h1>
-                  <p className="text-lg text-slate-500 font-semibold">por {book.author}</p>
-                  {book.publishedAt && (
-                    <p className="text-sm text-slate-400 font-medium">
-                      Publicado em {new Date(book.publishedAt).getFullYear()}
+                  {book.author && (
+                    <p className="text-base sm:text-lg text-slate-600 font-bold flex items-center gap-2">
+                      <span className="text-slate-400 font-normal">Autor(a):</span>
+                      <span className="text-blue-700 font-black">{book.author}</span>
                     </p>
                   )}
                 </div>
 
-                {/* Divider */}
-                <div className="h-px bg-slate-100" />
-
-                {/* Description */}
-                {translatedDesc && (
-                  <p className="text-slate-600 font-medium leading-relaxed text-base line-clamp-5">
-                    {translatedDesc}
-                  </p>
-                )}
-
-                {/* META CHIPS */}
+                {/* Gêneros & Categorias */}
                 {book.genres && book.genres.length > 0 && (
-                  <div className="flex flex-wrap gap-2 text-xs font-bold uppercase tracking-wider">
-                    {book.genres.map((g) => (
-                      <span key={g} className="px-3 py-1.5 rounded-full bg-blue-50 text-blue-700 border border-blue-100">
-                        {g}
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    {book.genres.map((genre) => (
+                      <span
+                        key={genre}
+                        className="px-3 py-1 rounded-xl text-xs font-black bg-blue-50 text-blue-800 border border-blue-200 shadow-2xs"
+                      >
+                        {genre}
                       </span>
                     ))}
                   </div>
                 )}
 
-                {/* RESERVE FORM */}
-                {isAvailable && (
-                  <div className="mt-auto">
-                    <div className="bg-[#1e40af]/5 border border-[#1e40af]/15 rounded-2xl p-5 sm:p-6">
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="size-9 rounded-xl bg-[#1e40af] flex items-center justify-center shrink-0">
-                          <Icon icon="solar:bookmark-bold" className="size-4 text-white" />
-                        </div>
-                        <h2 className="text-lg font-black text-slate-800">Fazer Reserva</h2>
-                      </div>
-                      <ReserveForm bookId={book.id} />
-                    </div>
+                {/* Ficha Técnica Catalogada */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 rounded-2xl border border-slate-200/80 p-4">
+                  <div className="space-y-1">
+                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <Calendar className="size-3 text-slate-500" />
+                      Ano
+                    </span>
+                    <p className="text-sm font-black text-slate-800">
+                      {book.publishedAt ? book.publishedAt : 'Não catalogado'}
+                    </p>
                   </div>
-                )}
 
-                {!isAvailable && (
-                  <div className="mt-auto rounded-2xl border border-red-100 bg-red-50 p-5 flex items-center gap-4">
-                    <Icon icon="solar:clock-circle-bold-duotone" className="size-8 text-red-400 shrink-0" />
-                    <div>
-                      <p className="font-black text-red-700 text-sm">Livro indisponível no momento</p>
-                      <p className="text-red-500 text-xs font-medium mt-0.5">
-                        Todas as cópias estão emprestadas. Tente novamente em breve.
-                      </p>
-                    </div>
+                  <div className="space-y-1">
+                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <Layers className="size-3 text-slate-500" />
+                      Total Físico
+                    </span>
+                    <p className="text-sm font-black text-slate-800">
+                      {book.quantity} {book.quantity === 1 ? 'exemplar' : 'exemplares'}
+                    </p>
                   </div>
-                )}
+
+                  <div className="space-y-1">
+                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <CheckCircle2 className="size-3 text-emerald-600" />
+                      Disponíveis
+                    </span>
+                    <p className={`text-sm font-black ${isAvailable ? 'text-emerald-700' : 'text-rose-600'}`}>
+                      {availableCopies} {availableCopies === 1 ? 'pronto' : 'prontos'}
+                    </p>
+                  </div>
+
+                  <div className="space-y-1">
+                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <Bookmark className="size-3 text-blue-600" />
+                      Modalidade
+                    </span>
+                    <p className="text-sm font-black text-slate-800">
+                      Empréstimo Escolar
+                    </p>
+                  </div>
+                </div>
+
+                {/* Sinopse / Resumo */}
+                <div className="space-y-2.5 pt-1">
+                  <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
+                    <BookMarked className="size-4 text-blue-700" />
+                    Sinopse & Apresentação da Obra
+                  </h2>
+                  <div className="text-slate-700 text-sm sm:text-base leading-relaxed font-medium bg-slate-50/70 p-5 rounded-2xl border border-slate-100">
+                    {book.description ? (
+                      <p className="whitespace-pre-line">{book.description}</p>
+                    ) : (
+                      <p className="text-slate-400 italic">
+                        Esta obra não possui sinopse cadastrada no acervo no momento. Consulte o bibliotecário para mais informações sobre o conteúdo.
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* ── PAINEL DE RESERVA DO ALUNO ───────────────── */}
+                <div className="pt-2">
+                  {isAvailable ? (
+                    <div className="bg-blue-50/80 border border-blue-200 rounded-3xl p-6 sm:p-7 space-y-4 shadow-sm">
+                      <div className="flex items-start gap-3">
+                        <div className="size-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-md">
+                          <Bookmark className="size-5" />
+                        </div>
+                        <div>
+                          <h3 className="text-base font-black text-slate-900">
+                            Reserva Online de Exemplar
+                          </h3>
+                          <p className="text-xs text-slate-600 font-semibold mt-0.5">
+                            Preencha seus dados abaixo para reservar este livro. O exemplar ficará guardado na biblioteca escolar para você retirar.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="pt-2">
+                        <ReserveForm bookId={book.id} />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="bg-rose-50/80 border border-rose-200 rounded-3xl p-6 flex items-start gap-4 shadow-sm">
+                      <div className="size-10 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                        <AlertCircle className="size-5" />
+                      </div>
+                      <div className="space-y-1">
+                        <h3 className="text-sm font-black text-rose-900">
+                          Exemplares Temporariamente Esgotados
+                        </h3>
+                        <p className="text-xs text-rose-700 leading-relaxed font-semibold">
+                          Todos os {book.quantity} exemplares deste título estão emprestados no momento. Assim que um aluno realizar a devolução, o livro ficará disponível para novas reservas.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* ── SEÇÃO: OUTRAS OBRAS RECOMENDADAS DO ACERVO ───────── */}
+      {relatedBooks && relatedBooks.length > 0 && (
+        <section className="container mx-auto px-4 sm:px-6 lg:px-12 max-w-6xl mt-14">
+          <div className="flex items-center justify-between mb-6 pb-3 border-b border-white/15">
+            <div>
+              <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                Outras Obras do Acervo
+              </h2>
+              <p className="text-xs sm:text-sm text-blue-200 font-bold mt-0.5">
+                Explore mais títulos disponíveis na biblioteca do colégio
+              </p>
+            </div>
+
+            <Link
+              href="/livros"
+              className="text-xs font-black text-blue-300 hover:text-white transition-colors inline-flex items-center gap-1"
+            >
+              Ver todas as obras →
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+            {relatedBooks.map((relBook) => (
+              <BookCard
+                key={relBook.id}
+                book={{
+                  id: relBook.id,
+                  title: relBook.title,
+                  author: relBook.author || 'Autor não informado',
+                  coverUrl: relBook.coverUrl || 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=600',
+                  description: relBook.description || '',
+                  publishedAt: relBook.publishedAt || 2024,
+                  quantity: relBook.quantity,
+                  genres: relBook.genres || [],
+                  createdAt: relBook.createdAt.toISOString()
+                }}
+              />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

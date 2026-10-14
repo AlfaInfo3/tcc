@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { normalizeString } from '@/lib/utils/string';
+import crypto from 'crypto';
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,75 +15,136 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Since we don't have a public Student model registration in this flow,
-    // we need to decide how to link the reservation.
-    // The requirement says "Aluno (sem login)".
-    // We should probably find or create a Student record based on name+class/code
-    // OR linked to a "Guest" student concept if the schema requires strict relation.
-    // The provided schema has `model Reservation { student Student ... }`.
-    // So we MUST have a student ID.
-    
-    // For this MVP/Project Plan where "Aluno sem login" reserves:
-    // We will auto-create a student record if one doesn't exist with this name/class
-    // to satisfy the foreign key constraint.
-    
-    // Generate a pseudo-unique hash or use name+class as identifier key
-    const { normalizeString } = require('@/lib/utils/string');
-    
-    // Smart Linking Logic
-    const normalizedName = normalizeString(name);
-    // Note: Class matching should also be somewhat loose or exact? 
-    // The user said "Ignorar acentos..." for name. Assuming class is also normalized.
-    // However, classes like "1º A" vs "1 A" might be tricky. 
-    // For now, strict string normalization on input.
-    // But we should strictly search for the student.
+    if (typeof name !== 'string' || name.trim().length < 2) {
+      return NextResponse.json(
+        { error: 'Informe o nome completo do aluno (mínimo 2 caracteres).' },
+        { status: 400 }
+      );
+    }
 
-    // Try to find existing student
-    // We search by normalizedName to catch slight variations if they were stored normalized
-    // But since `class` is free text, it's safer to check normalizedName AND class?
-    // Let's assume the user enters "1º A" consistently.
-    // If we only check name, we might link "Rickson" of "1B" to "Rickson" of "1A".
-    // So we MUST check class too.
+    if (typeof className !== 'string' || className.trim().length === 0) {
+      return NextResponse.json(
+        { error: 'Informe a turma ou série do aluno.' },
+        { status: 400 }
+      );
+    }
+
+    // 1. Verify and locate the book
+    const book = await prisma.book.findUnique({
+      where: { id: bookId },
+      include: {
+        loans: {
+          where: { status: 'active' }
+        },
+        reservations: {
+          where: { status: 'reserved' }
+        }
+      }
+    });
+
+    if (!book) {
+      return NextResponse.json(
+        { error: 'Livro não localizado no acervo escolar.' },
+        { status: 404 }
+      );
+    }
+
+    // 2. Check available physical copies
+    const activeLoansCount = book.loans ? book.loans.length : 0;
+    const activeResCount = book.reservations ? book.reservations.length : 0;
+    const availableCopies = Math.max(0, book.quantity - activeLoansCount - activeResCount);
+
+    if (availableCopies <= 0) {
+      return NextResponse.json(
+        { error: 'Todos os exemplares deste título já estão reservados ou emprestados no momento.' },
+        { status: 409 }
+      );
+    }
+
+    // 3. Smart Student identification or auto-registration
+    const normalizedName = normalizeString(name);
+    const cleanClass = className.trim();
 
     let student = await prisma.student.findFirst({
-        where: { 
-            normalizedName: normalizedName,
-            // Use case-insensitive mode for class to catch '1a' vs '1A'
-            class: {
-                equals: className.trim(),
-                mode: 'insensitive' // Postgres specific, fails on SQLite but we are using Postgres? schema says postgres.
-            }
+      where: {
+        normalizedName: normalizedName,
+        class: {
+          equals: cleanClass,
+          mode: 'insensitive'
         }
+      }
     });
 
     if (!student) {
-        // If not found, create new
-        const crypto = require('crypto');
-        const codeHash = crypto.createHash('md5').update(`${normalizedName}-${className.trim()}-${Date.now()}`).digest('hex').substring(0, 8);
+      const codeHash = crypto
+        .createHash('md5')
+        .update(`${normalizedName}-${cleanClass}-${Date.now()}`)
+        .digest('hex')
+        .substring(0, 8);
 
-        student = await prisma.student.create({
-            data: {
-                name: name.trim(),
-                class: className.trim(),
-                normalizedName,
-                codeHash
-            }
-        });
+      student = await prisma.student.create({
+        data: {
+          name: name.trim(),
+          class: cleanClass,
+          normalizedName,
+          codeHash
+        }
+      });
     }
 
-    const reservation = await prisma.reservation.create({
-      data: {
-        bookId,
+    // 4. Verify if student already has a pending reservation for this book
+    const existingReservation = await prisma.reservation.findFirst({
+      where: {
+        bookId: book.id,
         studentId: student.id,
         status: 'reserved'
       }
     });
 
-    return NextResponse.json(reservation, { status: 201 });
+    if (existingReservation) {
+      return NextResponse.json(
+        { error: 'Você já possui uma reserva ativa para este livro. Dirija-se à biblioteca para a retirada.' },
+        { status: 400 }
+      );
+    }
+
+    // 5. Create reservation
+    const reservation = await prisma.reservation.create({
+      data: {
+        bookId: book.id,
+        studentId: student.id,
+        status: 'reserved'
+      },
+      include: {
+        book: {
+          select: {
+            id: true,
+            title: true,
+            author: true
+          }
+        },
+        student: {
+          select: {
+            id: true,
+            name: true,
+            class: true
+          }
+        }
+      }
+    });
+
+    return NextResponse.json(
+      {
+        success: true,
+        message: 'Reserva realizada com sucesso!',
+        reservation
+      },
+      { status: 201 }
+    );
   } catch (error) {
     console.error('Error creating reservation:', error);
     return NextResponse.json(
-      { error: 'Erro ao criar reserva' },
+      { error: 'Erro interno ao registrar a reserva. Tente novamente mais tarde.' },
       { status: 500 }
     );
   }

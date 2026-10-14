@@ -2,19 +2,32 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
-
-interface BookSuggestion {
-  title: string;
-  authors: string[];
-  isbn: string;
-  publishedYear?: number;
-  coverUrl?: string;
-}
+import Link from 'next/link';
+import { 
+  ArrowLeft, 
+  Sparkles, 
+  Barcode, 
+  Upload, 
+  Camera, 
+  Check, 
+  X, 
+  Plus, 
+  Minus, 
+  BookOpen, 
+  Loader2, 
+  CheckCircle2, 
+  AlertCircle,
+  Image as ImageIcon
+} from 'lucide-react';
+import { BookSearchResult } from '@/lib/book-search';
+import { QuickBookRegisterModal } from '@/components/admin/QuickBookRegisterModal';
 
 export default function NewBookPage() {
   const router = useRouter();
-  
+
+  // Quick Modal Trigger
+  const [quickModalOpen, setQuickModalOpen] = useState(false);
+
   // Form State
   const [formData, setFormData] = useState({
     title: '',
@@ -24,7 +37,7 @@ export default function NewBookPage() {
     quantity: 1,
     coverUrl: '',
     genres: [] as string[],
-    description: ''
+    description: '',
   });
 
   // Tag Input State
@@ -32,31 +45,33 @@ export default function NewBookPage() {
   const [existingGenres, setExistingGenres] = useState<string[]>([]);
   const [showGenreSuggestions, setShowGenreSuggestions] = useState(false);
 
-  useEffect(() => {
-    fetch('/api/genres')
-      .then(res => res.json())
-      .then(data => setExistingGenres(data))
-      .catch(err => console.error("Failed to load genres", err));
-  }, []);
-
+  // Cover custom state
+  const [customCoverDataUrl, setCustomCoverDataUrl] = useState<string | null>(null);
   const [coverFile, setCoverFile] = useState<File | null>(null);
-  const [uploading, setUploading] = useState(false);
+
+  // Camera capture state
+  const [isCapturingPhoto, setIsCapturingPhoto] = useState(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const mediaStreamRef = useRef<MediaStream | null>(null);
 
   // Search/Autocomplete State
-  interface ExtendedBookSuggestion extends BookSuggestion {
-    workKey?: string;
-    genres?: string[];
-  }
-  const [suggestions, setSuggestions] = useState<ExtendedBookSuggestion[]>([]);
+  const [suggestions, setSuggestions] = useState<BookSearchResult[]>([]);
   const [loadingSearch, setLoadingSearch] = useState(false);
-  const [loadingDetails, setLoadingDetails] = useState(false); // To show spinner when fetching details
   const [showSuggestions, setShowSuggestions] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  // Debounce search
+  // Load existing genres for autocomplete
+  useEffect(() => {
+    fetch('/api/genres')
+      .then((res) => res.json())
+      .then((data) => setExistingGenres(data))
+      .catch((err) => console.error('Failed to load genres', err));
+  }, []);
+
+  // Debounced search for title or ISBN (unified PT-BR)
   useEffect(() => {
     const delayDebounceFn = setTimeout(async () => {
-      if (formData.title.length >= 3 && showSuggestions) {
+      if (formData.title.length >= 2 && showSuggestions) {
         setLoadingSearch(true);
         try {
           const response = await fetch(`/api/livros/search?q=${encodeURIComponent(formData.title)}`);
@@ -72,7 +87,7 @@ export default function NewBookPage() {
       } else {
         setSuggestions([]);
       }
-    }, 500);
+    }, 400);
 
     return () => clearTimeout(delayDebounceFn);
   }, [formData.title, showSuggestions]);
@@ -84,358 +99,612 @@ export default function NewBookPage() {
         setShowSuggestions(false);
       }
     }
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [wrapperRef]);
 
-  const handleSelectBook = async (book: ExtendedBookSuggestion) => {
-    // 1. Set basic info immediately
-    setFormData(prev => ({
+  const handleSelectBook = (book: BookSearchResult) => {
+    setFormData((prev) => ({
       ...prev,
       title: book.title,
       author: book.authors.join(', '),
-      isbn: book.isbn,
-      publishedYear: book.publishedYear?.toString() || '',
-      coverUrl: book.coverUrl || '',
-      genres: book.genres || [], 
+      isbn: book.isbn || prev.isbn,
+      publishedYear: book.publishedYear?.toString() || prev.publishedYear,
+      coverUrl: book.coverUrl || prev.coverUrl,
+      description: book.description || prev.description,
+      genres: book.genres && book.genres.length > 0 
+        ? Array.from(new Set([...prev.genres, ...book.genres])) 
+        : prev.genres,
     }));
+    setCustomCoverDataUrl(null);
+    setCoverFile(null);
     setShowSuggestions(false);
+  };
 
-    // 2. Fetch full details (description + maybe better genre)
-    if (book.workKey) {
-        setLoadingDetails(true);
-        try {
-            const res = await fetch(`/api/livros/details?key=${book.workKey}`);
-            if (res.ok) {
-                const details = await res.json();
-                setFormData(prev => ({
-                    ...prev,
-                    description: details.description || prev.description,
-                    genres: details.genres && details.genres.length > 0 
-                            ? Array.from(new Set([...prev.genres, ...details.genres])) // Merge unique
-                            : prev.genres
-                }));
-            }
-        } catch (e) {
-            console.error(e);
-        } finally {
-            setLoadingDetails(false);
-        }
+  // ── PHOTO CAMERA CAPTURE ─────────────────────────────────────
+  const startPhotoCamera = async () => {
+    setIsCapturingPhoto(true);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
+      });
+      mediaStreamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+      }
+    } catch (err) {
+      console.error('Error opening camera:', err);
+      alert('Não foi possível acessar a câmera. Você também pode carregar uma imagem do seu dispositivo.');
+      setIsCapturingPhoto(false);
     }
   };
 
-  const handleSave = async (e: React.FormEvent) => {
+  const capturePhoto = () => {
+    if (!videoRef.current) return;
+    const canvas = document.createElement('canvas');
+    canvas.width = videoRef.current.videoWidth || 640;
+    canvas.height = videoRef.current.videoHeight || 800;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
+      setCustomCoverDataUrl(dataUrl);
+      setCoverFile(null);
+    }
+    stopPhotoCamera();
+  };
+
+  const stopPhotoCamera = () => {
+    if (mediaStreamRef.current) {
+      mediaStreamRef.current.getTracks().forEach((t) => t.stop());
+      mediaStreamRef.current = null;
+    }
+    setIsCapturingPhoto(false);
+  };
+
+  // ── SAVE BOOK ────────────────────────────────────────────────
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async (e: React.FormEvent, continueAdding = false) => {
     e.preventDefault();
-    
-    if (!formData.title || !formData.author) {
-        alert('Título e Autor são obrigatórios');
-        return;
+
+    if (!formData.title.trim() || !formData.author.trim()) {
+      alert('Título e Autor são obrigatórios');
+      return;
     }
 
+    setSaving(true);
     try {
-      let finalCoverUrl = formData.coverUrl;
+      let finalCoverUrl = customCoverDataUrl || formData.coverUrl;
 
       // Handle Image Upload if file exists
       if (coverFile) {
-          const uploadData = new FormData();
-          uploadData.append('file', coverFile);
-          
-          const uploadRes = await fetch('/api/upload', {
-              method: 'POST',
-              body: uploadData
-          });
-          
-          if (uploadRes.ok) {
-              const { url } = await uploadRes.json();
-              finalCoverUrl = url;
-          } else {
-              alert('Erro ao fazer upload da imagem. O livro será salvo sem a capa personalizada.');
-          }
+        const uploadData = new FormData();
+        uploadData.append('file', coverFile);
+
+        const uploadRes = await fetch('/api/upload', {
+          method: 'POST',
+          body: uploadData,
+        });
+
+        if (uploadRes.ok) {
+          const { url } = await uploadRes.json();
+          finalCoverUrl = url;
+        }
       }
 
       const response = await fetch('/api/livros/create', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
-          coverUrl: finalCoverUrl,
-          publishedYear: parseInt(formData.publishedYear) || undefined,
-          quantity: parseInt(formData.quantity.toString()),
+          coverUrl: finalCoverUrl || 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=600&auto=format&fit=crop&q=80',
+          publishedAt: parseInt(formData.publishedYear) || undefined,
+          quantity: Math.max(1, parseInt(formData.quantity.toString()) || 1),
           description: formData.description || `Publicado em ${formData.publishedYear || '?'}`,
-          genres: formData.genres
+          genres: formData.genres.length > 0 ? formData.genres : ['Geral'],
         }),
       });
 
       if (response.ok) {
-        router.push('/admin/livros');
-        router.refresh();
+        if (continueAdding) {
+          setFormData({
+            title: '',
+            author: '',
+            isbn: '',
+            publishedYear: '',
+            quantity: 1,
+            coverUrl: '',
+            genres: [],
+            description: '',
+          });
+          setCustomCoverDataUrl(null);
+          setCoverFile(null);
+          alert('Livro cadastrado com sucesso! Pronto para cadastrar o próximo.');
+        } else {
+          router.push('/admin/livros');
+          router.refresh();
+        }
       } else {
-        alert('Erro ao salvar o livro');
+        const errData = await response.json();
+        alert(`Erro ao salvar: ${errData.error || 'Erro desconhecido'}`);
       }
     } catch (error) {
       console.error('Error saving book:', error);
-      alert('Erro ao salvar o livro');
+      alert('Erro de conexão ao salvar livro.');
+    } finally {
+      setSaving(false);
     }
   };
 
+  const activeCover = customCoverDataUrl || (coverFile ? URL.createObjectURL(coverFile) : null) || formData.coverUrl;
+
   return (
-    <div className="max-w-2xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6 text-gray-800">Adicionar Livro</h1>
-      
-      <form onSubmit={handleSave} className="bg-white p-6 rounded-lg shadow-md space-y-4">
+    <div className="min-h-screen bg-slate-50/60 p-4 sm:p-6 md:p-8 font-['Quicksand',sans-serif]">
+      <div className="max-w-6xl mx-auto space-y-6">
         
-        {/* Title / Search Input */}
-        <div className="relative" ref={wrapperRef}>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Título do Livro</label>
-            <div className="relative">
+        {/* ── TOP NAV BAR ─────────────────────────────────────── */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs">
+          <div className="flex items-center gap-3">
+            <Link
+              href="/admin/livros"
+              className="p-2 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer"
+              title="Voltar aos Livros"
+            >
+              <ArrowLeft size={18} />
+            </Link>
+            <div>
+              <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-tight">
+                Cadastrar Novo Livro
+              </h1>
+              <p className="text-xs text-slate-500 font-medium">
+                Catálogo inteligente com busca automática em português e capas em alta resolução
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setQuickModalOpen(true)}
+            className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-xs active:scale-95 transition-all cursor-pointer border border-slate-900/10"
+          >
+            <Barcode size={17} className="text-slate-300" />
+            <span>Escanear Código de Barras</span>
+          </button>
+        </div>
+
+        {/* ── TWO-COLUMN FORM LAYOUT ───────────────────────────── */}
+        <form onSubmit={(e) => handleSave(e, false)} className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          {/* ── LEFT COLUMN: METADATA FORM (8 cols) ────────────── */}
+          <div className="lg:col-span-8 bg-white p-6 sm:p-7 rounded-3xl border border-slate-200/80 shadow-xs space-y-5">
+            
+            {/* Title / Smart Autocomplete Input */}
+            <div className="relative" ref={wrapperRef}>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-xs font-black text-slate-800 uppercase tracking-wider">
+                  Título da Obra ou ISBN *
+                </label>
+                <span className="text-[11px] text-blue-600 font-bold flex items-center gap-1">
+                  <Sparkles size={13} />
+                  <span>Busca Automática PT-BR</span>
+                </span>
+              </div>
+
+              <div className="relative">
                 <input
-                type="text"
-                placeholder="Digite o título para buscar automático..."
-                value={formData.title}
-                onChange={(e) => {
-                    setFormData({...formData, title: e.target.value});
+                  type="text"
+                  placeholder="Digite o título ou código ISBN para autocompletar..."
+                  value={formData.title}
+                  onChange={(e) => {
+                    setFormData({ ...formData, title: e.target.value });
                     setShowSuggestions(true);
-                }}
-                onFocus={() => setShowSuggestions(true)}
-                className="w-full p-2 pr-8 border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                autoComplete="off"
+                  }}
+                  onFocus={() => setShowSuggestions(true)}
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all pr-10"
+                  autoComplete="off"
                 />
-                {/* Spinner inside input */}
-                {(loadingSearch || loadingDetails) && (
-                    <div className="absolute right-2 top-2">
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-indigo-600"></div>
-                    </div>
+                {loadingSearch && (
+                  <div className="absolute right-3.5 top-3.5">
+                    <Loader2 size={18} className="animate-spin text-blue-600" />
+                  </div>
                 )}
-            </div>
+              </div>
 
-            {/* Suggestions Dropdown */}
-            {showSuggestions && suggestions.length > 0 && (
-              <ul className="absolute z-50 w-full bg-white border border-gray-200 mt-1 rounded-md shadow-lg max-h-60 overflow-y-auto">
-                {suggestions.map((book, index) => (
-                  <li 
-                    key={`${book.isbn}-${index}`}
-                    onClick={() => handleSelectBook(book)}
-                    className="p-3 hover:bg-indigo-50 cursor-pointer border-b last:border-b-0 flex items-center gap-3"
-                  >
-                    {book.coverUrl && (
-                      <div className="w-8 h-12 relative shrink-0">
-                        <Image src={book.coverUrl} alt={book.title} fill className="object-cover rounded" />
-                      </div>
-                    )}
-                    <div>
-                      <p className="font-medium text-gray-900 text-sm">{book.title}</p>
-                      <p className="text-xs text-gray-500">{book.authors.join(', ')}</p>
-                      {book.genres && book.genres.length > 0 && (
-                          <div className="flex gap-1 flex-wrap mt-0.5">
-                              {book.genres.slice(0, 3).map((g, i) => (
-                                  <span key={i} className="text-[10px] bg-gray-100 text-gray-600 px-1 py-0.5 rounded">{g}</span>
-                              ))}
-                          </div>
-                      )}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-        </div>
-
-        {/* Other Fields - Auto-filled but editable */}
-        <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Autor(es)</label>
-            <input
-              type="text"
-              value={formData.author}
-              onChange={(e) => setFormData({...formData, author: e.target.value})}
-              className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-            />
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-            <div className="relative">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Gêneros / Assunto</label>
-                <div className="relative flex flex-wrap gap-2 p-2 border border-gray-300 rounded focus-within:ring-2 focus-within:ring-indigo-500 bg-white min-h-[42px]">
-                    {formData.genres.map((g, idx) => (
-                        <span key={idx} className="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-xs flex items-center gap-1">
-                            {g}
-                            <button 
-                                type="button"
-                                onClick={() => setFormData({...formData, genres: formData.genres.filter((_, i) => i !== idx)})}
-                                className="hover:text-indigo-900 font-bold"
-                            >
-                                ×
-                            </button>
-                        </span>
-                    ))}
-                    <div className="relative flex-1 min-w-[100px]">
-                        <input
-                            type="text"
-                            placeholder={formData.genres.length === 0 ? "Ex: Fantasia (Enter para adicionar)" : ""}
-                            value={currentGenreInput}
-                            onChange={(e) => {
-                                setCurrentGenreInput(e.target.value);
-                                setShowGenreSuggestions(true);
-                            }}
-                            onFocus={() => setShowGenreSuggestions(true)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter' || e.key === ',') {
-                                    e.preventDefault();
-                                    if (currentGenreInput.trim()) {
-                                        setFormData(prev => ({
-                                            ...prev, 
-                                            genres: [...prev.genres, currentGenreInput.trim()]
-                                        }));
-                                        setCurrentGenreInput('');
-                                        setShowGenreSuggestions(false);
-                                    }
-                                }
-                            }}
-                            onBlur={() => {
-                                // Delay to allow click on suggestion
-                                setTimeout(() => {
-                                     setShowGenreSuggestions(false);
-                                     if (currentGenreInput.trim()) {
-                                         setFormData(prev => ({
-                                            ...prev, 
-                                            genres: [...prev.genres, currentGenreInput.trim()]
-                                        }));
-                                        setCurrentGenreInput('');
-                                    }
-                                }, 200);
-                            }}
-                            className="w-full h-full outline-none text-sm bg-transparent"
-                        />
-                         {/* Genre Suggestions Dropdown */}
-                        {showGenreSuggestions && currentGenreInput.length > 0 && (
-                            <ul className="absolute left-0 bottom-full mb-1 w-full bg-white border border-gray-200 rounded shadow-lg max-h-40 overflow-y-auto z-10">
-                                {existingGenres
-                                    .filter(g => g.toLowerCase().includes(currentGenreInput.toLowerCase()) && !formData.genres.includes(g))
-                                    .map((g, i) => (
-                                    <li 
-                                        key={i}
-                                        onMouseDown={(e) => {
-                                            e.preventDefault(); // Prevent blur
-                                            setFormData(prev => ({
-                                                ...prev, 
-                                                genres: [...prev.genres, g]
-                                            }));
-                                            setCurrentGenreInput('');
-                                            setShowGenreSuggestions(false);
-                                        }}
-                                        className="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm text-gray-700"
-                                    >
-                                        {g}
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
-                    </div>
-                </div>
-                <p className="text-xs text-gray-400 mt-1">Pressione Enter ou Vírgula para adicionar tags.</p>
-            </div>
-            <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Ano de Publicação</label>
-                <input
-                type="number"
-                value={formData.publishedYear}
-                onChange={(e) => setFormData({...formData, publishedYear: e.target.value})}
-                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                />
-            </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">ISBN</label>
-                <input
-                type="text"
-                value={formData.isbn}
-                onChange={(e) => setFormData({...formData, isbn: e.target.value})}
-                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                />
-            </div>
-            <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Quantidade</label>
-                <input
-                type="number"
-                min="1"
-                value={formData.quantity}
-                onChange={(e) => setFormData({...formData, quantity: parseInt(e.target.value)})}
-                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                />
-            </div>
-        </div>
-        
-        <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Sinopse / Descrição</label>
-            <textarea
-              rows={4}
-              value={formData.description}
-              onChange={(e) => setFormData({...formData, description: e.target.value})}
-              placeholder="Sinopse do livro..."
-              className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-            />
-        </div>
-
-        {/* Cover Preview (from API) */}
-        {formData.coverUrl && !coverFile && (
-            <div className="flex items-center gap-4 p-3 bg-blue-50 rounded border border-blue-100">
-                <div className="h-20 w-14 relative shrink-0 border rounded overflow-hidden">
-                    <Image src={formData.coverUrl} alt="Capa" fill className="object-cover" />
-                </div>
-                <div className="flex-1">
-                    <p className="text-sm font-medium text-blue-800">Capa importada automaticamente</p>
-                    <button 
-                        type="button"
-                        onClick={() => setFormData({...formData, coverUrl: ''})}
-                        className="text-xs text-red-500 hover:underline mt-1"
+              {/* Suggestions Dropdown */}
+              {showSuggestions && suggestions.length > 0 && (
+                <ul className="absolute z-50 w-full bg-white border border-slate-200 mt-2 rounded-2xl shadow-xl max-h-72 overflow-y-auto divide-y divide-slate-100">
+                  {suggestions.map((book, index) => (
+                    <li
+                      key={`${book.isbn}-${index}`}
+                      onClick={() => handleSelectBook(book)}
+                      className="p-3 hover:bg-blue-50/80 cursor-pointer transition-colors flex items-center gap-3.5"
                     >
-                        Remover capa
-                    </button>
-                </div>
+                      {book.coverUrl ? (
+                        <div className="w-10 h-14 rounded-lg overflow-hidden bg-slate-100 shrink-0 border border-slate-200">
+                          <img src={book.coverUrl} alt={book.title} className="w-full h-full object-cover" />
+                        </div>
+                      ) : (
+                        <div className="w-10 h-14 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+                          <BookOpen size={16} />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-black text-slate-900 text-xs sm:text-sm truncate">{book.title}</p>
+                        <p className="text-[11px] text-slate-500 font-medium truncate">{book.authors.join(', ')}</p>
+                        <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                          {book.publishedYear && (
+                            <span className="text-[10px] font-bold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded-md">
+                              {book.publishedYear}
+                            </span>
+                          )}
+                          {book.source && (
+                            <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded-md">
+                              {book.source.toUpperCase()}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
+
+            {/* Author and Published Year */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="sm:col-span-2">
+                <label className="block text-xs font-black text-slate-800 uppercase tracking-wider mb-1.5">
+                  Autor(es) *
+                </label>
+                <input
+                  type="text"
+                  placeholder="Nome do(s) autor(es)"
+                  value={formData.author}
+                  onChange={(e) => setFormData({ ...formData, author: e.target.value })}
+                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs sm:text-sm font-bold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-black text-slate-800 uppercase tracking-wider mb-1.5">
+                  Ano de Publicação
+                </label>
+                <input
+                  type="number"
+                  placeholder="Ex: 2024"
+                  value={formData.publishedYear}
+                  onChange={(e) => setFormData({ ...formData, publishedYear: e.target.value })}
+                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs sm:text-sm font-bold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all"
+                />
+              </div>
+            </div>
+
+            {/* ISBN and Quantity */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-black text-slate-800 uppercase tracking-wider mb-1.5">
+                  ISBN / Código de Barras
+                </label>
+                <input
+                  type="text"
+                  placeholder="ISBN-10 ou ISBN-13"
+                  value={formData.isbn}
+                  onChange={(e) => setFormData({ ...formData, isbn: e.target.value })}
+                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs sm:text-sm font-bold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-black text-slate-800 uppercase tracking-wider mb-1.5">
+                  Quantidade de Exemplares
+                </label>
+                <div className="flex items-center border border-slate-200 rounded-2xl bg-slate-50 overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, quantity: Math.max(1, formData.quantity - 1) })}
+                    className="p-2.5 hover:bg-slate-200 text-slate-700 transition-colors"
+                  >
+                    <Minus size={16} />
+                  </button>
+                  <input
+                    type="number"
+                    min="1"
+                    value={formData.quantity}
+                    onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) || 1 })}
+                    className="w-full text-center bg-transparent font-black text-sm text-slate-900 outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, quantity: formData.quantity + 1 })}
+                    className="p-2.5 hover:bg-slate-200 text-slate-700 transition-colors"
+                  >
+                    <Plus size={16} />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Genres Tag Input */}
+            <div className="relative">
+              <label className="block text-xs font-black text-slate-800 uppercase tracking-wider mb-1.5">
+                Gêneros e Categorias
+              </label>
+              <div className="flex flex-wrap gap-1.5 p-2 bg-slate-50 border border-slate-200 rounded-2xl min-h-[46px] items-center focus-within:ring-2 focus-within:ring-blue-600 focus-within:bg-white">
+                {formData.genres.map((g, idx) => (
+                  <span
+                    key={idx}
+                    className="bg-blue-100 text-blue-800 font-bold px-2.5 py-1 rounded-xl text-xs flex items-center gap-1.5"
+                  >
+                    {g}
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, genres: formData.genres.filter((_, i) => i !== idx) })}
+                      className="hover:text-blue-950 font-bold text-sm cursor-pointer"
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+                <div className="relative flex-1 min-w-[130px]">
+                  <input
+                    type="text"
+                    placeholder={formData.genres.length === 0 ? 'Ex: Ficção, História (Enter para adicionar)' : ''}
+                    value={currentGenreInput}
+                    onChange={(e) => {
+                      setCurrentGenreInput(e.target.value);
+                      setShowGenreSuggestions(true);
+                    }}
+                    onFocus={() => setShowGenreSuggestions(true)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ',') {
+                        e.preventDefault();
+                        if (currentGenreInput.trim()) {
+                          setFormData((prev) => ({
+                            ...prev,
+                            genres: [...prev.genres, currentGenreInput.trim()],
+                          }));
+                          setCurrentGenreInput('');
+                          setShowGenreSuggestions(false);
+                        }
+                      }
+                    }}
+                    className="w-full outline-none text-xs font-bold text-slate-800 bg-transparent px-2"
+                  />
+
+                  {/* Suggestions for Genres */}
+                  {showGenreSuggestions && currentGenreInput.length > 0 && (
+                    <ul className="absolute left-0 bottom-full mb-1 w-full bg-white border border-slate-200 rounded-xl shadow-lg max-h-40 overflow-y-auto z-10">
+                      {existingGenres
+                        .filter(
+                          (g) =>
+                            g.toLowerCase().includes(currentGenreInput.toLowerCase()) &&
+                            !formData.genres.includes(g)
+                        )
+                        .map((g, i) => (
+                          <li
+                            key={i}
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              setFormData((prev) => ({
+                                ...prev,
+                                genres: [...prev.genres, g],
+                              }));
+                              setCurrentGenreInput('');
+                              setShowGenreSuggestions(false);
+                            }}
+                            className="px-3 py-2 hover:bg-blue-50 cursor-pointer text-xs font-bold text-slate-700"
+                          >
+                            {g}
+                          </li>
+                        ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Synopsis / Description */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-xs font-black text-slate-800 uppercase tracking-wider">
+                  Sinopse / Resumo (PT-BR)
+                </label>
+                <span className="text-[11px] text-slate-400 font-semibold">
+                  {formData.description.length} caracteres
+                </span>
+              </div>
+              <textarea
+                rows={4}
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                placeholder="Sinopse da obra em português..."
+                className="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs sm:text-sm text-slate-700 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all resize-none"
+              />
+            </div>
+
+            {/* Form Action Buttons */}
+            <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center gap-3">
+              <button
+                type="submit"
+                disabled={saving || !formData.title.trim() || !formData.author.trim()}
+                className="w-full sm:flex-1 py-3 px-6 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-black text-sm rounded-2xl shadow-lg shadow-blue-600/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              >
+                {saving ? <Loader2 size={16} className="animate-spin" /> : <Check size={18} className="stroke-[3]" />}
+                <span>Salvar Livro no Acervo</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={(e) => handleSave(e, true)}
+                disabled={saving || !formData.title.trim() || !formData.author.trim()}
+                className="w-full sm:w-auto py-3 px-5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-2xl transition-all cursor-pointer disabled:opacity-50"
+              >
+                Salvar e Adicionar Outro
+              </button>
+            </div>
+          </div>
+
+          {/* ── RIGHT COLUMN: INTERACTIVE COVER PREVIEW (4 cols) ─ */}
+          <div className="lg:col-span-4 space-y-5">
+            <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col items-center text-center">
+              <h3 className="text-xs font-black text-slate-800 uppercase tracking-wider mb-4">
+                Capa do Livro
+              </h3>
+
+              {/* Cover Display Card */}
+              <div className="relative w-44 h-64 rounded-2xl overflow-hidden shadow-xl bg-slate-100 border border-slate-200 flex items-center justify-center group mb-4">
+                {activeCover ? (
+                  <>
+                    <img src={activeCover} alt="Capa" className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                      <button
+                        type="button"
+                        onClick={startPhotoCamera}
+                        className="p-2.5 bg-white text-slate-900 rounded-xl hover:scale-105 transition-transform"
+                        title="Tirar nova foto"
+                      >
+                        <Camera size={16} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setFormData({ ...formData, coverUrl: '' });
+                          setCustomCoverDataUrl(null);
+                          setCoverFile(null);
+                        }}
+                        className="p-2.5 bg-rose-600 text-white rounded-xl hover:scale-105 transition-transform"
+                        title="Remover capa"
+                      >
+                        <X size={16} />
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex flex-col items-center justify-center p-4 text-slate-400">
+                    <ImageIcon size={36} className="mb-2 stroke-[1.5]" />
+                    <p className="text-xs font-bold text-slate-500">Sem Capa</p>
+                    <p className="text-[10px] text-slate-400">Busque pelo título ou fotografe</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Cover Controls */}
+              <div className="w-full grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={startPhotoCamera}
+                  className="py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                >
+                  <Camera size={14} />
+                  <span>Tirar Foto</span>
+                </button>
+
+                <label className="py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
+                  <Upload size={14} />
+                  <span>Upload</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0] || null;
+                      setCoverFile(file);
+                      setCustomCoverDataUrl(null);
+                    }}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+
+              {coverFile && (
+                <p className="text-[11px] text-emerald-600 font-bold mt-2 truncate max-w-full">
+                  ✓ {coverFile.name}
+                </p>
+              )}
+
+              {/* Live Preview Summary */}
+              <div className="w-full mt-5 pt-4 border-t border-slate-100 text-left">
+                <p className="text-[10px] uppercase tracking-wider font-black text-slate-400 mb-1">
+                  Prévia no Catálogo
+                </p>
+                <h4 className="font-black text-sm text-slate-900 line-clamp-1">
+                  {formData.title || 'Título do Livro'}
+                </h4>
+                <p className="text-xs text-slate-500 truncate">
+                  {formData.author || 'Autor da obra'}
+                </p>
+                <div className="mt-2 flex items-center gap-2">
+                  <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                    {formData.quantity} exemplares
+                  </span>
+                  {formData.genres[0] && (
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">
+                      {formData.genres[0]}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+
+        {/* ── LIVE PHOTO CAMERA MODAL ─────────────────────────── */}
+        {isCapturingPhoto && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in-0">
+            <div className="w-full max-w-md bg-slate-900 rounded-3xl p-5 text-white border border-slate-800 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-xs font-bold text-blue-300">
+                  <Camera size={16} />
+                  <span>Aponte para a capa física e clique em Fotografar</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={stopPhotoCamera}
+                  className="p-1 rounded-lg text-slate-400 hover:text-white"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="relative rounded-2xl overflow-hidden bg-black max-h-[360px] flex items-center justify-center">
+                <video ref={videoRef} className="w-full h-auto object-contain" autoPlay playsInline muted />
+              </div>
+
+              <div className="flex justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={capturePhoto}
+                  className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs rounded-xl shadow-lg flex items-center gap-2 cursor-pointer"
+                >
+                  <Camera size={16} />
+                  <span>Fotografar Capa</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={stopPhotoCamera}
+                  className="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white font-bold text-xs rounded-xl cursor-pointer"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          </div>
         )}
 
-        {/* Manual File Upload */}
-        <div className="border-t pt-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Upload de Capa Manual (Opcional)</label>
-            <input 
-                type="file" 
-                accept="image/*"
-                onChange={(e) => {
-                    const file = e.target.files?.[0] || null;
-                    setCoverFile(file);
-                    // Clear API URL if user selects a file manually to avoid confusion
-                    if (file) setFormData({...formData, coverUrl: ''});
-                }}
-                className="block w-full text-sm text-gray-500
-                  file:mr-4 file:py-2 file:px-4
-                  file:rounded-full file:border-0
-                  file:text-sm file:font-semibold
-                  file:bg-indigo-50 file:text-indigo-700
-                  hover:file:bg-indigo-100"
-            />
-            {coverFile && (
-                <p className="text-sm text-green-600 mt-2">
-                    Arquivo selecionado: {coverFile.name}
-                </p>
-            )}
-        </div>
+        {/* ── QUICK REGISTER MODAL (TRIGGERED FROM NEW BOOK PAGE) ─ */}
+        <QuickBookRegisterModal
+          isOpen={quickModalOpen}
+          onClose={() => setQuickModalOpen(false)}
+          onBookCreated={() => {
+            router.push('/admin/livros');
+            router.refresh();
+          }}
+        />
 
-        <div className="pt-4">
-            <button
-                type="submit"
-                className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 font-medium transition-colors"
-                disabled={!formData.title}
-            >
-                Adicionar ao Estoque
-            </button>
-        </div>
-
-      </form>
+      </div>
     </div>
   );
 }

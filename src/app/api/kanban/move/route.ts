@@ -7,6 +7,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { itemId, fromStatus, toStatus, loanDate, dueDate, returnDate } = body;
 
+    if (!itemId || typeof itemId !== 'string' || !fromStatus || !toStatus) {
+      return NextResponse.json({ error: 'itemId, fromStatus e toStatus são obrigatórios' }, { status: 400 });
+    }
+
     // Transition: Reserved -> Active (Loan Creation)
     if (fromStatus === 'reserved' && toStatus === 'active') {
       // 1. Find the reservation

@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcrypt';
 import { cookies } from 'next/headers';
+import { createSignedSessionToken } from '@/lib/security';
 
 export async function POST(request: NextRequest) {
   try {
@@ -49,21 +50,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Em um sistema real, você geraria um JWT real aqui
-    // Por enquanto, estamos usando um token fixo para demonstração
-    // Mas o importante é que agora estamos autenticando contra o banco de dados
-    // Set Cookie
+    // Gera token de sessão criptograficamente assinado (HMAC-SHA256)
+    const signedToken = createSignedSessionToken(adminUser.id, 'admin', 60 * 60 * 24 * 7);
+
+    // Set secure HTTP-only Cookie
     const cookieStore = await cookies();
-    cookieStore.set('admin_token', adminUser.id, {
+    cookieStore.set('admin_token', signedToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
         path: '/',
         maxAge: 60 * 60 * 24 * 7 // 7 days
     });
 
     return NextResponse.json({
       success: true,
-      token: 'fake-jwt-token', // Keep for compatibility if frontend uses it
+      token: signedToken,
       userId: adminUser.id,
       userName: adminUser.name,
       message: 'Login realizado com sucesso'
