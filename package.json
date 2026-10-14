@@ -17,6 +17,8 @@
     "@heroui/image": "^2.2.19",
     "@heroui/system": "^2.4.26",
     "@heroui/theme": "^2.4.26",
+    "@hugeicons/core-free-icons": "^4.3.5",
+    "@hugeicons/react": "^1.1.10",
     "@iconify/react": "^6.0.2",
     "@prisma/client": "5.10.2",
     "@tabler/icons-react": "^3.40.0",

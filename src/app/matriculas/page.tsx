@@ -6,12 +6,13 @@ import { PublicNav } from "@/components/PublicNav";
 import { LiquidGlassFooter } from "@/components/LiquidGlassFooter";
 import TiltedCard from "@/components/TiltedCard";
 import { 
-  Check, 
-  X,
-  ExternalLink,
-  MessageCircle,
-  ArrowRight
-} from "lucide-react";
+  Tick01Icon, 
+  Cancel01Icon, 
+  ArrowUpRight01Icon, 
+  WhatsappIcon, 
+  ArrowRight01Icon 
+} from "@hugeicons/core-free-icons";
+import { HugeIcon } from "@/components/ui/HugeIcon";
 
 interface Modalidade {
   id: string;
@@ -160,25 +161,25 @@ export default function MatriculasPage() {
               <div id="diferenciais" className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 pt-2 text-xs sm:text-sm text-slate-700 font-medium">
                 <div className="flex items-center gap-2">
                   <span className="size-4 rounded-full border border-slate-400 text-slate-700 flex items-center justify-center shrink-0">
-                    <Check className="size-3 stroke-[2.5]" />
+                    <HugeIcon icon={Tick01Icon} size={12} strokeWidth={2.5} />
                   </span>
                   <span>Sistema Estadual de Ensino</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="size-4 rounded-full border border-slate-400 text-slate-700 flex items-center justify-center shrink-0">
-                    <Check className="size-3 stroke-[2.5]" />
+                    <HugeIcon icon={Tick01Icon} size={12} strokeWidth={2.5} />
                   </span>
                   <span>Salas amplas e climatizadas</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="size-4 rounded-full border border-slate-400 text-slate-700 flex items-center justify-center shrink-0">
-                    <Check className="size-3 stroke-[2.5]" />
+                    <HugeIcon icon={Tick01Icon} size={12} strokeWidth={2.5} />
                   </span>
                   <span>Apoio pedagógico individualizado</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="size-4 rounded-full border border-slate-400 text-slate-700 flex items-center justify-center shrink-0">
-                    <Check className="size-3 stroke-[2.5]" />
+                    <HugeIcon icon={Tick01Icon} size={12} strokeWidth={2.5} />
                   </span>
                   <span>Ambiente monitorado e seguro</span>
                 </div>
@@ -270,7 +271,7 @@ export default function MatriculasPage() {
                         <span>{mod.sub}</span>
                       </span>
                       <span className="size-8 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center text-white/90 group-hover:bg-[#fbb034] group-hover:text-slate-950 transition-colors">
-                        <ArrowRight className="size-4" />
+                        <HugeIcon icon={ArrowRight01Icon} size={16} />
                       </span>
                     </div>
 
@@ -284,7 +285,7 @@ export default function MatriculasPage() {
                       </p>
                       <div className="pt-2 flex items-center gap-2 text-[#fbb034] text-xs font-bold uppercase tracking-wider group-hover:translate-x-1 transition-transform">
                         <span>Ver requisitos e turnos</span>
-                        <ArrowRight className="size-3.5" />
+                        <HugeIcon icon={ArrowRight01Icon} size={14} />
                       </div>
                     </div>
                   </div>
@@ -309,7 +310,7 @@ export default function MatriculasPage() {
               className="absolute top-6 right-6 size-9 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 transition-colors cursor-pointer"
               aria-label="Fechar janela"
             >
-              <X className="size-5" />
+              <HugeIcon icon={Cancel01Icon} size={20} />
             </button>
 
             {/* Cabeçalho do Modal */}
@@ -345,7 +346,7 @@ export default function MatriculasPage() {
               <ul className="space-y-2 text-sm text-slate-600 font-medium">
                 {selectedModalidade.requisitos.map((req) => (
                   <li key={req} className="flex items-start gap-2">
-                    <Check className="size-4 text-[#1a3875] shrink-0 mt-0.5" />
+                    <HugeIcon icon={Tick01Icon} size={16} className="text-[#1a3875] shrink-0 mt-0.5" />
                     <span>{req}</span>
                   </li>
                 ))}
@@ -360,7 +361,7 @@ export default function MatriculasPage() {
               <ul className="space-y-2 text-sm text-slate-600 font-medium">
                 {selectedModalidade.destaques.map((dest) => (
                   <li key={dest} className="flex items-start gap-2">
-                    <Check className="size-4 text-emerald-600 shrink-0 mt-0.5" />
+                    <HugeIcon icon={Tick01Icon} size={16} className="text-emerald-600 shrink-0 mt-0.5" />
                     <span>{dest}</span>
                   </li>
                 ))}
@@ -376,7 +377,7 @@ export default function MatriculasPage() {
                 className="flex-1 inline-flex items-center justify-center gap-2 bg-[#1a3875] hover:bg-[#122854] text-white font-bold py-3.5 px-6 rounded-xl text-sm transition-all shadow-xs"
               >
                 <span>Consultar Vaga no WhatsApp</span>
-                <ExternalLink className="size-4" />
+                <HugeIcon icon={ArrowUpRight01Icon} size={16} />
               </a>
               <button
                 onClick={() => setSelectedModalidade(null)}
@@ -398,7 +399,7 @@ export default function MatriculasPage() {
         className="fixed bottom-6 right-6 z-40 size-14 rounded-full bg-[#fbb034] hover:bg-[#f39c12] text-slate-950 shadow-xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all border border-amber-300/40"
         aria-label="Atendimento via WhatsApp"
       >
-        <MessageCircle className="size-7 text-slate-950 stroke-[2.2]" />
+        <HugeIcon icon={WhatsappIcon} size={28} className="text-slate-950" />
       </a>
 
       {/* ── RODAPÉ OFICIAL LIQUID GLASS ──────────────────────── */}

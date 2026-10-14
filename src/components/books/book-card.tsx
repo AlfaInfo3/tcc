@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import { Book } from '@/types/book';
 import { ModernBookCover, BookHeader, BookTitle, BookDescription } from '@/cuicui/other/books/modern-book-cover/modern-book-cover';
-import { Book as BookIcon } from 'lucide-react';
+import { Book01Icon } from '@hugeicons/core-free-icons';
+import { HugeIcon } from '@/components/ui/HugeIcon';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -48,7 +49,7 @@ export function BookCard({ book, onReserve, adminMode, dark = false }: BookCardP
               forceRotate={isNavigating}
             >
               <BookHeader>
-                <BookIcon size={20} />
+                <HugeIcon icon={Book01Icon} size={20} />
               </BookHeader>
               <BookTitle>{book.title}</BookTitle>
               <BookDescription>{book.author}</BookDescription>
@@ -64,7 +65,7 @@ export function BookCard({ book, onReserve, adminMode, dark = false }: BookCardP
               forceRotate={isNavigating}
             >
               <BookHeader>
-                <BookIcon size={16} />
+                <HugeIcon icon={Book01Icon} size={16} />
               </BookHeader>
               <BookTitle className="text-sm leading-tight">{book.title}</BookTitle>
               <BookDescription className="text-[10px] line-clamp-2">{book.author}</BookDescription>

@@ -5,24 +5,25 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { 
-  ArrowLeft, 
-  Trash2, 
-  Save, 
-  Upload, 
-  Camera, 
-  Globe, 
-  Plus, 
-  Minus, 
-  ExternalLink, 
-  Loader2, 
-  CheckCircle2, 
-  Image as ImageIcon,
-  BookOpen,
-  Check,
-  X,
-  Languages,
-  Sparkles
-} from 'lucide-react';
+  ArrowLeft01Icon, 
+  Delete02Icon, 
+  FloppyDiskIcon, 
+  Upload01Icon, 
+  Camera01Icon, 
+  Globe02Icon, 
+  PlusSignIcon, 
+  MinusSignIcon, 
+  ArrowUpRight01Icon, 
+  LoaderCircleIcon, 
+  CheckmarkCircle02Icon, 
+  Image01Icon, 
+  BookOpen01Icon, 
+  Tick01Icon, 
+  Cancel01Icon, 
+  TranslateIcon, 
+  SparklesIcon 
+} from '@hugeicons/core-free-icons';
+import { HugeIcon } from '@/components/ui/HugeIcon';
 import { ModernBookCover, BookHeader, BookTitle, BookDescription } from '@/cuicui/other/books/modern-book-cover/modern-book-cover';
 
 export interface BookData {
@@ -271,7 +272,7 @@ export function EditBookClientView({ id, initialBook, initialGenres }: EditBookC
             ? 'bg-emerald-50 dark:bg-emerald-950/70 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200'
             : 'bg-rose-50 dark:bg-rose-950/70 border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200'
         }`}>
-          <CheckCircle2 size={18} className="shrink-0" />
+          <HugeIcon icon={CheckmarkCircle02Icon} size={18} className="shrink-0" />
           <p className="text-xs sm:text-sm font-bold">{notification.message}</p>
         </div>
       )}
@@ -284,7 +285,7 @@ export function EditBookClientView({ id, initialBook, initialGenres }: EditBookC
             className="p-2 rounded-xl bg-white dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 text-slate-600 dark:text-neutral-300 hover:bg-slate-50 dark:hover:bg-neutral-700 transition-colors shadow-2xs"
             title="Voltar para a lista de livros"
           >
-            <ArrowLeft size={16} />
+            <HugeIcon icon={ArrowLeft01Icon} size={16} />
           </Link>
           <div>
             <div className="flex items-center gap-2 text-xs font-bold text-slate-400 dark:text-neutral-500">
@@ -305,7 +306,7 @@ export function EditBookClientView({ id, initialBook, initialGenres }: EditBookC
             target="_blank"
             className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-white dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 text-slate-700 dark:text-neutral-300 hover:bg-slate-50 dark:hover:bg-neutral-700 transition-colors shadow-2xs"
           >
-            <ExternalLink size={14} />
+            <HugeIcon icon={ArrowUpRight01Icon} size={14} />
             <span>Ver no Catálogo</span>
           </Link>
 
@@ -316,7 +317,7 @@ export function EditBookClientView({ id, initialBook, initialGenres }: EditBookC
             className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/60 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 transition-colors cursor-pointer"
             title="Excluir este livro permanentemente"
           >
-            <Trash2 size={14} />
+            <HugeIcon icon={Delete02Icon} size={14} />
             <span>{deleting ? 'Excluindo...' : 'Excluir'}</span>
           </button>
         </div>
@@ -331,7 +332,7 @@ export function EditBookClientView({ id, initialBook, initialGenres }: EditBookC
           {/* Metadata Card */}
           <div className="bg-white dark:bg-neutral-800/90 rounded-2xl border border-slate-200/90 dark:border-neutral-700/80 p-5 sm:p-6 shadow-xs space-y-5">
             <h2 className="text-sm font-extrabold uppercase tracking-wider text-slate-800 dark:text-white flex items-center gap-2">
-              <BookOpen size={16} className="text-blue-600 dark:text-blue-400" />
+              <HugeIcon icon={BookOpen01Icon} size={16} className="text-blue-600 dark:text-blue-400" />
               <span>Informações Principais</span>
             </h2>
 
@@ -393,7 +394,7 @@ export function EditBookClientView({ id, initialBook, initialGenres }: EditBookC
                     onClick={() => setBook({ ...book, quantity: Math.max(0, book.quantity - 1) })}
                     className="p-2.5 hover:bg-slate-200 dark:hover:bg-neutral-700 text-slate-600 dark:text-neutral-300 transition-colors cursor-pointer"
                   >
-                    <Minus size={14} />
+                    <HugeIcon icon={MinusSignIcon} size={14} />
                   </button>
                   <input
                     type="number"
@@ -407,7 +408,7 @@ export function EditBookClientView({ id, initialBook, initialGenres }: EditBookC
                     onClick={() => setBook({ ...book, quantity: book.quantity + 1 })}
                     className="p-2.5 hover:bg-slate-200 dark:hover:bg-neutral-700 text-slate-600 dark:text-neutral-300 transition-colors cursor-pointer"
                   >
-                    <Plus size={14} />
+                    <HugeIcon icon={PlusSignIcon} size={14} />
                   </button>
                 </div>
                 <span className="text-xs text-slate-500 dark:text-neutral-400">
@@ -438,7 +439,7 @@ export function EditBookClientView({ id, initialBook, initialGenres }: EditBookC
                       onClick={() => removeGenre(idx)}
                       className="hover:text-rose-600 transition-colors cursor-pointer"
                     >
-                      <X size={12} />
+                      <HugeIcon icon={Cancel01Icon} size={12} />
                     </button>
                   </span>
                 ))
@@ -514,12 +515,12 @@ export function EditBookClientView({ id, initialBook, initialGenres }: EditBookC
                 >
                   {translating ? (
                     <>
-                      <Loader2 size={12} className="animate-spin text-amber-600" />
+                      <HugeIcon icon={LoaderCircleIcon} size={12} className="animate-spin text-amber-600" />
                       <span>Traduzindo...</span>
                     </>
                   ) : (
                     <>
-                      <Languages size={12} />
+                      <HugeIcon icon={TranslateIcon} size={12} />
                       <span>Traduzir p/ Português</span>
                     </>
                   )}
@@ -539,7 +540,7 @@ export function EditBookClientView({ id, initialBook, initialGenres }: EditBookC
           {/* Cover Management Studio (File Upload, Camera, or Web URL) */}
           <div className="bg-white dark:bg-neutral-800/90 rounded-2xl border border-slate-200/90 dark:border-neutral-700/80 p-5 sm:p-6 shadow-xs space-y-4">
             <h2 className="text-sm font-extrabold uppercase tracking-wider text-slate-800 dark:text-white flex items-center gap-2">
-              <ImageIcon size={16} className="text-blue-600 dark:text-blue-400" />
+              <HugeIcon icon={Image01Icon} size={16} className="text-blue-600 dark:text-blue-400" />
               <span>Gerenciamento da Imagem da Capa</span>
             </h2>
 
@@ -554,7 +555,7 @@ export function EditBookClientView({ id, initialBook, initialGenres }: EditBookC
                     : 'text-slate-600 dark:text-neutral-400 hover:text-slate-900'
                 }`}
               >
-                <Upload size={14} />
+                <HugeIcon icon={Upload01Icon} size={14} />
                 <span>Upload Arquivo</span>
               </button>
 
@@ -570,7 +571,7 @@ export function EditBookClientView({ id, initialBook, initialGenres }: EditBookC
                     : 'text-slate-600 dark:text-neutral-400 hover:text-slate-900'
                 }`}
               >
-                <Camera size={14} />
+                <HugeIcon icon={Camera01Icon} size={14} />
                 <span>Câmera / Foto</span>
               </button>
 
@@ -583,7 +584,7 @@ export function EditBookClientView({ id, initialBook, initialGenres }: EditBookC
                     : 'text-slate-600 dark:text-neutral-400 hover:text-slate-900'
                 }`}
               >
-                <Globe size={14} />
+                <HugeIcon icon={Globe02Icon} size={14} />
                 <span>Link / URL Externa</span>
               </button>
             </div>
@@ -602,7 +603,7 @@ export function EditBookClientView({ id, initialBook, initialGenres }: EditBookC
                   htmlFor="coverFileInput"
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 text-xs font-bold hover:bg-blue-100 transition-colors cursor-pointer"
                 >
-                  <Upload size={14} />
+                  <HugeIcon icon={Upload01Icon} size={14} />
                   <span>Escolher imagem do dispositivo</span>
                 </label>
                 {selectedFile && (
@@ -683,7 +684,7 @@ export function EditBookClientView({ id, initialBook, initialGenres }: EditBookC
                 coverImage={previewCoverUrl || book.coverUrl}
               >
                 <BookHeader>
-                  <BookOpen size={20} />
+                  <HugeIcon icon={BookOpen01Icon} size={20} />
                 </BookHeader>
                 <BookTitle>{book.title || 'Título da Obra'}</BookTitle>
                 <BookDescription>{book.author || 'Autor da Obra'}</BookDescription>
@@ -724,12 +725,12 @@ export function EditBookClientView({ id, initialBook, initialGenres }: EditBookC
               >
                 {saving ? (
                   <>
-                    <Loader2 size={16} className="animate-spin" />
+                    <HugeIcon icon={LoaderCircleIcon} size={16} className="animate-spin" />
                     <span>Salvando alterações...</span>
                   </>
                 ) : (
                   <>
-                    <Save size={16} />
+                    <HugeIcon icon={FloppyDiskIcon} size={16} />
                     <span>Salvar Alterações</span>
                   </>
                 )}

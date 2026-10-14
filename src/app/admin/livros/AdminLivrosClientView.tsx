@@ -4,18 +4,18 @@ import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { 
-  BookOpen, 
-  Layers, 
-  CheckCircle2, 
-  LayoutGrid, 
-  List, 
-  Search, 
-  Pencil, 
-  ExternalLink, 
-  X,
-  Sparkles,
-  PackageCheck
-} from 'lucide-react';
+  BookOpen01Icon, 
+  Layers01Icon, 
+  CheckmarkCircle02Icon, 
+  LayoutGridIcon, 
+  LayoutListIcon, 
+  Search01Icon, 
+  PencilEdit02Icon, 
+  ArrowUpRight01Icon, 
+  Cancel01Icon,
+  SparklesIcon
+} from '@hugeicons/core-free-icons';
+import { HugeIcon } from '@/components/ui/HugeIcon';
 import { BookCard } from '@/components/books/book-card';
 import { AdminLivrosHeader } from '@/components/admin/AdminLivrosHeader';
 
@@ -114,7 +114,7 @@ export function AdminLivrosClientView({ initialBooks }: AdminLivrosClientViewPro
             </p>
           </div>
           <div className="size-11 rounded-xl bg-blue-100/70 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center">
-            <BookOpen size={22} />
+            <HugeIcon icon={BookOpen01Icon} size={22} />
           </div>
         </div>
 
@@ -132,7 +132,7 @@ export function AdminLivrosClientView({ initialBooks }: AdminLivrosClientViewPro
             </p>
           </div>
           <div className="size-11 rounded-xl bg-indigo-100/70 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
-            <Layers size={22} />
+            <HugeIcon icon={Layers01Icon} size={22} />
           </div>
         </div>
 
@@ -153,7 +153,7 @@ export function AdminLivrosClientView({ initialBooks }: AdminLivrosClientViewPro
             </p>
           </div>
           <div className="size-11 rounded-xl bg-emerald-100/70 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-            <PackageCheck size={22} />
+            <HugeIcon icon={CheckmarkCircle02Icon} size={22} />
           </div>
         </div>
       </div>
@@ -162,7 +162,7 @@ export function AdminLivrosClientView({ initialBooks }: AdminLivrosClientViewPro
       <div className="bg-white dark:bg-neutral-800/80 rounded-2xl border border-slate-200/80 dark:border-neutral-700/80 p-3 sm:p-4 flex flex-col md:flex-row gap-3 justify-between items-stretch md:items-center shadow-xs">
         {/* Search Input */}
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 size-4" />
+          <HugeIcon icon={Search01Icon} size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
             value={searchQuery}
@@ -176,7 +176,7 @@ export function AdminLivrosClientView({ initialBooks }: AdminLivrosClientViewPro
               onClick={() => setSearchQuery('')}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 cursor-pointer"
             >
-              <X size={15} />
+              <HugeIcon icon={Cancel01Icon} size={15} />
             </button>
           )}
         </div>
@@ -232,7 +232,7 @@ export function AdminLivrosClientView({ initialBooks }: AdminLivrosClientViewPro
               }`}
               title="Exibir em Grade de Livros 3D"
             >
-              <LayoutGrid size={16} />
+              <HugeIcon icon={LayoutGridIcon} size={16} />
             </button>
             <button
               type="button"
@@ -244,7 +244,7 @@ export function AdminLivrosClientView({ initialBooks }: AdminLivrosClientViewPro
               }`}
               title="Exibir em Lista / Tabela"
             >
-              <List size={16} />
+              <HugeIcon icon={LayoutListIcon} size={16} />
             </button>
           </div>
         </div>
@@ -254,7 +254,7 @@ export function AdminLivrosClientView({ initialBooks }: AdminLivrosClientViewPro
       {filteredBooks.length === 0 ? (
         <div className="py-16 text-center bg-slate-50/50 dark:bg-neutral-900/40 rounded-2xl border border-dashed border-slate-200 dark:border-neutral-800">
           <div className="mx-auto size-12 text-slate-400 mb-3 flex items-center justify-center rounded-full bg-slate-100 dark:bg-neutral-800">
-            <Search className="size-6" />
+            <HugeIcon icon={Search01Icon} size={24} />
           </div>
           <h3 className="text-base font-bold text-slate-800 dark:text-white">
             Nenhum livro encontrado
@@ -300,7 +300,7 @@ export function AdminLivrosClientView({ initialBooks }: AdminLivrosClientViewPro
                   className="text-slate-400 hover:text-blue-600 transition-colors p-1"
                   title="Ver no Catálogo de Alunos"
                 >
-                  <ExternalLink size={13} />
+                  <HugeIcon icon={ArrowUpRight01Icon} size={13} />
                 </Link>
               </div>
 
@@ -318,7 +318,7 @@ export function AdminLivrosClientView({ initialBooks }: AdminLivrosClientViewPro
                   href={`/admin/livros/${book.id}`}
                   className="flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-xl text-xs font-bold bg-slate-100 hover:bg-blue-600 text-slate-700 hover:text-white dark:bg-neutral-700 dark:text-neutral-200 dark:hover:bg-blue-600 dark:hover:text-white transition-all shadow-2xs active:scale-95"
                 >
-                  <Pencil size={12} />
+                  <HugeIcon icon={PencilEdit02Icon} size={12} />
                   <span>Editar</span>
                 </Link>
                 <Link
@@ -327,7 +327,7 @@ export function AdminLivrosClientView({ initialBooks }: AdminLivrosClientViewPro
                   className="p-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-500 hover:text-slate-700 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-700 transition-colors"
                   title="Abrir no Catálogo"
                 >
-                  <ExternalLink size={14} />
+                  <HugeIcon icon={ArrowUpRight01Icon} size={14} />
                 </Link>
               </div>
             </div>
@@ -367,7 +367,7 @@ export function AdminLivrosClientView({ initialBooks }: AdminLivrosClientViewPro
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-slate-400">
-                            <BookOpen size={16} />
+                            <HugeIcon icon={BookOpen01Icon} size={16} />
                           </div>
                         )}
                       </div>
@@ -421,7 +421,7 @@ export function AdminLivrosClientView({ initialBooks }: AdminLivrosClientViewPro
                           href={`/admin/livros/${book.id}`}
                           className="inline-flex items-center gap-1 py-1 px-2.5 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white transition-all shadow-xs"
                         >
-                          <Pencil size={11} />
+                          <HugeIcon icon={PencilEdit02Icon} size={11} />
                           <span>Editar</span>
                         </Link>
                         <Link
@@ -430,7 +430,7 @@ export function AdminLivrosClientView({ initialBooks }: AdminLivrosClientViewPro
                           className="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 dark:hover:bg-neutral-700 transition-colors"
                           title="Ver no Catálogo"
                         >
-                          <ExternalLink size={14} />
+                          <HugeIcon icon={ArrowUpRight01Icon} size={14} />
                         </Link>
                       </div>
                     </td>

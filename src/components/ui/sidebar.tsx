@@ -130,30 +130,32 @@ export const MobileSidebar = ({
     <>
       <div
         className={cn(
-          "px-4 py-4 flex flex-row md:hidden sticky top-0 left-0 z-50 items-center justify-between bg-sidebar w-full border-b border-sidebar-border"
+          "h-16 px-4 flex flex-row md:hidden sticky top-0 left-0 z-40 items-center justify-between bg-sidebar w-full border-b border-sidebar-border shrink-0 shadow-xs"
         )}
         {...props}
       >
-        <div className="flex items-center gap-2">
-            {/* Added Logo to Mobile Header */}
-             <div className="flex h-10 w-10 shrink-0 items-center justify-center">
-                <img
-                    src="/logo/LaurentãoLogoB.svg"
-                    alt="Logo"
-                    className="h-8 w-8 shrink-0"
-                />
-            </div>
-             <span className="font-bold text-2xl text-white">Biblioteca</span>
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center">
+            <img
+              src="/logo/laurentao-logo-b.svg"
+              alt="Logo Laurentino"
+              className="h-8 w-8 shrink-0 object-contain"
+            />
+          </div>
+          <span className="font-bold text-xl text-white tracking-tight">Biblioteca</span>
         </div>
 
-        <div className="flex justify-end z-20">
+        <div className="flex items-center justify-end z-20">
           <button
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-sidebar-primary p-2 text-sidebar-primary-foreground hover:bg-sidebar-primary/90"
+            type="button"
+            aria-label={open ? "Fechar menu" : "Abrir menu"}
+            className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 text-white transition-all cursor-pointer"
             onClick={() => setOpen(!open)}
           >
-            <IconMenu2 className="h-6 w-6" />
+            {open ? <IconX className="h-5 w-5" /> : <IconMenu2 className="h-5 w-5" />}
           </button>
         </div>
+
         <AnimatePresence>
           {open && (
             <motion.div
@@ -161,21 +163,36 @@ export const MobileSidebar = ({
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: "-100%", opacity: 0 }}
               transition={{
-                duration: 0.3,
+                duration: 0.25,
                 ease: "easeInOut",
               }}
               className={cn(
-                "fixed h-full w-full inset-0 bg-sidebar p-10 z-[100] flex flex-col justify-between",
+                "fixed inset-0 h-full w-full bg-sidebar/98 backdrop-blur-xl p-6 sm:p-8 z-[100] flex flex-col justify-between overflow-y-auto",
                 className
               )}
             >
-              <div
-                className="absolute right-10 top-10 z-50 text-sidebar-foreground"
-                onClick={() => setOpen(!open)}
-              >
-                <IconX />
+              <div className="flex items-center justify-between pb-4 border-b border-white/15">
+                <div className="flex items-center gap-2.5">
+                  <img
+                    src="/logo/laurentao-logo-b.svg"
+                    alt="Logo Laurentino"
+                    className="h-8 w-8 shrink-0 object-contain"
+                  />
+                  <span className="font-bold text-xl text-white tracking-tight">Biblioteca</span>
+                </div>
+                <button
+                  type="button"
+                  aria-label="Fechar menu"
+                  className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer"
+                  onClick={() => setOpen(false)}
+                >
+                  <IconX className="h-5 w-5" />
+                </button>
               </div>
-              {children}
+
+              <div className="flex-1 py-4 overflow-y-auto">
+                {children}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

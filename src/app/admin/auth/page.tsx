@@ -3,8 +3,6 @@
 import Image from 'next/image';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Lock } from 'lucide-react';
-import layout from './layout';
 
 
 export default function AdminLoginPage() {
@@ -43,8 +41,14 @@ export default function AdminLoginPage() {
     <div className="min-h-screen flex items-center justify-center">
       <div className="max-w-md w-full rounded-lg shadow-md p-8 border border-border">
         <div className="flex flex-col items-center mb-6">
-          <div className="bg-primary/10 p-3 rounded-full mb-3">
-            <Image src="/logo/LaurentãoLogo.svg" width={120} height={120} alt='Image da logo do laurentino'></Image>
+          <div className="mb-3 flex items-center justify-center">
+            <Image
+              src="/logo/laurentao-logo.svg"
+              width={120}
+              height={120}
+              alt="Logo do Colégio Laurentino Martins"
+              priority
+            />
           </div>
           <h1 className="text-2xl font-bold text-foreground">Acesso Administrativo</h1>
           <p className="text-muted-foreground text-sm">Sistema De informação Bibliotecária Laurentino</p>

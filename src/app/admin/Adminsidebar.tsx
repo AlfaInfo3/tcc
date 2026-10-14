@@ -9,15 +9,15 @@ import {
   SidebarLink,
 } from '@/components/ui/sidebar'; // ajuste o caminho
 import {
-    SquareLibrary,
-    CalendarArrowUp,
-    Settings,
-    UserRound,
-    NotebookText,
-    ShieldCheck,
-    LayoutDashboard,
-    LogOut
-  } from "lucide-react";
+  DashboardSquare01Icon,
+  LibraryIcon,
+  Calendar01Icon,
+  UserIcon,
+  Book01Icon,
+  ShieldCheckIcon,
+  Logout01Icon
+} from "@hugeicons/core-free-icons";
+import { HugeIcon } from "@/components/ui/HugeIcon";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
@@ -34,34 +34,34 @@ export default function AdminSidebar() {
   }
   const links = [
     {
-        label: 'DashBoard',
-        href: '/admin/dashboard',
-        icon: <LayoutDashboard />
-      },
+      label: 'DashBoard',
+      href: '/admin/dashboard',
+      icon: <HugeIcon icon={DashboardSquare01Icon} size={20} />
+    },
     {
       label: 'Ver livros',
       href: '/admin/livros',
-      icon: <SquareLibrary />
+      icon: <HugeIcon icon={LibraryIcon} size={20} />
     },
     {
       label: 'Reservas',
       href: '/admin/reservas',
-      icon: < CalendarArrowUp />
+      icon: <HugeIcon icon={Calendar01Icon} size={20} />
     },
     {
       label: 'Alunos',
       href: '/admin/alunos',
-      icon: <UserRound />,
+      icon: <HugeIcon icon={UserIcon} size={20} />,
     },
     {
       label: 'Emprestimos',
       href: '/admin/emprestimos',
-      icon: <NotebookText />,
+      icon: <HugeIcon icon={Book01Icon} size={20} />,
     },
     {
         label: 'Usuario',
         href: '/admin/users',
-        icon: <ShieldCheck/>,
+        icon: <HugeIcon icon={ShieldCheckIcon} size={20} />,
     },
   ];
 
@@ -82,8 +82,8 @@ export default function AdminSidebar() {
     <Sidebar open={open} setOpen={setOpen} >
       <SidebarBody className="justify-between gap-10 bg-sidebar border-none">
         <div>
-          {/* LOGO */}
-          <div className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto">
+          {/* LOGO (Desktop only - mobile drawer has its own header) */}
+          <div className="hidden md:flex flex-1 flex-col overflow-x-hidden overflow-y-auto">
             <AnimatePresence mode="wait">
               {open ? (
                 <motion.div
@@ -110,12 +110,13 @@ export default function AdminSidebar() {
           </div>
 
           {/* LINKS */}
-          <div className="mt-6 flex flex-col gap-2">
+          <div className="mt-2 md:mt-6 flex flex-col gap-2">
             {links.map((link, i) => (
               <SidebarLink 
                 key={i} 
                 link={link}
                 className={pathname === link.href ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm" : ""}
+                onClick={() => setOpen(false)}
               />
             ))}
           </div>
@@ -127,7 +128,7 @@ export default function AdminSidebar() {
                 link={{
                     label: 'Sair',
                     href: '#',
-                    icon: <LogOut className="text-red-500" />
+                    icon: <HugeIcon icon={Logout01Icon} size={20} className="text-red-500" />
                 }}
                 className="hover:bg-red-500/10 hover:text-red-600 text-red-500 mt-auto"
                 onClick={handleLogout}

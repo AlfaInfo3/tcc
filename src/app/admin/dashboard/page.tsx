@@ -15,11 +15,11 @@ export default function DashboardPage() {
           <div className="absolute inset-0 bg-linear-to-r from-blue-950/90 via-blue-900/50 to-transparent"></div>
         </div>
         
-        <div className="relative z-10 px-8 py-10 lg:py-12">
-          <h1 className="text-3xl lg:text-4xl font-black text-white tracking-tight">
+        <div className="relative z-10 px-4 sm:px-8 py-6 sm:py-10 lg:py-12">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight">
             Dashboard Administrativo
           </h1>
-          <p className="text-blue-100 font-medium mt-2 max-w-xl">
+          <p className="text-blue-100 text-xs sm:text-sm lg:text-base font-medium mt-1.5 sm:mt-2 max-w-xl">
             Visão geral do sistema da biblioteca do Colégio Estadual Laurentino Martins.
           </p>
         </div>

@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { X, Menu } from "lucide-react";
+import { Cancel01Icon, Menu01Icon } from "@hugeicons/core-free-icons";
+import { HugeIcon } from "@/components/ui/HugeIcon";
 
 interface BubbleMenuItem {
   label: string;
@@ -33,7 +34,7 @@ export default function BubbleMenu({ logo, items, menuBg = "#ffffff", menuConten
         aria-label="Menu"
       >
         {logo}
-        {open ? <X className="size-4" /> : <Menu className="size-4" />}
+        {open ? <HugeIcon icon={Cancel01Icon} size={16} /> : <HugeIcon icon={Menu01Icon} size={16} />}
       </button>
 
       {/* Dropdown */}

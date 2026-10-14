@@ -16,7 +16,7 @@ export default function Header() {
         openMenuButtonColor="#00008B"
         accentColor="#00008B"
         colors={['#cce3f0', '#4682B4', '#00008B']}
-        logoUrl="/logo/LaurentãoLogo.svg"
+        logoUrl="/logo/laurentao-logo.svg"
         headerClassName="pointer-events-auto"
         transparentHeader={isBookPage}
         items={[

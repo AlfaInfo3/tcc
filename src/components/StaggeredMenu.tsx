@@ -41,7 +41,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
   displaySocials = true,
   displayItemNumbering = true,
   className,
-  logoUrl = '/logo/LaurentãoLogoB.svg',
+  logoUrl = '/logo/laurentao-logo.svg',
   menuButtonColor = '#00008B',
   openMenuButtonColor = '#00008B',
   changeMenuColorOnOpen = true,
@@ -428,7 +428,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
         >
           <div className={`sm-logo flex items-center select-none pointer-events-auto transition-colors duration-300 ${transparentHeader && !open ? 'bg-white/90 backdrop-blur-md shadow-md border border-border/50 rounded-full px-3 py-1' : ''}`} aria-label="Logo">
             <img
-              src={logoUrl || '/src/assets/logos/reactbits-gh-white.svg'}
+              src={open ? '/logo/laurentao-logo-b.svg' : (logoUrl || '/logo/laurentao-logo.svg')}
               alt="Logo"
               className="sm-logo-img block h-16 md:h-24 w-auto object-contain"
               draggable={false}

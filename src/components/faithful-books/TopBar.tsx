@@ -1,6 +1,13 @@
 'use client';
 
-import { Search, RotateCcw, XCircle, ChevronDown, SlidersHorizontal } from 'lucide-react';
+import { 
+  Search01Icon, 
+  ReloadIcon, 
+  CancelCircleIcon, 
+  ArrowDown01Icon, 
+  FilterHorizontalIcon 
+} from '@hugeicons/core-free-icons';
+import { HugeIcon } from '@/components/ui/HugeIcon';
 import { useState } from 'react';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { FilterState } from './FiltersPanel';
@@ -67,7 +74,7 @@ export function TopBar({
               onClick={onOpenMobileFilters}
               className="lg:hidden bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-2 rounded-full text-xs font-bold shadow-md flex items-center gap-1.5 cursor-pointer transition-colors"
             >
-              <SlidersHorizontal size={14} />
+              <HugeIcon icon={FilterHorizontalIcon} size={14} />
               <span>Filtros</span>
               {activeFiltersCount > 0 && (
                 <span className="size-4.5 bg-white text-blue-700 text-[10px] font-black rounded-full flex items-center justify-center">
@@ -85,7 +92,7 @@ export function TopBar({
                 className="bg-white/95 hover:bg-white px-4 py-2 rounded-full text-xs font-bold text-slate-800 shadow-sm border border-white/20 flex items-center gap-1.5 cursor-pointer transition-colors outline-none"
               >
                 <span>{sortLabels[sortBy] || 'Ordem: A - Z'}</span>
-                <ChevronDown size={14} className="text-slate-500" />
+                <HugeIcon icon={ArrowDown01Icon} size={14} className="text-slate-500" />
               </button>
             </DropdownMenu.Trigger>
 
@@ -136,7 +143,7 @@ export function TopBar({
 
         {/* Right Search Input */}
         <div className="relative flex-1 sm:flex-initial sm:w-72">
-          <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+          <HugeIcon icon={Search01Icon} size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
             placeholder="Buscar por título, autor ou gênero..."
@@ -150,7 +157,7 @@ export function TopBar({
               onClick={() => onSearchChange('')}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
             >
-              <XCircle size={14} />
+              <HugeIcon icon={CancelCircleIcon} size={14} />
             </button>
           )}
         </div>
@@ -168,7 +175,7 @@ export function TopBar({
                 className="hover:text-blue-200 transition-colors cursor-pointer"
                 title="Remover filtro de letra"
               >
-                <XCircle size={14} />
+                <HugeIcon icon={CancelCircleIcon} size={14} />
               </button>
               <span>Letra inicial: &ldquo;{selectedLetter}&rdquo;</span>
             </div>
@@ -185,7 +192,7 @@ export function TopBar({
                 className="text-slate-400 hover:text-rose-500 transition-colors cursor-pointer"
                 title="Remover filtro"
               >
-                <XCircle size={14} />
+                <HugeIcon icon={CancelCircleIcon} size={14} />
               </button>
               <span>{chip.label}</span>
             </div>
@@ -199,7 +206,7 @@ export function TopBar({
                 className="text-slate-400 hover:text-rose-500 transition-colors cursor-pointer"
                 title="Limpar busca"
               >
-                <XCircle size={14} />
+                <HugeIcon icon={CancelCircleIcon} size={14} />
               </button>
               <span>Busca: &ldquo;{searchQuery}&rdquo;</span>
             </div>
@@ -211,7 +218,7 @@ export function TopBar({
             onClick={onResetAll}
             className="text-xs font-bold text-blue-200 hover:text-white flex items-center gap-1 cursor-pointer transition-colors ml-1"
           >
-            <RotateCcw size={12} className="stroke-[2.5]" />
+            <HugeIcon icon={ReloadIcon} size={12} />
             <span>Limpar Todos</span>
           </button>
         </div>

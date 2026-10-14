@@ -1,5 +1,6 @@
 import { useRef } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowLeft01Icon, ArrowRight01Icon } from '@hugeicons/core-free-icons';
+import { HugeIcon } from '@/components/ui/HugeIcon';
 import { BookCardHorizontal } from "./book-card-horizontal";
 
 interface BookRowProps {
@@ -32,15 +33,15 @@ export function BookRow({ title, books }: BookRowProps) {
         <div className="hidden md:flex gap-2 opacity-0 group-hover/row:opacity-100 transition-opacity">
             <button 
                 onClick={() => scroll('left')}
-                className="p-1.5 rounded-full bg-background/80 hover:bg-background border shadow-sm text-foreground/80"
+                className="p-1.5 rounded-full bg-background/80 hover:bg-background border shadow-sm text-foreground/80 cursor-pointer"
             >
-                <ChevronLeft size={16} />
+                <HugeIcon icon={ArrowLeft01Icon} size={16} />
             </button>
             <button 
                 onClick={() => scroll('right')}
-                className="p-1.5 rounded-full bg-background/80 hover:bg-background border shadow-sm text-foreground/80"
+                className="p-1.5 rounded-full bg-background/80 hover:bg-background border shadow-sm text-foreground/80 cursor-pointer"
             >
-                <ChevronRight size={16} />
+                <HugeIcon icon={ArrowRight01Icon} size={16} />
             </button>
         </div>
       </div>

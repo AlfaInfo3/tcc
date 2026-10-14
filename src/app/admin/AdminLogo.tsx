@@ -5,7 +5,7 @@ export const AdminLogo = () => {
     <div className="flex items-center justify-start gap-2 py-2 relative z-20">
       <div className="flex h-16 w-16 shrink-0 items-center justify-center">
         <Image
-          src="/logo/LaurentãoLogoB.svg"
+          src="/logo/laurentao-logo-b.svg"
           alt="Logo"
           width={80}
           height={80}
@@ -25,7 +25,7 @@ export const AdminLogoIcon = () => {
     <div className="flex items-center justify-center py-2">
         <div className="flex h-12 w-12 shrink-0 items-center justify-center">
             <Image
-                src="/logo/LaurentãoLogoB.svg"
+                src="/logo/laurentao-logo-b.svg"
                 alt="Logo"
                 width={60}
                 height={60}

@@ -2,15 +2,16 @@
 
 import React, { useState } from 'react';
 import { 
-  Star, 
-  MessageSquare, 
-  CheckCircle2, 
-  AlertCircle, 
-  Loader2, 
-  PenLine, 
-  Sparkles, 
-  X 
-} from 'lucide-react';
+  StarIcon, 
+  Comment01Icon, 
+  CheckmarkCircle02Icon, 
+  Alert02Icon, 
+  LoaderCircleIcon, 
+  PencilEdit02Icon, 
+  SparklesIcon, 
+  Cancel01Icon 
+} from '@hugeicons/core-free-icons';
+import { HugeIcon } from '@/components/ui/HugeIcon';
 
 export interface SerializedReview {
   id: string;
@@ -148,7 +149,7 @@ export function BookReviewsSection({
         <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-white/10">
           <div className="flex items-center gap-2.5">
             <div className="size-8 rounded-xl bg-amber-400/20 text-amber-300 border border-amber-400/30 flex items-center justify-center font-bold shrink-0">
-              <Star className="size-4 text-amber-400 fill-amber-400" />
+              <HugeIcon icon={StarIcon} size={16} className="text-amber-400 fill-amber-400" />
             </div>
             <div>
               <h2 className="text-lg sm:text-xl font-black text-white tracking-tight leading-tight">
@@ -170,12 +171,12 @@ export function BookReviewsSection({
           >
             {isFormOpen ? (
               <>
-                <X className="size-3.5" />
+                <HugeIcon icon={Cancel01Icon} size={14} />
                 <span>Fechar</span>
               </>
             ) : (
               <>
-                <PenLine className="size-3.5" />
+                <HugeIcon icon={PencilEdit02Icon} size={14} />
                 <span>Avaliar Livro</span>
               </>
             )}
@@ -195,8 +196,10 @@ export function BookReviewsSection({
                 </span>
                 <div className="flex items-center justify-center gap-0.5 mt-1.5">
                   {[1, 2, 3, 4, 5].map((star) => (
-                    <Star
+                    <HugeIcon
+                      icon={StarIcon}
                       key={star}
+                      size={14}
                       className={`size-3.5 ${
                         star <= Math.round(averageRating)
                           ? 'text-amber-400 fill-amber-400'
@@ -216,7 +219,7 @@ export function BookReviewsSection({
                   <div key={star} className="flex items-center gap-2 text-[11px] font-bold">
                     <span className="w-7 text-blue-200/70 flex items-center gap-0.5 justify-end font-mono">
                       <span>{star}</span>
-                      <Star className="size-2.5 text-amber-400 fill-amber-400" />
+                      <HugeIcon icon={StarIcon} size={10} className="text-amber-400 fill-amber-400" />
                     </span>
                     <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
                       <div
@@ -234,7 +237,7 @@ export function BookReviewsSection({
 
             <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[11px] font-semibold text-blue-200/60">
               <span className="flex items-center gap-1">
-                <Sparkles className="size-3 text-amber-400" />
+                <HugeIcon icon={SparklesIcon} size={12} className="text-amber-400" />
                 Avaliações escolares
               </span>
               <span>Laurentino Martins</span>
@@ -249,7 +252,7 @@ export function BookReviewsSection({
               <div className="bg-white/[0.06] rounded-2xl border border-white/20 p-5 space-y-4 shadow-xl animate-in fade-in duration-200">
                 <div className="flex items-center justify-between">
                   <h3 className="text-xs font-black uppercase tracking-wider text-white flex items-center gap-1.5">
-                    <PenLine className="size-3.5 text-blue-300" />
+                    <HugeIcon icon={PencilEdit02Icon} size={14} className="text-blue-300" />
                     Sua Avaliação para &ldquo;{bookTitle}&rdquo;
                   </h3>
                   <button
@@ -257,20 +260,20 @@ export function BookReviewsSection({
                     onClick={() => setIsFormOpen(false)}
                     className="text-white/60 hover:text-white p-1 cursor-pointer"
                   >
-                    <X className="size-4" />
+                    <HugeIcon icon={Cancel01Icon} size={16} />
                   </button>
                 </div>
 
                 {successMessage && (
                   <div className="p-3 rounded-xl bg-emerald-500/20 border border-emerald-400/40 text-emerald-200 text-xs font-bold flex items-center gap-2">
-                    <CheckCircle2 className="size-4 text-emerald-400 shrink-0" />
+                    <HugeIcon icon={CheckmarkCircle02Icon} size={16} className="text-emerald-400 shrink-0" />
                     <span>{successMessage}</span>
                   </div>
                 )}
 
                 {errors.submit && (
                   <div className="p-3 rounded-xl bg-rose-500/20 border border-rose-400/40 text-rose-200 text-xs font-bold flex items-center gap-2">
-                    <AlertCircle className="size-4 text-rose-400 shrink-0" />
+                    <HugeIcon icon={Alert02Icon} size={16} className="text-rose-400 shrink-0" />
                     <span>{errors.submit}</span>
                   </div>
                 )}
@@ -288,7 +291,9 @@ export function BookReviewsSection({
                           onMouseLeave={() => setHoveredStar(null)}
                           className="p-0.5 rounded-md hover:scale-120 transition-transform cursor-pointer"
                         >
-                          <Star
+                          <HugeIcon
+                            icon={StarIcon}
+                            size={20}
                             className={`size-5 transition-colors ${
                               star <= activeStarRating
                                 ? 'text-amber-400 fill-amber-400'
@@ -362,12 +367,12 @@ export function BookReviewsSection({
                     >
                       {isSubmitting ? (
                         <>
-                          <Loader2 className="size-3.5 animate-spin" />
+                          <HugeIcon icon={LoaderCircleIcon} size={14} className="animate-spin" />
                           <span>Enviando...</span>
                         </>
                       ) : (
                         <>
-                          <CheckCircle2 className="size-3.5" />
+                          <HugeIcon icon={CheckmarkCircle02Icon} size={14} />
                           <span>Publicar</span>
                         </>
                       )}
@@ -381,7 +386,7 @@ export function BookReviewsSection({
             <div className="space-y-3">
               {totalReviews === 0 ? (
                 <div className="text-center py-6 px-4 rounded-2xl bg-white/[0.03] border border-dashed border-white/15 space-y-2">
-                  <Star className="size-5 text-amber-400 fill-amber-400 mx-auto" />
+                  <HugeIcon icon={StarIcon} size={20} className="text-amber-400 fill-amber-400 mx-auto" />
                   <p className="text-xs font-bold text-white">
                     Nenhuma avaliação ainda para este livro.
                   </p>
@@ -393,7 +398,7 @@ export function BookReviewsSection({
                     onClick={() => setIsFormOpen(true)}
                     className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold transition-all cursor-pointer mt-1"
                   >
-                    <PenLine className="size-3" />
+                    <HugeIcon icon={PencilEdit02Icon} size={12} />
                     <span>Avaliar agora</span>
                   </button>
                 </div>
@@ -406,11 +411,11 @@ export function BookReviewsSection({
                     });
 
                     const initials = rev.studentName
-                      .split(' ')
-                      .filter(Boolean)
-                      .slice(0, 2)
-                      .map((p) => p[0].toUpperCase())
-                      .join('');
+                        .split(' ')
+                        .filter(Boolean)
+                        .slice(0, 2)
+                        .map((p) => p[0].toUpperCase())
+                        .join('');
 
                     return (
                       <div
@@ -439,8 +444,10 @@ export function BookReviewsSection({
 
                           <div className="flex items-center gap-0.5 bg-white/10 px-2 py-1 rounded-lg border border-white/15 shrink-0">
                             {[1, 2, 3, 4, 5].map((star) => (
-                              <Star
+                              <HugeIcon
+                                icon={StarIcon}
                                 key={star}
+                                size={12}
                                 className={`size-3 ${
                                   star <= rev.rating
                                   ? 'text-amber-400 fill-amber-400'

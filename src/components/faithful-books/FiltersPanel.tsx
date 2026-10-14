@@ -1,6 +1,7 @@
 'use client';
 
-import { ListFilter, X, CheckCircle2, BookOpen, Calendar, Check } from 'lucide-react';
+import { FilterIcon, Cancel01Icon } from '@hugeicons/core-free-icons';
+import { HugeIcon } from '@/components/ui/HugeIcon';
 
 export interface FilterState {
   published?: string;
@@ -48,7 +49,7 @@ export function FiltersPanel({
       {/* Header */}
       <div className="flex items-center justify-between gap-2 mb-4 text-slate-900 border-b border-slate-100 pb-3">
         <div className="flex items-center gap-2">
-          <ListFilter size={18} className="text-blue-600 stroke-[2.2]" />
+          <HugeIcon icon={FilterIcon} size={18} className="text-blue-600" />
           <h2 className="text-sm font-black tracking-tight">Filtros</h2>
         </div>
         {onClose && (
@@ -57,7 +58,7 @@ export function FiltersPanel({
             onClick={onClose}
             className="lg:hidden p-1.5 rounded-full hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition-colors"
           >
-            <X size={18} />
+            <HugeIcon icon={Cancel01Icon} size={18} />
           </button>
         )}
       </div>

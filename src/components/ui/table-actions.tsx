@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { AnimatePresence, motion } from "motion/react";
-import { MoreHorizontal } from 'lucide-react';
+import { MoreHorizontalIcon } from '@hugeicons/core-free-icons';
+import { HugeIcon } from '@/components/ui/HugeIcon';
 import Link from 'next/link';
 
 interface Action {
@@ -47,7 +48,7 @@ export const TableActions = ({ actions }: TableActionsProps) => {
         }}
         className="p-1 rounded-md hover:bg-muted transition-colors text-muted-foreground hover:text-foreground outline-none focus:ring-2 focus:ring-ring"
       >
-        <MoreHorizontal size={20} />
+        <HugeIcon icon={MoreHorizontalIcon} size={20} />
       </button>
 
       <AnimatePresence>

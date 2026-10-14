@@ -1,6 +1,7 @@
 'use client';
 
-import { Star } from 'lucide-react';
+import { StarIcon } from '@hugeicons/core-free-icons';
+import { HugeIcon } from '@/components/ui/HugeIcon';
 
 interface StarsProps {
   rating: number; // 0 to 5
@@ -15,7 +16,7 @@ export function Stars({ rating, size = 16 }: StarsProps) {
       {/* Background Gray Stars */}
       <div className="flex items-center gap-0.5 text-[#E0CECE]">
         {[...Array(5)].map((_, i) => (
-          <Star key={i} size={size} fill="currentColor" stroke="none" />
+          <HugeIcon key={i} icon={StarIcon} size={size} className="[&_path]:fill-current stroke-none" />
         ))}
       </div>
 
@@ -25,7 +26,7 @@ export function Stars({ rating, size = 16 }: StarsProps) {
         style={{ width: `${percentage}%` }}
       >
         {[...Array(5)].map((_, i) => (
-          <Star key={i} size={size} fill="currentColor" stroke="none" />
+          <HugeIcon key={i} icon={StarIcon} size={size} className="[&_path]:fill-current stroke-none" />
         ))}
       </div>
     </div>

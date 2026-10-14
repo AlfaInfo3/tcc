@@ -1,7 +1,8 @@
 'use client';
 
 import * as HoverCard from '@radix-ui/react-hover-card';
-import { BookOpen, ArrowRight, Bookmark, Book as BookIcon } from 'lucide-react';
+import { Bookmark01Icon, BookOpen01Icon, ArrowRight01Icon } from '@hugeicons/core-free-icons';
+import { HugeIcon } from '@/components/ui/HugeIcon';
 import Link from 'next/link';
 import { Stars } from './Stars';
 import { ModernBookCover, BookHeader, BookTitle, BookDescription } from '@/cuicui/other/books/modern-book-cover/modern-book-cover';
@@ -71,7 +72,7 @@ export function BookCardWithHover({ book, defaultOpen = false, onReserve }: Book
                 forceRotate={isNavigating}
               >
                 <BookHeader>
-                  <BookIcon size={20} />
+                  <HugeIcon icon={BookOpen01Icon} size={20} />
                 </BookHeader>
                 <BookTitle>{book.title}</BookTitle>
                 <BookDescription>{book.author}</BookDescription>
@@ -87,7 +88,7 @@ export function BookCardWithHover({ book, defaultOpen = false, onReserve }: Book
                 forceRotate={isNavigating}
               >
                 <BookHeader>
-                  <BookIcon size={16} />
+                  <HugeIcon icon={BookOpen01Icon} size={16} />
                 </BookHeader>
                 <BookTitle className="text-sm leading-tight">{book.title}</BookTitle>
                 <BookDescription className="text-[10px] line-clamp-2">{book.author}</BookDescription>
@@ -149,7 +150,7 @@ export function BookCardWithHover({ book, defaultOpen = false, onReserve }: Book
                       : 'bg-slate-200 text-slate-400 cursor-not-allowed'
                   }`}
                 >
-                  <Bookmark size={15} className="stroke-[2.2]" />
+                  <HugeIcon icon={Bookmark01Icon} size={15} />
                   <span>{isAvailable ? 'Reservar' : 'Indisponível'}</span>
                 </button>
               )}
@@ -158,9 +159,9 @@ export function BookCardWithHover({ book, defaultOpen = false, onReserve }: Book
                 href={href}
                 className="bg-slate-100 hover:bg-blue-50 text-slate-800 hover:text-blue-700 font-bold text-[13px] px-5 py-2.5 rounded-xl flex items-center gap-2 transition-all cursor-pointer border border-slate-200 hover:border-blue-200"
               >
-                <BookOpen size={15} className="stroke-[2.2]" />
+                <HugeIcon icon={BookOpen01Icon} size={15} />
                 <span>Ver Detalhes</span>
-                <ArrowRight size={14} className="stroke-[2.2]" />
+                <HugeIcon icon={ArrowRight01Icon} size={14} />
               </Link>
             </div>
           </HoverCard.Content>

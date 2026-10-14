@@ -1,8 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { X, Bookmark, CheckCircle2, AlertCircle, Loader2, BookOpen } from 'lucide-react';
-import { BookItem } from './BookCardWithHover';
+import { 
+  Cancel01Icon, 
+  Bookmark01Icon, 
+  CheckmarkCircle02Icon, 
+  Alert02Icon, 
+  LoaderCircleIcon 
+} from '@hugeicons/core-free-icons';
+import { HugeIcon } from '@/components/ui/HugeIcon';
+import type { BookItem } from './BookCardWithHover';
 
 interface ReserveModalProps {
   book: BookItem | null;
@@ -81,7 +88,7 @@ export function ReserveModal({ book, isOpen, onClose, onSuccess }: ReserveModalP
           className="absolute top-5 right-5 p-2 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
           title="Fechar"
         >
-          <X size={18} />
+          <HugeIcon icon={Cancel01Icon} size={18} />
         </button>
 
         {/* Modal Header with Book Preview */}
@@ -95,7 +102,7 @@ export function ReserveModal({ book, isOpen, onClose, onSuccess }: ReserveModalP
           </div>
           <div className="min-w-0">
             <span className="inline-flex items-center gap-1 text-[11px] font-black uppercase tracking-wider text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full mb-1">
-              <Bookmark size={11} />
+              <HugeIcon icon={Bookmark01Icon} size={11} />
               Reserva Escolar
             </span>
             <h3 className="text-base sm:text-lg font-black text-slate-900 leading-tight truncate">
@@ -116,7 +123,7 @@ export function ReserveModal({ book, isOpen, onClose, onSuccess }: ReserveModalP
         {success ? (
           <div className="py-8 text-center space-y-3">
             <div className="size-14 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto shadow-xs border border-emerald-200">
-              <CheckCircle2 size={32} />
+              <HugeIcon icon={CheckmarkCircle02Icon} size={32} />
             </div>
             <h4 className="text-lg font-black text-slate-900">Reserva Confirmada!</h4>
             <p className="text-xs text-slate-600 max-w-sm mx-auto leading-relaxed">
@@ -128,7 +135,7 @@ export function ReserveModal({ book, isOpen, onClose, onSuccess }: ReserveModalP
           <form onSubmit={handleSubmit} className="pt-5 space-y-4">
             {error && (
               <div className="flex items-center gap-2 p-3 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold">
-                <AlertCircle size={16} className="shrink-0 text-rose-600" />
+                <HugeIcon icon={Alert02Icon} size={16} className="shrink-0 text-rose-600" />
                 <span>{error}</span>
               </div>
             )}
@@ -179,12 +186,12 @@ export function ReserveModal({ book, isOpen, onClose, onSuccess }: ReserveModalP
               >
                 {isLoading ? (
                   <>
-                    <Loader2 size={14} className="animate-spin" />
+                    <HugeIcon icon={LoaderCircleIcon} size={14} className="animate-spin" />
                     <span>Confirmando...</span>
                   </>
                 ) : (
                   <>
-                    <Bookmark size={14} />
+                    <HugeIcon icon={Bookmark01Icon} size={14} />
                     <span>Confirmar Reserva</span>
                   </>
                 )}

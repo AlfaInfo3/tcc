@@ -2,21 +2,22 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { 
-  Barcode, 
-  Camera, 
-  Check, 
-  X, 
-  Loader2, 
-  Sparkles, 
-  Upload, 
-  Plus, 
-  Minus, 
-  BookOpen, 
-  CheckCircle2, 
-  AlertCircle,
-  RefreshCw,
-  CameraOff
-} from 'lucide-react';
+  BarcodeScanIcon, 
+  Camera01Icon, 
+  Tick01Icon, 
+  Cancel01Icon, 
+  LoaderCircleIcon, 
+  SparklesIcon, 
+  Upload01Icon, 
+  PlusSignIcon, 
+  MinusSignIcon, 
+  BookOpen01Icon, 
+  CheckmarkCircle02Icon, 
+  Alert02Icon,
+  ReloadIcon,
+  CameraOff01Icon
+} from '@hugeicons/core-free-icons';
+import { HugeIcon } from '@/components/ui/HugeIcon';
 import { Html5Qrcode } from 'html5-qrcode';
 import { BookSearchResult } from '@/lib/book-search';
 
@@ -280,7 +281,7 @@ export function QuickBookRegisterModal({ isOpen, onClose, onBookCreated }: Quick
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-blue-900 to-indigo-900 text-white">
           <div className="flex items-center gap-2.5">
             <div className="size-9 rounded-xl bg-blue-600/90 flex items-center justify-center text-white shadow-md">
-              <Sparkles size={20} className="animate-pulse" />
+              <HugeIcon icon={SparklesIcon} size={20} className="animate-pulse" />
             </div>
             <div>
               <h2 className="text-base sm:text-lg font-black tracking-tight leading-tight">
@@ -297,7 +298,7 @@ export function QuickBookRegisterModal({ isOpen, onClose, onBookCreated }: Quick
             className="p-1.5 rounded-xl hover:bg-white/20 text-white transition-colors cursor-pointer"
             title="Fechar"
           >
-            <X size={20} />
+            <HugeIcon icon={Cancel01Icon} size={20} />
           </button>
         </div>
 
@@ -306,7 +307,7 @@ export function QuickBookRegisterModal({ isOpen, onClose, onBookCreated }: Quick
           {/* Success Banner */}
           {successMessage && (
             <div className="flex items-center gap-2.5 p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold animate-in fade-in-0">
-              <CheckCircle2 size={18} className="text-emerald-600 shrink-0" />
+              <HugeIcon icon={CheckmarkCircle02Icon} size={18} className="text-emerald-600 shrink-0" />
               <span>{successMessage}</span>
             </div>
           )}
@@ -314,7 +315,7 @@ export function QuickBookRegisterModal({ isOpen, onClose, onBookCreated }: Quick
           {/* Error Banner */}
           {searchError && (
             <div className="flex items-center gap-2.5 p-3 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold animate-in fade-in-0">
-              <AlertCircle size={18} className="text-rose-600 shrink-0" />
+              <HugeIcon icon={Alert02Icon} size={18} className="text-rose-600 shrink-0" />
               <span>{searchError}</span>
             </div>
           )}
@@ -348,7 +349,7 @@ export function QuickBookRegisterModal({ isOpen, onClose, onBookCreated }: Quick
                 />
                 {loadingSearch && (
                   <div className="absolute right-3 top-3">
-                    <Loader2 size={18} className="animate-spin text-blue-600" />
+                    <HugeIcon icon={LoaderCircleIcon} size={18} className="animate-spin text-blue-600" />
                   </div>
                 )}
               </div>
@@ -371,7 +372,7 @@ export function QuickBookRegisterModal({ isOpen, onClose, onBookCreated }: Quick
                     : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-600/25'
                 }`}
               >
-                <Camera size={16} />
+                <HugeIcon icon={Camera01Icon} size={16} />
                 <span>{isScanning ? 'Parar Câmera' : 'Escanear Câmera'}</span>
               </button>
             </div>
@@ -381,7 +382,7 @@ export function QuickBookRegisterModal({ isOpen, onClose, onBookCreated }: Quick
               <div className="mt-3 p-3 bg-slate-900 rounded-2xl border border-slate-800 animate-in fade-in-0">
                 <div className="flex items-center justify-between mb-2 text-white">
                   <div className="flex items-center gap-2 text-xs font-bold text-blue-300">
-                    <Barcode size={16} />
+                    <HugeIcon icon={BarcodeScanIcon} size={16} />
                     <span>Aponte o código de barras para a linha vermelha</span>
                   </div>
                   <button 
@@ -414,7 +415,7 @@ export function QuickBookRegisterModal({ isOpen, onClose, onBookCreated }: Quick
                     />
                     {isCoverApproved && (
                       <div className="absolute top-1.5 right-1.5 bg-emerald-500 text-white rounded-full p-0.5 shadow-sm">
-                        <Check size={12} className="stroke-[3]" />
+                        <HugeIcon icon={Tick01Icon} size={12} strokeWidth={3} />
                       </div>
                     )}
                   </div>
@@ -432,7 +433,7 @@ export function QuickBookRegisterModal({ isOpen, onClose, onBookCreated }: Quick
                     >
                       {isCoverApproved ? (
                         <span className="inline-flex items-center gap-1">
-                          <Check size={12} />
+                          <HugeIcon icon={Tick01Icon} size={12} />
                           <span>Capa Aprovada</span>
                         </span>
                       ) : (
@@ -447,12 +448,12 @@ export function QuickBookRegisterModal({ isOpen, onClose, onBookCreated }: Quick
                         className="flex-1 flex items-center justify-center gap-1 text-[10px] font-bold px-2 py-1 bg-white hover:bg-slate-100 text-slate-700 rounded-xl border border-slate-200 transition-all cursor-pointer"
                         title="Tirar foto da capa física com a câmera"
                       >
-                        <Camera size={12} />
+                        <HugeIcon icon={Camera01Icon} size={12} />
                         <span>Foto</span>
                       </button>
 
                       <label className="flex-1 flex items-center justify-center gap-1 text-[10px] font-bold px-2 py-1 bg-white hover:bg-slate-100 text-slate-700 rounded-xl border border-slate-200 transition-all cursor-pointer">
-                        <Upload size={12} />
+                        <HugeIcon icon={Upload01Icon} size={12} />
                         <span>Upload</span>
                         <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
                       </label>
@@ -530,7 +531,7 @@ export function QuickBookRegisterModal({ isOpen, onClose, onBookCreated }: Quick
                           onClick={() => setQuantity(Math.max(1, quantity - 1))}
                           className="p-1.5 hover:bg-slate-100 text-slate-600 transition-colors"
                         >
-                          <Minus size={14} />
+                          <HugeIcon icon={MinusSignIcon} size={14} />
                         </button>
                         <span className="px-3 text-xs font-black text-slate-900 min-w-[28px] text-center">
                           {quantity}
@@ -540,7 +541,7 @@ export function QuickBookRegisterModal({ isOpen, onClose, onBookCreated }: Quick
                           onClick={() => setQuantity(quantity + 1)}
                           className="p-1.5 hover:bg-slate-100 text-slate-600 transition-colors"
                         >
-                          <Plus size={14} />
+                          <HugeIcon icon={PlusSignIcon} size={14} />
                         </button>
                       </div>
                     </div>
@@ -565,7 +566,7 @@ export function QuickBookRegisterModal({ isOpen, onClose, onBookCreated }: Quick
             <div className="p-4 bg-slate-900 rounded-2xl border border-slate-800 text-white animate-in zoom-in-95">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-xs font-bold text-blue-300 flex items-center gap-1.5">
-                  <Camera size={16} />
+                  <HugeIcon icon={Camera01Icon} size={16} />
                   <span>Posicione a capa do livro na câmera e clique em Fotografar</span>
                 </span>
                 <button
@@ -573,7 +574,7 @@ export function QuickBookRegisterModal({ isOpen, onClose, onBookCreated }: Quick
                   onClick={stopPhotoCamera}
                   className="p-1 text-slate-400 hover:text-white"
                 >
-                  <X size={16} />
+                  <HugeIcon icon={Cancel01Icon} size={16} />
                 </button>
               </div>
 
@@ -587,7 +588,7 @@ export function QuickBookRegisterModal({ isOpen, onClose, onBookCreated }: Quick
                   onClick={capturePhoto}
                   className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black rounded-xl shadow-lg flex items-center gap-2 cursor-pointer"
                 >
-                  <Camera size={16} />
+                  <HugeIcon icon={Camera01Icon} size={16} />
                   <span>Fotografar Capa</span>
                 </button>
                 <button
@@ -630,7 +631,7 @@ export function QuickBookRegisterModal({ isOpen, onClose, onBookCreated }: Quick
                   className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md shadow-indigo-600/25 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
                   title="Salva este livro no banco e já prepara o leitor para o próximo código de barras"
                 >
-                  {saving ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
+                  {saving ? <HugeIcon icon={LoaderCircleIcon} size={14} className="animate-spin" /> : <HugeIcon icon={ReloadIcon} size={14} />}
                   <span>Salvar e Próximo</span>
                 </button>
 
@@ -640,7 +641,7 @@ export function QuickBookRegisterModal({ isOpen, onClose, onBookCreated }: Quick
                   disabled={saving}
                   className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs rounded-xl shadow-md shadow-emerald-600/25 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
                 >
-                  {saving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} className="stroke-[3]" />}
+                  {saving ? <HugeIcon icon={LoaderCircleIcon} size={14} className="animate-spin" /> : <HugeIcon icon={Tick01Icon} size={14} strokeWidth={3} />}
                   <span>Salvar e Concluir</span>
                 </button>
               </>

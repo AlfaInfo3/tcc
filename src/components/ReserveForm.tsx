@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { BookmarkCheck, Loader2 } from 'lucide-react';
+import { BookmarkCheck01Icon, LoaderCircleIcon } from '@hugeicons/core-free-icons';
+import { HugeIcon } from '@/components/ui/HugeIcon';
 
 interface ReserveFormProps {
   bookId: string;
@@ -133,7 +134,7 @@ export function ReserveForm({ bookId }: ReserveFormProps) {
 
       {successMessage && (
         <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2">
-          <BookmarkCheck className="size-4 shrink-0 text-emerald-600" />
+          <HugeIcon icon={BookmarkCheck01Icon} size={16} className="shrink-0 text-emerald-600" />
           <span>{successMessage}</span>
         </div>
       )}
@@ -149,14 +150,14 @@ export function ReserveForm({ bookId }: ReserveFormProps) {
       >
         {isSubmitting ? (
           <>
-            <Loader2 className="size-4 animate-spin" />
+            <HugeIcon icon={LoaderCircleIcon} size={16} className="animate-spin" />
             <span>Processando Reserva...</span>
           </>
         ) : successMessage ? (
           <span>Reserva Confirmada!</span>
         ) : (
           <>
-            <BookmarkCheck className="size-4 text-[#FFD166]" />
+            <HugeIcon icon={BookmarkCheck01Icon} size={16} className="text-[#FFD166]" />
             <span>Confirmar Reserva de Exemplar</span>
           </>
         )}

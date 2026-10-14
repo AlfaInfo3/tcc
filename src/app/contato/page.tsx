@@ -3,23 +3,21 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { PublicNav } from '@/components/PublicNav';
+import { LiquidGlassFooter } from '@/components/LiquidGlassFooter';
 import {
-  ChevronRight,
-  MapPin,
-  Phone,
-  Instagram,
-  ArrowUpRight,
-  Maximize2,
-  Navigation,
-  Clock,
-  Users,
-  FileText,
-  MessageCircle,
-  ArrowRight,
-  ArrowUp,
-  Facebook,
-  Youtube
-} from 'lucide-react';
+  ArrowRight01Icon,
+  ArrowUpRight01Icon,
+  Location01Icon,
+  CallIcon,
+  InstagramIcon,
+  Maximize01Icon,
+  Navigation01Icon,
+  Clock01Icon,
+  UserGroupIcon,
+  File01Icon,
+  WhatsappIcon,
+} from "@hugeicons/core-free-icons";
+import { HugeIcon } from "@/components/ui/HugeIcon";
 
 interface FaqItem {
   question: string;
@@ -61,13 +59,9 @@ export default function ContatoPage() {
     setOpenFaqIndex(openFaqIndex === index ? null : index);
   };
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-800 font-sans selection:bg-blue-100 selection:text-blue-900">
-      
+
       {/* =========================================================================
           1. NAVBAR GLOBAL (CardNav com logo e links padrão do sistema)
           ========================================================================= */}
@@ -79,16 +73,13 @@ export default function ContatoPage() {
       <section className="bg-[#0B2545] text-white pt-32 sm:pt-40 lg:pt-44 pb-20 sm:pb-28 overflow-hidden relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-            
+
             {/* Lado Esquerdo: Textos & Título */}
             <div className="lg:col-span-7 space-y-4 sm:space-y-5 text-left">
-              
+
               {/* Badge "FALE CONOSCO" */}
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#07192F] border border-blue-400/30 text-white text-xs font-bold uppercase tracking-wider shadow-inner">
                 <span className="text-[#FFD166] font-black text-sm">FALE CONOSCO</span>
-                <span className="size-5 rounded-full bg-blue-600/80 flex items-center justify-center text-white">
-                  <Phone className="size-3 text-white" />
-                </span>
               </div>
 
               {/* Título Principal */}
@@ -125,19 +116,19 @@ export default function ContatoPage() {
       <section className="-mt-10 sm:-mt-14 relative z-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            
+
             {/* Card 1: Endereço */}
             <div className="bg-white rounded-2xl p-6 sm:p-7 shadow-sm hover:shadow-md border border-slate-100 transition-all duration-300 flex flex-col justify-between group">
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <div className="size-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
-                    <MapPin size={24} className="text-blue-600" />
+                    <HugeIcon icon={Location01Icon} size={24} className="text-blue-600" />
                   </div>
                   <div className="size-7 rounded-full border border-slate-200 text-slate-400 flex items-center justify-center group-hover:border-blue-300 group-hover:text-blue-600 transition-colors">
-                    <ArrowUpRight size={14} />
+                    <HugeIcon icon={ArrowUpRight01Icon} size={14} />
                   </div>
                 </div>
-                
+
                 <h3 className="font-bold text-slate-900 text-base mb-1.5">Endereço</h3>
                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
                   R. 36, Nº 391 – São Cristóvão
@@ -154,7 +145,7 @@ export default function ContatoPage() {
                   className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full border border-blue-200 hover:border-blue-400 hover:bg-blue-50/60 text-blue-600 text-xs font-semibold transition-all"
                 >
                   <span>Ver no mapa</span>
-                  <ChevronRight size={14} />
+                  <HugeIcon icon={ArrowRight01Icon} size={14} />
                 </a>
               </div>
             </div>
@@ -164,10 +155,10 @@ export default function ContatoPage() {
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <div className="size-12 rounded-xl bg-pink-50 text-pink-500 flex items-center justify-center group-hover:bg-pink-100 transition-colors">
-                    <Phone size={24} className="text-pink-500" />
+                    <HugeIcon icon={CallIcon} size={24} className="text-pink-500" />
                   </div>
                   <div className="size-7 rounded-full border border-slate-200 text-slate-400 flex items-center justify-center group-hover:border-pink-300 group-hover:text-pink-500 transition-colors">
-                    <ArrowUpRight size={14} />
+                    <HugeIcon icon={ArrowUpRight01Icon} size={14} />
                   </div>
                 </div>
 
@@ -187,9 +178,9 @@ export default function ContatoPage() {
                   href="tel:62984152867"
                   className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full border border-blue-200 hover:border-blue-400 hover:bg-blue-50/60 text-blue-600 text-xs font-semibold transition-all"
                 >
-                  <Phone size={13} className="text-blue-600" />
+                  <HugeIcon icon={CallIcon} size={13} className="text-blue-600" />
                   <span>Ligar agora</span>
-                  <ChevronRight size={14} />
+                  <HugeIcon icon={ArrowRight01Icon} size={14} />
                 </a>
               </div>
             </div>
@@ -199,10 +190,10 @@ export default function ContatoPage() {
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <div className="size-12 rounded-xl bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 text-white flex items-center justify-center shadow-xs">
-                    <Instagram size={24} className="text-white" />
+                    <HugeIcon icon={InstagramIcon} size={24} className="text-white" />
                   </div>
                   <div className="size-7 rounded-full border border-slate-200 text-slate-400 flex items-center justify-center group-hover:border-rose-300 group-hover:text-rose-500 transition-colors">
-                    <ArrowUpRight size={14} />
+                    <HugeIcon icon={ArrowUpRight01Icon} size={14} />
                   </div>
                 </div>
 
@@ -229,9 +220,9 @@ export default function ContatoPage() {
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full border border-blue-200 hover:border-blue-400 hover:bg-blue-50/60 text-blue-600 text-xs font-semibold transition-all"
                 >
-                  <Instagram size={13} className="text-blue-600" />
+                  <HugeIcon icon={InstagramIcon} size={13} className="text-blue-600" />
                   <span>Acessar perfil</span>
-                  <ChevronRight size={14} />
+                  <HugeIcon icon={ArrowRight01Icon} size={14} />
                 </a>
               </div>
             </div>
@@ -247,11 +238,11 @@ export default function ContatoPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white rounded-3xl p-5 sm:p-7 lg:p-9 shadow-sm border border-slate-100">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
-              
+
               {/* Lado Esquerdo: Visualização do Mapa */}
               <div className="lg:col-span-7">
                 <div className="rounded-2xl overflow-hidden relative border border-slate-200/90 h-[340px] sm:h-[400px] w-full bg-slate-100 shadow-inner group">
-                  
+
                   {/* Botão Superior Esquerdo "Ampliar mapa" */}
                   <a
                     href="https://www.google.com/maps/search/?api=1&query=Col%C3%A9gio+Estadual+Laurentino+Martins,+R.+36,+391+-+S%C3%A3o+Crist%C3%B3v%C3%A3o,+Goian%C3%A9sia+-+GO,+76381-152"
@@ -259,7 +250,7 @@ export default function ContatoPage() {
                     rel="noopener noreferrer"
                     className="absolute top-3 left-3 z-20 bg-white/95 hover:bg-white text-slate-700 hover:text-slate-900 text-xs font-semibold px-3.5 py-1.5 rounded-full shadow-sm border border-slate-200 inline-flex items-center gap-1.5 transition-colors"
                   >
-                    <Maximize2 size={13} className="text-slate-600" />
+                    <HugeIcon icon={Maximize01Icon} size={13} className="text-slate-600" />
                     <span>Ampliar mapa</span>
                   </a>
 
@@ -282,11 +273,11 @@ export default function ContatoPage() {
 
               {/* Lado Direito: Informações de Visita */}
               <div className="lg:col-span-5 space-y-6 text-left">
-                
+
                 {/* Bloco 1: Venha nos visitar */}
                 <div className="space-y-2">
                   <div className="size-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mb-3">
-                    <MapPin size={20} className="text-blue-600" />
+                    <HugeIcon icon={Location01Icon} size={20} className="text-blue-600" />
                   </div>
                   <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
                     Venha nos visitar!
@@ -299,7 +290,7 @@ export default function ContatoPage() {
                 {/* Bloco 2: Endereço Detalhado */}
                 <div className="space-y-2 pt-1">
                   <div className="size-10 rounded-full border border-blue-200 text-blue-600 flex items-center justify-center mb-3">
-                    <Navigation size={18} className="text-blue-600" />
+                    <HugeIcon icon={Navigation01Icon} size={18} className="text-blue-600" />
                   </div>
                   <h3 className="text-sm font-bold text-slate-800">Endereço</h3>
                   <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
@@ -317,9 +308,9 @@ export default function ContatoPage() {
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 bg-[#1E40AF] hover:bg-blue-700 text-white font-bold text-xs sm:text-sm px-6 py-3 rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5"
                   >
-                    <Navigation size={16} className="text-white fill-white" />
+                    <HugeIcon icon={Navigation01Icon} size={16} className="text-white" />
                     <span>Como chegar</span>
-                    <ChevronRight size={16} />
+                    <HugeIcon icon={ArrowRight01Icon} size={16} />
                   </a>
                 </div>
 
@@ -337,11 +328,11 @@ export default function ContatoPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-[#F0F6FF] rounded-2xl p-6 sm:p-8 border border-blue-100/90 shadow-xs">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 items-start">
-              
+
               {/* Col 1: Horário de Atendimento */}
               <div className="flex items-start gap-3.5">
                 <div className="size-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center shrink-0 mt-0.5">
-                  <Clock size={20} className="text-blue-700" />
+                  <HugeIcon icon={Clock01Icon} size={20} className="text-blue-700" />
                 </div>
                 <div>
                   <h4 className="font-bold text-slate-900 text-sm mb-1">
@@ -358,7 +349,7 @@ export default function ContatoPage() {
               {/* Col 2: Secretaria */}
               <div className="flex items-start gap-3.5">
                 <div className="size-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center shrink-0 mt-0.5">
-                  <Users size={20} className="text-blue-700" />
+                  <HugeIcon icon={UserGroupIcon} size={20} className="text-blue-700" />
                 </div>
                 <div>
                   <h4 className="font-bold text-slate-900 text-sm mb-1">
@@ -373,7 +364,7 @@ export default function ContatoPage() {
               {/* Col 3: Setores */}
               <div className="flex items-start gap-3.5">
                 <div className="size-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center shrink-0 mt-0.5">
-                  <FileText size={20} className="text-blue-700" />
+                  <HugeIcon icon={File01Icon} size={20} className="text-blue-700" />
                 </div>
                 <div>
                   <h4 className="font-bold text-slate-900 text-sm mb-1">
@@ -388,7 +379,7 @@ export default function ContatoPage() {
               {/* Col 4: Fale pelo WhatsApp */}
               <div className="flex items-start gap-3.5">
                 <div className="size-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center shrink-0 mt-0.5">
-                  <MessageCircle size={20} className="text-blue-700" />
+                  <HugeIcon icon={WhatsappIcon} size={20} className="text-blue-700" />
                 </div>
                 <div className="space-y-3">
                   <div>
@@ -405,7 +396,7 @@ export default function ContatoPage() {
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white hover:bg-blue-50 text-blue-700 border border-blue-200 text-xs font-semibold shadow-2xs hover:shadow-xs transition-all"
                   >
-                    <MessageCircle size={14} className="text-blue-600" />
+                    <HugeIcon icon={WhatsappIcon} size={14} className="text-blue-600" />
                     <span>Iniciar conversa</span>
                   </a>
                 </div>
@@ -422,14 +413,13 @@ export default function ContatoPage() {
       <section className="py-14 sm:py-20 overflow-hidden relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start relative">
-            
+
             {/* Lado Esquerdo: Chamada para Dúvidas & Doodle Avião */}
             <div className="lg:col-span-5 space-y-4 text-left relative">
-              
+
               {/* Badge Amarela */}
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFD166] text-slate-900 text-xs font-black uppercase tracking-wider shadow-xs">
                 <span>DÚVIDAS FREQUENTES</span>
-                <MessageCircle className="size-3.5 text-slate-900" />
               </div>
 
               {/* Título Principal da Seção */}
@@ -449,7 +439,7 @@ export default function ContatoPage() {
                   className="inline-flex items-center gap-2 bg-[#0B2545] hover:bg-[#123868] text-white font-semibold text-xs sm:text-sm px-6 py-3 rounded-full shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-0.5"
                 >
                   <span>Ver perguntas frequentes</span>
-                  <ArrowRight size={16} />
+                  <HugeIcon icon={ArrowRight01Icon} size={16} />
                 </a>
               </div>
 
@@ -507,11 +497,11 @@ export default function ContatoPage() {
                       className="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-4 font-bold text-slate-800 text-xs sm:text-sm hover:text-blue-700 transition-colors focus:outline-none cursor-pointer"
                     >
                       <span className="leading-snug">{item.question}</span>
-                      <ChevronRight
+                      <HugeIcon
+                        icon={ArrowRight01Icon}
                         size={18}
-                        className={`text-slate-400 shrink-0 transition-transform duration-200 ${
-                          isOpen ? 'rotate-90 text-blue-600' : ''
-                        }`}
+                        className={`text-slate-400 shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-90 text-blue-600' : ''
+                          }`}
                       />
                     </button>
 
@@ -529,158 +519,8 @@ export default function ContatoPage() {
         </div>
       </section>
 
-      {/* =========================================================================
-          7. RODAPÉ INSTITUCIONAL OFICIAL (NAVY BLUE #0B2545)
-          ========================================================================= */}
-      <footer className="bg-[#0B2545] text-white pt-16 pb-8 border-t border-blue-900/40 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
-          {/* Grade de 4 Colunas */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-8 pb-12">
-            
-            {/* Coluna 1: Brasão, Nome e Missão (~4 cols) */}
-            <div className="lg:col-span-4 space-y-4">
-              <div className="flex items-center gap-3">
-                <img
-                  src="/logo/laurentao-logo-b.svg"
-                  alt="Brasão Laurentino Martins"
-                  className="h-12 w-auto"
-                />
-                <div className="flex flex-col text-left">
-                  <span className="text-[10px] uppercase tracking-wider text-blue-200/90 font-semibold leading-tight">
-                    Colégio Estadual
-                  </span>
-                  <span className="text-lg font-black text-white leading-none tracking-tight">
-                    Laurentino Martins
-                  </span>
-                </div>
-              </div>
-
-              <p className="text-xs text-blue-100/70 italic leading-relaxed max-w-sm pt-2">
-                “Educação pública de excelência em Goianésia. Nosso compromisso é formar cidadãos conscientes e preparados para o futuro.”
-              </p>
-            </div>
-
-            {/* Coluna 2: Navegação (~2 cols) */}
-            <div className="lg:col-span-2 space-y-3">
-              <h5 className="font-bold text-white text-sm tracking-wide">Navegação</h5>
-              <ul className="space-y-2 text-xs text-blue-200/80 font-medium">
-                <li>
-                  <Link href="/" className="hover:text-white transition-colors">
-                    Início
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/sobre" className="hover:text-white transition-colors">
-                    A Escola
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/#ensino" className="hover:text-white transition-colors">
-                    Ensino
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/matriculas" className="hover:text-white transition-colors">
-                    Matrícula
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/#turmas" className="hover:text-white transition-colors">
-                    Notícias
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/contato" className="text-white font-semibold">
-                    Contato
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            {/* Coluna 3: Modalidades (~3 cols) */}
-            <div className="lg:col-span-3 space-y-3">
-              <h5 className="font-bold text-white text-sm tracking-wide">Modalidades</h5>
-              <ul className="space-y-2 text-xs text-blue-200/80 font-medium">
-                <li>Fundamental II</li>
-                <li>Ensino Médio</li>
-                <li>Téc. Profissional</li>
-                <li>EJA Noturno</li>
-              </ul>
-            </div>
-
-            {/* Coluna 4: Atendimento & Redes (~3 cols) */}
-            <div className="lg:col-span-3 space-y-3 text-left">
-              <h5 className="font-bold text-white text-sm tracking-wide">Atendimento</h5>
-              <ul className="space-y-2.5 text-xs text-blue-200/80 font-medium">
-                <li className="flex items-start gap-2.5">
-                  <MapPin size={15} className="text-blue-300 shrink-0 mt-0.5" />
-                  <span>R. 36, Nº 391 – São Cristóvão<br />Goianésia – GO, 76381-152</span>
-                </li>
-                <li className="flex items-center gap-2.5">
-                  <Phone size={15} className="text-blue-300 shrink-0" />
-                  <a href="tel:62984152867" className="hover:text-white transition-colors">
-                    (62) 98415-2867
-                  </a>
-                </li>
-                <li className="flex items-center gap-2.5">
-                  <Clock size={15} className="text-blue-300 shrink-0" />
-                  <span>Seg a Sex – 7h às 17h</span>
-                </li>
-              </ul>
-
-              {/* Ícones de Redes Sociais */}
-              <div className="pt-2 flex items-center gap-3">
-                <a
-                  href="https://www.instagram.com/colestaduallaurentinomartins/?hl=pt"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="size-8 rounded-full bg-blue-900/60 hover:bg-blue-800 text-white flex items-center justify-center transition-colors border border-blue-700/40"
-                  aria-label="Instagram"
-                >
-                  <Instagram size={15} />
-                </a>
-                <a
-                  href="https://facebook.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="size-8 rounded-full bg-blue-900/60 hover:bg-blue-800 text-white flex items-center justify-center transition-colors border border-blue-700/40"
-                  aria-label="Facebook"
-                >
-                  <Facebook size={15} />
-                </a>
-                <a
-                  href="https://youtube.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="size-8 rounded-full bg-blue-900/60 hover:bg-blue-800 text-white flex items-center justify-center transition-colors border border-blue-700/40"
-                  aria-label="YouTube"
-                >
-                  <Youtube size={15} />
-                </a>
-              </div>
-            </div>
-
-          </div>
-
-          {/* Barra Inferior com Linha Divisória */}
-          <div className="pt-8 border-t border-blue-900/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-blue-200/60">
-            <p>© 2025 Colégio Estadual Laurentino Martins. Todos os direitos reservados.</p>
-            <p className="text-right">Governo do Estado de Goiás · Secretaria de Educação</p>
-          </div>
-
-        </div>
-
-        {/* Botão Flutuante de Scroll to Top (Canto Inferior Direito) */}
-        <button
-          type="button"
-          onClick={scrollToTop}
-          className="fixed bottom-6 right-6 z-40 size-11 rounded-full bg-[#0B2545]/90 hover:bg-blue-800 text-white flex items-center justify-center shadow-lg border border-blue-400/30 backdrop-blur-sm transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer"
-          aria-label="Voltar ao topo da página"
-        >
-          <ArrowUp size={18} strokeWidth={2.5} />
-        </button>
-      </footer>
+      {/* Global Liquid Glass Footer */}
+      <LiquidGlassFooter />
 
     </div>
   );

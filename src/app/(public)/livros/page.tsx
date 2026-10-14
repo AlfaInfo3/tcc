@@ -1,9 +1,15 @@
 import { prisma } from '@/lib/prisma';
 import { LivrosClientView } from './LivrosClientView';
 import { BookItem } from '@/components/faithful-books/BookCardWithHover';
+import type { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
+
+export const metadata: Metadata = {
+  title: 'Acervo de Livros',
+  description: 'Explore o catálogo completo de obras disponíveis na biblioteca do Colégio Estadual Laurentino Martins.',
+};
 
 export default async function LivrosPage() {
   // Direct PostgreSQL query using Prisma

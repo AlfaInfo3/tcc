@@ -5,22 +5,44 @@ import Link from 'next/link';
 import { BookCard } from '@/components/books/book-card';
 import { BookReviewsSection } from '@/components/books/BookReviewsSection';
 import { 
-  ArrowLeft, 
-  BookOpen, 
-  Calendar, 
-  Library, 
-  Layers, 
-  CheckCircle2, 
-  AlertCircle, 
-  Bookmark,
-  Share2,
-  BookMarked,
-  Sparkles,
-  Home,
-  Star
-} from 'lucide-react';
+  ArrowLeft01Icon, 
+  ArrowRight01Icon,
+  BookOpen01Icon, 
+  Calendar01Icon, 
+  LibraryIcon, 
+  Layers01Icon, 
+  CheckmarkCircle02Icon, 
+  Alert02Icon, 
+  Bookmark01Icon,
+  BookBookmark01Icon,
+  Home01Icon,
+  StarIcon
+} from '@hugeicons/core-free-icons';
+import { HugeIcon } from '@/components/ui/HugeIcon';
+import type { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata(props: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await props.params;
+  const book = await prisma.book.findUnique({
+    where: { id },
+    select: { title: true, author: true, description: true }
+  });
+
+  if (!book) {
+    return {
+      title: 'Livro não encontrado',
+    };
+  }
+
+  return {
+    title: book.title,
+    description: book.description || `Exemplar "${book.title}" disponível no acervo do Colégio Estadual Laurentino Martins. Autor: ${book.author || 'Não informado'}.`,
+  };
+}
 
 async function getBook(bookId: string) {
   const book = await prisma.book.findUnique({
@@ -84,7 +106,7 @@ export default async function BookDetailPage({
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#060F33] via-[#0B1B5C] to-[#040924] px-4 py-20 font-['Quicksand',sans-serif]">
         <div className="text-center max-w-md bg-white/95 backdrop-blur-md p-8 rounded-3xl border border-white/20 shadow-2xl space-y-5 text-slate-800">
           <div className="size-16 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto shadow-inner">
-            <BookOpen className="size-8" />
+            <HugeIcon icon={BookOpen01Icon} size={32} />
           </div>
           <div className="space-y-2">
             <h1 className="text-2xl font-black text-slate-900">Livro não encontrado</h1>
@@ -96,7 +118,7 @@ export default async function BookDetailPage({
             href="/livros"
             className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black text-xs transition-all shadow-md hover:shadow-lg"
           >
-            <ArrowLeft className="size-4" />
+            <HugeIcon icon={ArrowLeft01Icon} size={16} />
             Voltar ao Catálogo
           </Link>
         </div>
@@ -138,7 +160,7 @@ export default async function BookDetailPage({
         <div className="flex flex-wrap items-center justify-between gap-4">
           <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs font-bold text-blue-200">
             <Link href="/" className="hover:text-white transition-colors flex items-center gap-1">
-              <Home size={13} />
+              <HugeIcon icon={Home01Icon} size={14} />
               <span>Início</span>
             </Link>
             <span className="text-blue-400">/</span>
@@ -155,7 +177,7 @@ export default async function BookDetailPage({
             href="/livros"
             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black text-white bg-white/10 hover:bg-white/20 border border-white/20 transition-all shadow-md backdrop-blur-md"
           >
-            <ArrowLeft className="size-3.5" />
+            <HugeIcon icon={ArrowLeft01Icon} size={14} />
             <span>Voltar ao Acervo</span>
           </Link>
         </div>
@@ -169,7 +191,7 @@ export default async function BookDetailPage({
           <div className="px-6 sm:px-10 py-5 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3 bg-slate-50/70">
             <div className="flex items-center gap-2.5 text-xs font-black text-blue-900">
               <div className="size-7 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-bold">
-                <Library size={15} />
+                <HugeIcon icon={LibraryIcon} size={15} />
               </div>
               <span>Acervo Escolar · Colégio Estadual Laurentino Martins</span>
             </div>
@@ -181,7 +203,7 @@ export default async function BookDetailPage({
                 className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-amber-50 text-amber-900 border border-amber-200 hover:bg-amber-100 transition-colors shadow-2xs cursor-pointer"
                 title="Ver avaliações deste livro"
               >
-                <Star className="size-3.5 text-amber-500 fill-amber-500" />
+                <HugeIcon icon={StarIcon} size={14} className="text-amber-500 fill-amber-500" />
                 <span>{averageRating.toFixed(1)}</span>
                 <span className="text-amber-700/80 font-semibold text-[11px]">
                   ({totalReviews} {totalReviews === 1 ? 'avaliação' : 'avaliações'})
@@ -195,7 +217,7 @@ export default async function BookDetailPage({
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-1.5 text-rose-800 bg-rose-50 px-3 py-1 rounded-full text-xs font-black border border-rose-200 shadow-2xs">
-                  <AlertCircle className="size-3.5 text-rose-500" />
+                  <HugeIcon icon={Alert02Icon} size={14} className="text-rose-500" />
                   Todos os exemplares emprestados
                 </span>
               )}
@@ -225,7 +247,7 @@ export default async function BookDetailPage({
                       />
                     ) : (
                       <div className="w-full h-full flex flex-col justify-between p-6 bg-gradient-to-br from-blue-900 to-slate-900 text-white">
-                        <BookOpen className="size-8 text-blue-300 opacity-80" />
+                        <HugeIcon icon={BookOpen01Icon} size={32} className="text-blue-300 opacity-80" />
                         <div>
                           <p className="font-black text-lg leading-tight mb-2 line-clamp-3">{book.title}</p>
                           <p className="text-xs text-blue-200 font-medium">{book.author || 'Autor não informado'}</p>
@@ -268,8 +290,10 @@ export default async function BookDetailPage({
                   <div className="flex items-center gap-2 pt-1">
                     <div className="flex items-center gap-0.5">
                       {[1, 2, 3, 4, 5].map((s) => (
-                        <Star
+                        <HugeIcon
+                          icon={StarIcon}
                           key={s}
+                          size={16}
                           className={`size-4 ${
                             s <= Math.round(averageRating)
                               ? 'text-amber-400 fill-amber-400'
@@ -311,7 +335,7 @@ export default async function BookDetailPage({
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 rounded-2xl border border-slate-200/80 p-4">
                   <div className="space-y-1">
                     <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                      <Calendar className="size-3 text-slate-500" />
+                      <HugeIcon icon={Calendar01Icon} size={14} className="text-slate-500" />
                       Ano
                     </span>
                     <p className="text-sm font-black text-slate-800">
@@ -321,7 +345,7 @@ export default async function BookDetailPage({
 
                   <div className="space-y-1">
                     <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                      <Layers className="size-3 text-slate-500" />
+                      <HugeIcon icon={Layers01Icon} size={14} className="text-slate-500" />
                       Total Físico
                     </span>
                     <p className="text-sm font-black text-slate-800">
@@ -331,7 +355,7 @@ export default async function BookDetailPage({
 
                   <div className="space-y-1">
                     <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                      <CheckCircle2 className="size-3 text-emerald-600" />
+                      <HugeIcon icon={CheckmarkCircle02Icon} size={14} className="text-emerald-600" />
                       Disponíveis
                     </span>
                     <p className={`text-sm font-black ${isAvailable ? 'text-emerald-700' : 'text-rose-600'}`}>
@@ -341,7 +365,7 @@ export default async function BookDetailPage({
 
                   <div className="space-y-1">
                     <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                      <Bookmark className="size-3 text-blue-600" />
+                      <HugeIcon icon={Bookmark01Icon} size={14} className="text-blue-600" />
                       Modalidade
                     </span>
                     <p className="text-sm font-black text-slate-800">
@@ -353,7 +377,7 @@ export default async function BookDetailPage({
                 {/* Sinopse / Resumo */}
                 <div className="space-y-2.5 pt-1">
                   <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
-                    <BookMarked className="size-4 text-blue-700" />
+                    <HugeIcon icon={BookBookmark01Icon} size={16} className="text-blue-700" />
                     Sinopse & Apresentação da Obra
                   </h2>
                   <div className="text-slate-700 text-sm sm:text-base leading-relaxed font-medium bg-slate-50/70 p-5 rounded-2xl border border-slate-100">
@@ -373,7 +397,7 @@ export default async function BookDetailPage({
                     <div className="bg-blue-50/80 border border-blue-200 rounded-3xl p-6 sm:p-7 space-y-4 shadow-sm">
                       <div className="flex items-start gap-3">
                         <div className="size-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-md">
-                          <Bookmark className="size-5" />
+                          <HugeIcon icon={Bookmark01Icon} size={20} />
                         </div>
                         <div>
                           <h3 className="text-base font-black text-slate-900">
@@ -392,7 +416,7 @@ export default async function BookDetailPage({
                   ) : (
                     <div className="bg-rose-50/80 border border-rose-200 rounded-3xl p-6 flex items-start gap-4 shadow-sm">
                       <div className="size-10 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
-                        <AlertCircle className="size-5" />
+                        <HugeIcon icon={Alert02Icon} size={20} />
                       </div>
                       <div className="space-y-1">
                         <h3 className="text-sm font-black text-rose-900">
@@ -425,7 +449,6 @@ export default async function BookDetailPage({
           <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-white/15 mb-6">
             <div>
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-200 text-[11px] font-black uppercase tracking-wider mb-1.5">
-                <BookOpen className="size-3.5 text-blue-300" />
                 Sugestões da Biblioteca
               </div>
               <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
@@ -441,7 +464,7 @@ export default async function BookDetailPage({
               className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black text-white bg-white/10 hover:bg-white/20 border border-white/20 transition-all shadow-sm"
             >
               <span>Ver todo o catálogo</span>
-              <span>→</span>
+              <HugeIcon icon={ArrowRight01Icon} size={14} />
             </Link>
           </div>
 

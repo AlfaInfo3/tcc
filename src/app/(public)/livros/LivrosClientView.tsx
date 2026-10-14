@@ -7,8 +7,9 @@ import { TopBar } from '@/components/faithful-books/TopBar';
 import { BookCardWithHover, BookItem } from '@/components/faithful-books/BookCardWithHover';
 import { AlphaRail } from '@/components/faithful-books/AlphaRail';
 import { ReserveModal } from '@/components/faithful-books/ReserveModal';
-import { Library, Home, SlidersHorizontal, Sparkles } from 'lucide-react';
 import Link from 'next/link';
+import { Home01Icon, LibraryIcon, FilterHorizontalIcon, SparklesIcon } from '@hugeicons/core-free-icons';
+import { HugeIcon } from '@/components/ui/HugeIcon';
 
 interface LivrosClientViewProps {
   initialBooks: BookItem[];
@@ -221,7 +222,7 @@ export function LivrosClientView({ initialBooks }: LivrosClientViewProps) {
             onClick={() => setMobileFiltersOpen(true)}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600/90 text-white rounded-xl text-xs font-bold shadow-md hover:bg-blue-600 active:scale-95 transition-all"
           >
-            <SlidersHorizontal size={14} />
+            <HugeIcon icon={FilterHorizontalIcon} size={14} />
             <span>Filtros</span>
             {Object.values(filters).filter(Boolean).length > 0 && (
               <span className="size-4 bg-white text-blue-700 text-[10px] font-black rounded-full flex items-center justify-center">
@@ -234,7 +235,7 @@ export function LivrosClientView({ initialBooks }: LivrosClientViewProps) {
             className="p-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white transition-colors"
             title="Início"
           >
-            <Home size={16} />
+            <HugeIcon icon={Home01Icon} size={16} />
           </Link>
         </div>
       </div>
@@ -265,7 +266,7 @@ export function LivrosClientView({ initialBooks }: LivrosClientViewProps) {
           {activeTab === 'last' && (
             <div className="mb-2.5 bg-blue-500/20 border border-blue-400/30 rounded-2xl px-4 py-2 text-white flex items-center justify-between text-xs backdrop-blur-md">
               <div className="flex items-center gap-2">
-                <Sparkles size={15} className="text-amber-300" />
+                <HugeIcon icon={SparklesIcon} size={15} className="text-amber-300" />
                 <span className="font-bold">Modo Destaques:</span>
                 <span className="text-blue-100">Exibindo livros mais bem avaliados do acervo escolar</span>
               </div>
@@ -282,7 +283,7 @@ export function LivrosClientView({ initialBooks }: LivrosClientViewProps) {
           {activeTab === 'recent' && (
             <div className="mb-2.5 bg-emerald-500/20 border border-emerald-400/30 rounded-2xl px-4 py-2 text-white flex items-center justify-between text-xs backdrop-blur-md">
               <div className="flex items-center gap-2">
-                <Sparkles size={15} className="text-emerald-300" />
+                <HugeIcon icon={SparklesIcon} size={15} className="text-emerald-300" />
                 <span className="font-bold">Modo Recentes:</span>
                 <span className="text-emerald-100">Exibindo títulos mais recentes catalogados</span>
               </div>
@@ -397,7 +398,7 @@ export function LivrosClientView({ initialBooks }: LivrosClientViewProps) {
           href="/"
           className="flex flex-col items-center text-slate-500 hover:text-blue-600 py-1 px-3 transition-colors"
         >
-          <Home size={18} />
+          <HugeIcon icon={Home01Icon} size={18} />
           <span className="text-[10px] font-bold mt-0.5">Início</span>
         </Link>
         <button
@@ -408,7 +409,7 @@ export function LivrosClientView({ initialBooks }: LivrosClientViewProps) {
           }}
           className="flex flex-col items-center text-blue-600 py-1 px-3"
         >
-          <Library size={18} />
+          <HugeIcon icon={LibraryIcon} size={18} />
           <span className="text-[10px] font-black mt-0.5">Acervo</span>
         </button>
         <button
@@ -416,7 +417,7 @@ export function LivrosClientView({ initialBooks }: LivrosClientViewProps) {
           onClick={() => setMobileFiltersOpen(true)}
           className="flex flex-col items-center text-slate-500 hover:text-blue-600 py-1 px-3 transition-colors relative"
         >
-          <SlidersHorizontal size={18} />
+          <HugeIcon icon={FilterHorizontalIcon} size={18} />
           <span className="text-[10px] font-bold mt-0.5">Filtros</span>
           {Object.values(filters).filter(Boolean).length > 0 && (
             <span className="absolute top-0 right-2 size-2 bg-blue-600 rounded-full" />
