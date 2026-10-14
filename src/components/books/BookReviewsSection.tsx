@@ -214,8 +214,9 @@ export function BookReviewsSection({
               <div className="flex-1 space-y-1.5 pl-3 border-l border-white/10">
                 {distribution.map(({ star, count, percentage }) => (
                   <div key={star} className="flex items-center gap-2 text-[11px] font-bold">
-                    <span className="w-6 text-blue-200/70 flex items-center gap-0.5 justify-end font-mono">
-                      {star}★
+                    <span className="w-7 text-blue-200/70 flex items-center gap-0.5 justify-end font-mono">
+                      <span>{star}</span>
+                      <Star className="size-2.5 text-amber-400 fill-amber-400" />
                     </span>
                     <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
                       <div

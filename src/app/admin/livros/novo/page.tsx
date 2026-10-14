@@ -620,8 +620,9 @@ export default function NewBookPage() {
               </div>
 
               {coverFile && (
-                <p className="text-[11px] text-emerald-600 font-bold mt-2 truncate max-w-full">
-                  ✓ {coverFile.name}
+                <p className="text-[11px] text-emerald-600 font-bold mt-2 truncate max-w-full flex items-center gap-1">
+                  <Check className="size-3.5 shrink-0" />
+                  <span className="truncate">{coverFile.name}</span>
                 </p>
               )}
 

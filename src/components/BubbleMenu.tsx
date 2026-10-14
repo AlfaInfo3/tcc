@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { X, Menu } from "lucide-react";
 
 interface BubbleMenuItem {
   label: string;
@@ -28,11 +29,11 @@ export default function BubbleMenu({ logo, items, menuBg = "#ffffff", menuConten
       <button
         onClick={() => setOpen((v) => !v)}
         style={{ backgroundColor: menuBg, color: menuContentColor }}
-        className="flex items-center gap-2 px-4 py-2 rounded-full shadow-lg border border-slate-200 font-semibold transition-all hover:shadow-xl"
+        className="flex items-center gap-2 px-4 py-2 rounded-full shadow-lg border border-slate-200 font-semibold transition-all hover:shadow-xl cursor-pointer"
         aria-label="Menu"
       >
         {logo}
-        <span className="text-lg leading-none">{open ? "✕" : "☰"}</span>
+        {open ? <X className="size-4" /> : <Menu className="size-4" />}
       </button>
 
       {/* Dropdown */}

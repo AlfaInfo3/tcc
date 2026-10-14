@@ -1,4 +1,5 @@
-import { Calendar, BookOpen, Clock } from 'lucide-react';
+import React from 'react';
+import { Calendar, BookOpen, Clock, CheckCircle2, Bookmark, AlertTriangle } from 'lucide-react';
 
 interface HistoryItem {
   id?: string;
@@ -15,11 +16,11 @@ interface ReadingHistoryProps {
   history: HistoryItem[];
 }
 
-const statusConfig: Record<string, { label: string; color: string; bgColor: string; icon: string }> = {
-  active: { label: 'Emprestado', color: 'text-primary', bgColor: 'bg-primary/10', icon: '📖' },
-  returned: { label: 'Devolvido', color: 'text-muted-foreground', bgColor: 'bg-muted', icon: '✅' },
-  reserved: { label: 'Solicitado', color: 'text-streak', bgColor: 'bg-streak/10', icon: '🔖' },
-  overdue: { label: 'Atrasado', color: 'text-danger', bgColor: 'bg-danger/10', icon: '⚠️' },
+const statusConfig: Record<string, { label: string; color: string; bgColor: string; icon: React.ReactNode }> = {
+  active: { label: 'Emprestado', color: 'text-primary', bgColor: 'bg-primary/10', icon: <BookOpen size={18} className="text-primary" /> },
+  returned: { label: 'Devolvido', color: 'text-muted-foreground', bgColor: 'bg-muted', icon: <CheckCircle2 size={18} className="text-muted-foreground" /> },
+  reserved: { label: 'Solicitado', color: 'text-streak', bgColor: 'bg-streak/10', icon: <Bookmark size={18} className="text-streak" /> },
+  overdue: { label: 'Atrasado', color: 'text-danger', bgColor: 'bg-danger/10', icon: <AlertTriangle size={18} className="text-danger" /> },
 };
 
 export function CurrentLoansSection({ loans }: { loans: HistoryItem[] }) {

@@ -430,7 +430,14 @@ export function QuickBookRegisterModal({ isOpen, onClose, onBookCreated }: Quick
                           : 'bg-white text-slate-600 border-slate-300 hover:bg-slate-100'
                       }`}
                     >
-                      {isCoverApproved ? '✓ Capa Aprovada' : 'Aprovar Capa'}
+                      {isCoverApproved ? (
+                        <span className="inline-flex items-center gap-1">
+                          <Check size={12} />
+                          <span>Capa Aprovada</span>
+                        </span>
+                      ) : (
+                        'Aprovar Capa'
+                      )}
                     </button>
 
                     <div className="flex gap-1">

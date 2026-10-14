@@ -86,8 +86,8 @@ export default function ContatoPage() {
               {/* Badge "FALE CONOSCO" */}
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#07192F] border border-blue-400/30 text-white text-xs font-bold uppercase tracking-wider shadow-inner">
                 <span className="text-[#FFD166] font-black text-sm">FALE CONOSCO</span>
-                <span className="size-4 rounded-full bg-blue-600/80 flex items-center justify-center text-[10px]">
-                  📞
+                <span className="size-5 rounded-full bg-blue-600/80 flex items-center justify-center text-white">
+                  <Phone className="size-3 text-white" />
                 </span>
               </div>
 
@@ -429,7 +429,7 @@ export default function ContatoPage() {
               {/* Badge Amarela */}
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFD166] text-slate-900 text-xs font-black uppercase tracking-wider shadow-xs">
                 <span>DÚVIDAS FREQUENTES</span>
-                <span className="text-xs">💬</span>
+                <MessageCircle className="size-3.5 text-slate-900" />
               </div>
 
               {/* Título Principal da Seção */}
