@@ -22,6 +22,7 @@ model Book {
 
   reservations Reservation[]
   loans       Loan[]
+  reviews     Review[]
 }
 
 model Student {
@@ -115,3 +116,20 @@ model Loan {
   book    Book    @relation(fields: [bookId], references: [id])
   student Student @relation(fields: [studentId], references: [id])
 }
+
+model Review {
+  id           String   @id @default(cuid())
+  bookId       String
+  studentName  String
+  studentClass String?
+  rating       Int      @default(5)
+  comment      String?
+  createdAt    DateTime @default(now())
+
+  book         Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@index([bookId])
+  @@index([createdAt])
+  @@map("reviews")
+}
+

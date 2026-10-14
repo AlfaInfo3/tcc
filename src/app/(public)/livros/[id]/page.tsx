@@ -3,6 +3,7 @@ import { ReserveForm } from '@/components/ReserveForm';
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { BookCard } from '@/components/books/book-card';
+import { BookReviewsSection } from '@/components/books/BookReviewsSection';
 import { 
   ArrowLeft, 
   BookOpen, 
@@ -15,7 +16,8 @@ import {
   Share2,
   BookMarked,
   Sparkles,
-  Home
+  Home,
+  Star
 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -29,6 +31,9 @@ async function getBook(bookId: string) {
       },
       reservations: {
         where: { status: 'reserved' }
+      },
+      reviews: {
+        orderBy: { createdAt: 'desc' }
       }
     }
   });
@@ -93,6 +98,23 @@ export default async function BookDetailPage({
   const availableCopies = Math.max(0, book.quantity - activeLoansCount - activeResCount);
   const isAvailable = availableCopies > 0;
 
+  // Calculate review stats
+  const reviews = (book as any).reviews || [];
+  const totalReviews = reviews.length;
+  const averageRating = totalReviews > 0
+    ? Number((reviews.reduce((acc: number, r: any) => acc + r.rating, 0) / totalReviews).toFixed(1))
+    : 5.0;
+
+  const serializedReviews = reviews.map((r: any) => ({
+    id: r.id,
+    bookId: r.bookId,
+    studentName: r.studentName,
+    studentClass: r.studentClass,
+    rating: r.rating,
+    comment: r.comment,
+    createdAt: r.createdAt.toISOString(),
+  }));
+
   // Related books
   const relatedBooks = await getRelatedBooks(book.id, book.genres);
 
@@ -140,8 +162,20 @@ export default async function BookDetailPage({
               <span>Acervo Escolar · Colégio Estadual Laurentino Martins</span>
             </div>
 
-            {/* Status Badge */}
-            <div className="inline-flex items-center gap-2">
+            {/* Status & Avaliações Badges */}
+            <div className="flex flex-wrap items-center gap-2.5">
+              <a
+                href="#avaliacoes"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-amber-50 text-amber-900 border border-amber-200 hover:bg-amber-100 transition-colors shadow-2xs cursor-pointer"
+                title="Ver avaliações deste livro"
+              >
+                <Star className="size-3.5 text-amber-500 fill-amber-500" />
+                <span>{averageRating.toFixed(1)}</span>
+                <span className="text-amber-700/80 font-semibold text-[11px]">
+                  ({totalReviews} {totalReviews === 1 ? 'avaliação' : 'avaliações'})
+                </span>
+              </a>
+
               {isAvailable ? (
                 <span className="inline-flex items-center gap-1.5 text-emerald-800 bg-emerald-50 px-3 py-1 rounded-full text-xs font-black border border-emerald-200 shadow-2xs">
                   <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -207,7 +241,7 @@ export default async function BookDetailPage({
               {/* ── COLUNA DA DIREITA: INFORMAÇÕES EDITORIAIS ─── */}
               <div className="md:col-span-7 lg:col-span-8 space-y-6">
                 
-                {/* Título & Autor */}
+                {/* Título & Autor & Avaliação Rápida */}
                 <div className="space-y-2">
                   <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight leading-tight">
                     {book.title}
@@ -218,6 +252,33 @@ export default async function BookDetailPage({
                       <span className="text-blue-700 font-black">{book.author}</span>
                     </p>
                   )}
+
+                  <div className="flex items-center gap-2 pt-1">
+                    <div className="flex items-center gap-0.5">
+                      {[1, 2, 3, 4, 5].map((s) => (
+                        <Star
+                          key={s}
+                          className={`size-4 ${
+                            s <= Math.round(averageRating)
+                              ? 'text-amber-400 fill-amber-400'
+                              : 'text-slate-200'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-sm font-black text-slate-900">
+                      {averageRating.toFixed(1)}
+                    </span>
+                    <span className="text-slate-300 font-bold">·</span>
+                    <a
+                      href="#avaliacoes"
+                      className="text-xs font-bold text-blue-600 hover:text-blue-800 hover:underline transition-colors"
+                    >
+                      {totalReviews === 0
+                        ? 'Seja o primeiro a avaliar'
+                        : `${totalReviews} ${totalReviews === 1 ? 'avaliação registrada' : 'avaliações registradas'}`}
+                    </a>
+                  </div>
                 </div>
 
                 {/* Gêneros & Categorias */}
@@ -338,6 +399,13 @@ export default async function BookDetailPage({
           </div>
         </div>
       </div>
+
+      {/* ── SEÇÃO DE AVALIAÇÕES E RESENHAS DOS ALUNOS ───────── */}
+      <BookReviewsSection
+        bookId={book.id}
+        bookTitle={book.title}
+        initialReviews={serializedReviews}
+      />
 
       {/* ── SEÇÃO: OUTRAS OBRAS RECOMENDADAS DO ACERVO ───────── */}
       {relatedBooks && relatedBooks.length > 0 && (

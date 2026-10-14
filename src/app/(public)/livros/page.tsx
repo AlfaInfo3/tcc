@@ -17,6 +17,9 @@ export default async function LivrosPage() {
       },
       reservations: {
         where: { status: 'reserved' }
+      },
+      reviews: {
+        select: { rating: true }
       }
     }
   });
@@ -25,6 +28,11 @@ export default async function LivrosPage() {
     const activeLoans = b.loans ? b.loans.length : 0;
     const activeRes = b.reservations ? b.reservations.length : 0;
     const available = Math.max(0, b.quantity - activeLoans - activeRes);
+    const reviews = (b as any).reviews || [];
+    const totalReviews = reviews.length;
+    const avgRating = totalReviews > 0
+      ? Number((reviews.reduce((acc: number, r: any) => acc + r.rating, 0) / totalReviews).toFixed(1))
+      : 5.0;
 
     return {
       id: b.id,
@@ -36,8 +44,10 @@ export default async function LivrosPage() {
       publishedAt: b.publishedAt || (b.createdAt ? new Date(b.createdAt).getFullYear() : 2024),
       quantity: b.quantity,
       availableCopies: available,
-      rating: 4.85,
-      ratingsCount: `${b.quantity} exemplares`,
+      rating: avgRating,
+      ratingsCount: totalReviews > 0
+        ? `${totalReviews} ${totalReviews === 1 ? 'avaliação' : 'avaliações'}`
+        : `${b.quantity} exemplares`,
       createdAt: b.createdAt.toISOString(),
     };
   });
