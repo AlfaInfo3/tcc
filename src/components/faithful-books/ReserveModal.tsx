@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { 
   Cancel01Icon, 
   Bookmark01Icon, 
@@ -9,6 +9,7 @@ import {
   LoaderCircleIcon 
 } from '@hugeicons/core-free-icons';
 import { HugeIcon } from '@/components/ui/HugeIcon';
+import { Modal } from '@/components/ui/modal';
 import type { BookItem } from './BookCardWithHover';
 
 interface ReserveModalProps {
@@ -24,8 +25,25 @@ export function ReserveModal({ book, isOpen, onClose, onSuccess }: ReserveModalP
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const closeTimeoutRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (closeTimeoutRef.current !== null) {
+        window.clearTimeout(closeTimeoutRef.current);
+      }
+    };
+  }, []);
 
   if (!isOpen || !book) return null;
+
+  const handleClose = () => {
+    if (closeTimeoutRef.current !== null) {
+      window.clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+    onClose();
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,28 +78,27 @@ export function ReserveModal({ book, isOpen, onClose, onSuccess }: ReserveModalP
 
       setSuccess(true);
       onSuccess?.();
-      setTimeout(() => {
+      closeTimeoutRef.current = window.setTimeout(() => {
         setSuccess(false);
         setName('');
         setClassName('');
         onClose();
       }, 3000);
-    } catch (err: any) {
-      setError(err.message || 'Falha ao realizar reserva. Tente novamente.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Falha ao realizar reserva. Tente novamente.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-xs animate-in fade-in-0 duration-200">
-      {/* Click outside backdrop */}
-      <div className="fixed inset-0" onClick={onClose} />
-
-      {/* Modal Dialog Card */}
-      <div className="relative w-full max-w-lg bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-blue-100 z-10 text-slate-800 font-['Quicksand',sans-serif] animate-in zoom-in-95 duration-200">
-        
-        {/* Close Button */}
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      labelledBy="reserve-modal-title"
+      className="max-w-lg bg-white p-6 text-slate-800 shadow-2xl sm:p-8 font-['Quicksand',sans-serif]"
+    >
+      {/* Close Button */}
         <button
           type="button"
           onClick={onClose}
@@ -105,7 +122,7 @@ export function ReserveModal({ book, isOpen, onClose, onSuccess }: ReserveModalP
               <HugeIcon icon={Bookmark01Icon} size={11} />
               Reserva Escolar
             </span>
-            <h3 className="text-base sm:text-lg font-black text-slate-900 leading-tight truncate">
+            <h3 id="reserve-modal-title" className="text-base sm:text-lg font-black text-slate-900 leading-tight truncate">
               {book.title}
             </h3>
             <p className="text-xs font-semibold text-slate-500 truncate mt-0.5">
@@ -200,7 +217,6 @@ export function ReserveModal({ book, isOpen, onClose, onSuccess }: ReserveModalP
           </form>
         )}
 
-      </div>
-    </div>
+    </Modal>
   );
 }

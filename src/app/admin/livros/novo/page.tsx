@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { BookSearchResult } from '@/lib/book-search';
 import { QuickBookRegisterModal } from '@/components/admin/QuickBookRegisterModal';
+import { Modal } from '@/components/ui/modal';
 
 export default function NewBookPage() {
   const router = useRouter();
@@ -53,6 +54,16 @@ export default function NewBookPage() {
   const [isCapturingPhoto, setIsCapturingPhoto] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
+
+  // Stop the camera stream if the page unmounts while capturing.
+  useEffect(() => {
+    return () => {
+      if (mediaStreamRef.current) {
+        mediaStreamRef.current.getTracks().forEach((track) => track.stop());
+        mediaStreamRef.current = null;
+      }
+    };
+  }, []);
 
   // Inline feedback (replaces native alert dialogs)
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -671,9 +682,11 @@ export default function NewBookPage() {
         </form>
 
         {/* ── LIVE PHOTO CAMERA MODAL ─────────────────────────── */}
-        {isCapturingPhoto && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in-0">
-            <div className="w-full max-w-md bg-slate-900 rounded-3xl p-5 text-white border border-slate-800 space-y-4">
+        <Modal
+          isOpen={isCapturingPhoto}
+          onClose={stopPhotoCamera}
+          className="max-w-md border-slate-800 bg-slate-900 p-5 text-white"
+        >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-xs font-bold text-blue-300">
                   <Camera size={16} />
@@ -709,9 +722,7 @@ export default function NewBookPage() {
                   Cancelar
                 </button>
               </div>
-            </div>
-          </div>
-        )}
+        </Modal>
 
         {/* ── QUICK REGISTER MODAL (TRIGGERED FROM NEW BOOK PAGE) ─ */}
         <QuickBookRegisterModal

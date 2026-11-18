@@ -5,6 +5,7 @@ import { Icon } from "@iconify/react";
 import { PublicNav } from "@/components/PublicNav";
 import { LiquidGlassFooter } from "@/components/LiquidGlassFooter";
 import TiltedCard from "@/components/TiltedCard";
+import { Modal } from "@/components/ui/modal";
 import { 
   Tick01Icon, 
   Cancel01Icon, 
@@ -298,12 +299,12 @@ export default function MatriculasPage() {
 
       {/* ── MODAL INTERATIVO DE REQUISITOS DA MODALIDADE ─────────── */}
       {selectedModalidade && (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-4 sm:p-6 animate-in fade-in duration-200">
-          <div 
-            className="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 space-y-6 shadow-2xl border border-slate-200 relative max-h-[90vh] overflow-y-auto"
-            role="dialog"
-            aria-modal="true"
-          >
+        <Modal
+          isOpen
+          onClose={() => setSelectedModalidade(null)}
+          labelledBy="modalidade-titulo"
+          className="max-w-xl bg-white p-6 sm:p-8 space-y-6 border-slate-200 overflow-y-auto"
+        >
             {/* Fechar Modal */}
             <button
               onClick={() => setSelectedModalidade(null)}
@@ -318,7 +319,7 @@ export default function MatriculasPage() {
               <span className="text-xs font-bold text-[#1a3875] uppercase tracking-wider block">
                 {selectedModalidade.sub}
               </span>
-              <h3 className="text-2xl font-black text-slate-900">
+              <h3 id="modalidade-titulo" className="text-2xl font-black text-slate-900">
                 {selectedModalidade.label}
               </h3>
               <p className="text-slate-600 text-sm font-medium leading-relaxed">
@@ -386,8 +387,7 @@ export default function MatriculasPage() {
                 Voltar
               </button>
             </div>
-          </div>
-        </div>
+        </Modal>
       )}
 
       {/* ── BOTÃO FLUTUANTE DE WHATSAPP (FIEL AO BOTÃO AMARELO DA IMAGEM) ── */}

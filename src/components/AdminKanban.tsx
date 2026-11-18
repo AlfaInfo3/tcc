@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
+import { Modal } from '@/components/ui/modal';
 
 // Types definition
 interface KanbanItem {
@@ -344,34 +345,35 @@ export default function AdminKanban() {
       </DragDropContext>
 
       {/* MODAL FOR DUE DATE */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-4">
-            <div className="bg-card p-6 rounded-lg shadow-xl w-full max-w-sm border border-border">
-                <h3 className="text-lg font-bold mb-4">Confirmar Empréstimo</h3>
-                <p className="text-muted-foreground mb-4">Data de devolução (Opcional):</p>
-                <input 
-                    type="date"
-                    value={dueDate}
-                    onChange={(e) => setDueDate(e.target.value)}
-                    className="w-full p-2 border border-border bg-background rounded mb-6 text-foreground"
-                />
-                <div className="flex justify-end gap-2">
-                    <button 
-                        onClick={() => { setShowModal(false); setPendingMove(null); fetchData(); }}
-                        className="px-4 py-2 text-muted-foreground hover:bg-muted rounded"
-                    >
-                        Cancelar
-                    </button>
-                    <button 
-                        onClick={confirmLoan}
-                        className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded"
-                    >
-                        Confirmar
-                    </button>
-                </div>
-            </div>
+      <Modal
+        isOpen={showModal}
+        onClose={() => { setShowModal(false); setPendingMove(null); fetchData(); }}
+        labelledBy="kanban-loan-title"
+        className="max-w-sm border-border bg-card p-6 shadow-xl"
+      >
+        <h3 id="kanban-loan-title" className="text-lg font-bold mb-4">Confirmar empréstimo</h3>
+        <p className="text-muted-foreground mb-4">Data de devolução (opcional):</p>
+        <input 
+            type="date"
+            value={dueDate}
+            onChange={(e) => setDueDate(e.target.value)}
+            className="w-full p-2 border border-border bg-background rounded mb-6 text-foreground"
+        />
+        <div className="flex justify-end gap-2">
+            <button 
+                onClick={() => { setShowModal(false); setPendingMove(null); fetchData(); }}
+                className="px-4 py-2 text-muted-foreground hover:bg-muted rounded"
+            >
+                Cancelar
+            </button>
+            <button 
+                onClick={confirmLoan}
+                className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded"
+            >
+                Confirmar
+            </button>
         </div>
-      )}
+      </Modal>
     </div>
   );
 }

@@ -69,13 +69,27 @@ export function EditBookClientView({ id, initialBook, initialGenres }: EditBookC
 
   // Notification / Toast
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const notificationTimeoutRef = useRef<number | null>(null);
+  const redirectTimeoutRef = useRef<number | null>(null);
 
-  // Clean camera stream on unmount
+  const showNotification = (type: 'success' | 'error', message: string, duration = 4000) => {
+    if (notificationTimeoutRef.current !== null) window.clearTimeout(notificationTimeoutRef.current);
+    setNotification({ type, message });
+    notificationTimeoutRef.current = window.setTimeout(() => {
+      setNotification(null);
+      notificationTimeoutRef.current = null;
+    }, duration);
+  };
+
+  // Clean camera stream and pending timers on unmount
   useEffect(() => {
     return () => {
       if (mediaStreamRef.current) {
         mediaStreamRef.current.getTracks().forEach((track) => track.stop());
+        mediaStreamRef.current = null;
       }
+      if (notificationTimeoutRef.current !== null) window.clearTimeout(notificationTimeoutRef.current);
+      if (redirectTimeoutRef.current !== null) window.clearTimeout(redirectTimeoutRef.current);
     };
   }, []);
 
@@ -92,8 +106,7 @@ export function EditBookClientView({ id, initialBook, initialGenres }: EditBookC
       }
     } catch (err) {
       console.error('Erro ao acessar câmera:', err);
-      setNotification({ type: 'error', message: 'Não foi possível acessar a câmera. Verifique as permissões.' });
-      setTimeout(() => setNotification(null), 4000);
+      showNotification('error', 'Não foi possível acessar a câmera. Verifique as permissões.');
       setIsCapturingCamera(false);
     }
   };
@@ -178,13 +191,11 @@ export function EditBookClientView({ id, initialBook, initialGenres }: EditBookC
       const data = await res.json();
       if (data.translated) {
         setBook((prev) => ({ ...prev, description: data.translated }));
-        setNotification({ type: 'success', message: 'Sinopse traduzida para Português com sucesso!' });
-        setTimeout(() => setNotification(null), 4000);
+        showNotification('success', 'Sinopse traduzida para Português com sucesso!');
       }
     } catch (e) {
       console.error(e);
-      setNotification({ type: 'error', message: 'Erro ao traduzir sinopse.' });
-      setTimeout(() => setNotification(null), 4000);
+      showNotification('error', 'Erro ao traduzir sinopse.');
     } finally {
       setTranslating(false);
     }
@@ -203,12 +214,10 @@ export function EditBookClientView({ id, initialBook, initialGenres }: EditBookC
         router.refresh();
       } else {
         const err = await res.json();
-        setNotification({ type: 'error', message: err.error || 'Erro ao excluir livro.' });
-        setTimeout(() => setNotification(null), 4000);
+        showNotification('error', err.error || 'Erro ao excluir livro.');
       }
     } catch {
-      setNotification({ type: 'error', message: 'Erro ao excluir livro.' });
-      setTimeout(() => setNotification(null), 4000);
+      showNotification('error', 'Erro ao excluir livro.');
     } finally {
       setDeleting(false);
     }
@@ -248,20 +257,18 @@ export function EditBookClientView({ id, initialBook, initialGenres }: EditBookC
       });
 
       if (res.ok) {
-        setNotification({ type: 'success', message: 'Livro atualizado com sucesso!' });
-        setTimeout(() => {
+        showNotification('success', 'Livro atualizado com sucesso!', 1000);
+        redirectTimeoutRef.current = window.setTimeout(() => {
           router.push('/admin/livros');
           router.refresh();
         }, 1000);
       } else {
         const err = await res.json();
-        setNotification({ type: 'error', message: err.error || 'Erro ao atualizar livro.' });
-        setTimeout(() => setNotification(null), 4000);
+        showNotification('error', err.error || 'Erro ao atualizar livro.');
       }
     } catch (error) {
       console.error('Erro ao salvar:', error);
-      setNotification({ type: 'error', message: 'Erro ao atualizar livro.' });
-      setTimeout(() => setNotification(null), 4000);
+      showNotification('error', 'Erro ao atualizar livro.');
     } finally {
       setSaving(false);
     }

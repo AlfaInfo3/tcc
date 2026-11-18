@@ -18,6 +18,7 @@ import {
   CameraOff01Icon
 } from '@hugeicons/core-free-icons';
 import { HugeIcon } from '@/components/ui/HugeIcon';
+import { Modal } from '@/components/ui/modal';
 import { Html5Qrcode } from 'html5-qrcode';
 import { BookSearchResult } from '@/lib/book-search';
 
@@ -52,11 +53,14 @@ export function QuickBookRegisterModal({ isOpen, onClose, onBookCreated }: Quick
   const mediaStreamRef = useRef<MediaStream | null>(null);
 
   const isbnInputRef = useRef<HTMLInputElement | null>(null);
+  const focusTimeoutRef = useRef<number | null>(null);
+  const scannerTimeoutRef = useRef<number | null>(null);
+  const closeTimeoutRef = useRef<number | null>(null);
 
   // Auto focus on input when opened
   useEffect(() => {
     if (isOpen) {
-      setTimeout(() => {
+      focusTimeoutRef.current = window.setTimeout(() => {
         isbnInputRef.current?.focus();
       }, 150);
     } else {
@@ -64,7 +68,31 @@ export function QuickBookRegisterModal({ isOpen, onClose, onBookCreated }: Quick
       stopPhotoCamera();
       resetForm();
     }
+
+    return () => {
+      if (focusTimeoutRef.current !== null) window.clearTimeout(focusTimeoutRef.current);
+    };
   }, [isOpen]);
+
+  // Safety net: never leave the camera or pending timers running after unmount.
+  useEffect(() => {
+    return () => {
+      if (scannerTimeoutRef.current !== null) window.clearTimeout(scannerTimeoutRef.current);
+      if (closeTimeoutRef.current !== null) window.clearTimeout(closeTimeoutRef.current);
+      if (focusTimeoutRef.current !== null) window.clearTimeout(focusTimeoutRef.current);
+
+      if (mediaStreamRef.current) {
+        mediaStreamRef.current.getTracks().forEach((track) => track.stop());
+        mediaStreamRef.current = null;
+      }
+
+      const scanner = scannerRef.current;
+      if (scanner) {
+        scannerRef.current = null;
+        scanner.stop().then(() => scanner.clear()).catch(() => undefined);
+      }
+    };
+  }, []);
 
   const resetForm = () => {
     setIsbnInput('');
@@ -119,8 +147,13 @@ export function QuickBookRegisterModal({ isOpen, onClose, onBookCreated }: Quick
     setSearchError(null);
 
     // Wait for DOM to render the container
-    setTimeout(async () => {
+    scannerTimeoutRef.current = window.setTimeout(async () => {
       try {
+        if (!scannerDivId || !document.getElementById(scannerDivId)) {
+          setIsScanning(false);
+          return;
+        }
+
         const html5QrCode = new Html5Qrcode(scannerDivId);
         scannerRef.current = html5QrCode;
 
@@ -150,11 +183,17 @@ export function QuickBookRegisterModal({ isOpen, onClose, onBookCreated }: Quick
   };
 
   const stopScanner = () => {
+    if (scannerTimeoutRef.current !== null) {
+      window.clearTimeout(scannerTimeoutRef.current);
+      scannerTimeoutRef.current = null;
+    }
+
     if (scannerRef.current) {
-      scannerRef.current.stop().then(() => {
-        scannerRef.current?.clear();
-        scannerRef.current = null;
-      }).catch(console.warn);
+      const scanner = scannerRef.current;
+      scannerRef.current = null;
+      scanner.stop().then(() => {
+        scanner.clear();
+      }).catch(() => undefined);
     }
     setIsScanning(false);
   };
@@ -173,7 +212,7 @@ export function QuickBookRegisterModal({ isOpen, onClose, onBookCreated }: Quick
       }
     } catch (err) {
       console.error('Error opening camera for photo:', err);
-      alert('Não foi possível acessar a câmera. Você também pode enviar uma imagem do seu computador.');
+      setSearchError('Não foi possível acessar a câmera. Você também pode enviar uma imagem do seu computador.');
       setIsCapturingPhoto(false);
     }
   };
@@ -249,21 +288,21 @@ export function QuickBookRegisterModal({ isOpen, onClose, onBookCreated }: Quick
           setCustomCover(null);
           setIsCoverApproved(true);
           setQuantity(1);
-          setTimeout(() => {
+          focusTimeoutRef.current = window.setTimeout(() => {
             isbnInputRef.current?.focus();
           }, 100);
         } else {
-          setTimeout(() => {
+          closeTimeoutRef.current = window.setTimeout(() => {
             onClose();
           }, 800);
         }
       } else {
         const errorData = await response.json();
-        alert(`Erro ao cadastrar livro: ${errorData.error || 'Erro desconhecido'}`);
+        setSearchError(`Erro ao cadastrar livro: ${errorData.error || 'Erro desconhecido'}`);
       }
     } catch (err) {
       console.error(err);
-      alert('Falha de conexão ao salvar livro.');
+      setSearchError('Falha de conexão ao salvar livro.');
     } finally {
       setSaving(false);
     }
@@ -272,11 +311,12 @@ export function QuickBookRegisterModal({ isOpen, onClose, onBookCreated }: Quick
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75 backdrop-blur-sm animate-in fade-in-0 duration-200">
-      <div 
-        className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col max-h-[92vh] font-['Quicksand',sans-serif]"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      labelledBy="quick-book-modal-title"
+      className="max-w-2xl border-slate-100 bg-white font-['Quicksand',sans-serif]"
+    >
         {/* ── HEADER ─────────────────────────────────────────── */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-blue-900 to-indigo-900 text-white">
           <div className="flex items-center gap-2.5">
@@ -284,7 +324,7 @@ export function QuickBookRegisterModal({ isOpen, onClose, onBookCreated }: Quick
               <HugeIcon icon={SparklesIcon} size={20} className="animate-pulse" />
             </div>
             <div>
-              <h2 className="text-base sm:text-lg font-black tracking-tight leading-tight">
+              <h2 id="quick-book-modal-title" className="text-base sm:text-lg font-black tracking-tight leading-tight">
                 Cadastro Rápido de Livros
               </h2>
               <p className="text-[11px] text-blue-200 font-medium">
@@ -648,7 +688,6 @@ export function QuickBookRegisterModal({ isOpen, onClose, onBookCreated }: Quick
             )}
           </div>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }
