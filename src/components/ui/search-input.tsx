@@ -16,6 +16,11 @@ export function SearchInput({ placeholder }: SearchInputProps) {
   const [searchTerm, setSearchTerm] = useState(searchParams.get('q')?.toString() || '');
 
   useEffect(() => {
+    // Avoid a redundant navigation (and request) right after mount when the
+    // term already matches the URL.
+    const currentQuery = searchParams.get('q') ?? '';
+    if (searchTerm === currentQuery) return;
+
     const handler = setTimeout(() => {
       const params = new URLSearchParams(searchParams);
       if (searchTerm) {
