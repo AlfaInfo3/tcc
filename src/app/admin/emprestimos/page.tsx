@@ -1,7 +1,8 @@
-import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
-import { Plus, Search, Filter, MoreHorizontal, FileText, User, Calendar, Pencil, CheckCircle } from 'lucide-react';
+import Link from 'next/link';
+import { Plus, FileText, User, Calendar, Pencil } from 'lucide-react';
 import { TableActions } from '@/components/ui/table-actions';
+import { formatDateBR } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
 
@@ -34,11 +35,10 @@ export default async function ManageLoansPage(props: {
 }) {
   const searchParams = await props.searchParams;
   const query = searchParams?.q || '';
-  console.log('Loans Search Query:', query);
   const loans = await getLoans(query);
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
+    <div className="w-full max-w-7xl mx-auto">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
         <div>
@@ -51,10 +51,10 @@ export default async function ManageLoansPage(props: {
         </div>
         
         <div className="flex items-center gap-3">
-             <a href="/admin/emprestimos/novo" className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2.5 rounded-lg border border-transparent font-medium transition-all shadow-sm">
+             <Link href="/admin/emprestimos/novo" className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2.5 rounded-lg border border-transparent font-medium transition-all shadow-sm">
             <Plus size={18} />
             Novo Empréstimo
-          </a>
+          </Link>
         </div>
       </div>
 
@@ -96,7 +96,7 @@ export default async function ManageLoansPage(props: {
                                 <User size={12} /> {loan.student.name}
                             </div>
                             <div className="flex items-center gap-1">
-                                <Calendar size={12} /> Prev: {new Date(loan.dueDate).toLocaleDateString()}
+                                <Calendar size={12} /> Prev: {formatDateBR(loan.dueDate)}
                             </div>
                         </div>
                       </div>
@@ -139,12 +139,12 @@ export default async function ManageLoansPage(props: {
                     <div className="flex flex-col gap-1">
                         <div className="flex items-center text-xs text-muted-foreground">
                              <Calendar className="w-3 h-3 mr-1.5 opacity-70" />
-                             Previsto: {new Date(loan.dueDate).toLocaleDateString()}
+                             Previsto: {formatDateBR(loan.dueDate)}
                         </div>
                         {loan.returnDate && (
                             <div className="flex items-center text-xs text-green-600 dark:text-green-400 font-medium">
                                 <Calendar className="w-3 h-3 mr-1.5 opacity-70" />
-                                Devolvido: {new Date(loan.returnDate).toLocaleDateString()}
+                                Devolvido: {formatDateBR(loan.returnDate)}
                             </div>
                         )}
                     </div>
@@ -154,8 +154,7 @@ export default async function ManageLoansPage(props: {
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <TableActions 
                         actions={[
-                            { label: 'Editar', icon: <Pencil size={14} />, href: `/admin/emprestimos/${loan.id}` },
-                            // { label: 'Devolver', icon: <CheckCircle size={14} />, onClick: () => console.log('Return loan', loan.id) }
+                            { label: 'Detalhes', icon: <Pencil size={14} />, href: `/admin/emprestimos/${loan.id}` },
                         ]}
                     />
                   </td>
@@ -168,9 +167,9 @@ export default async function ManageLoansPage(props: {
                         <FileText className="mx-auto h-12 w-12 text-muted-foreground/50 mb-3" />
                         <h3 className="text-lg font-medium text-foreground">Nenhum empréstimo encontrado</h3>
                         <p className="mt-1 text-sm text-muted-foreground">Comece criando um novo empréstimo para os alunos.</p>
-                         <a href="/admin/emprestimos/novo" className="mt-4 inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg text-sm border border-transparent font-medium transition-all shadow-sm">
+                         <Link href="/admin/emprestimos/novo" className="mt-4 inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg text-sm border border-transparent font-medium transition-all shadow-sm">
                              Criar primeiro empréstimo
-                        </a>
+                        </Link>
                     </td>
                 </tr>
               )}

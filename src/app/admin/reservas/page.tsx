@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
-import { CalendarArrowUp, Search, Filter, Calendar, User, BookOpen, Eye, Ban } from 'lucide-react';
+import { CalendarArrowUp, Calendar, User, BookOpen, Eye } from 'lucide-react';
 import { TableActions } from '@/components/ui/table-actions';
+import { formatDateBR } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,11 +34,10 @@ export default async function AdminReservationsPage(props: {
 }) {
   const searchParams = await props.searchParams;
   const query = searchParams?.q || '';
-  console.log('Reservations Search Query:', query);
   const reservations = await getReservations(query);
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
+    <div className="w-full max-w-7xl mx-auto">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
         <div>
@@ -85,7 +85,7 @@ export default async function AdminReservationsPage(props: {
                                         <User size={12} className="opacity-70" /> {res.student.name}
                                     </span>
                                     <span className="flex items-center gap-1 mt-0.5">
-                                        <Calendar size={12} className="opacity-70" /> {new Date(res.createdAt).toLocaleDateString()}
+                                        <Calendar size={12} className="opacity-70" /> {formatDateBR(res.createdAt)}
                                     </span>
                                 </div>
                             </div>
@@ -117,14 +117,13 @@ export default async function AdminReservationsPage(props: {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground hidden sm:table-cell">
                          <div className="flex items-center gap-1.5">
                             <Calendar size={14} className="opacity-50" />
-                            {new Date(res.createdAt).toLocaleDateString()}
+                            {formatDateBR(res.createdAt)}
                          </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <TableActions 
                             actions={[
                                 { label: 'Detalhes', icon: <Eye size={14} />, href: `/admin/reservas/${res.id}` },
-                                // { label: 'Cancelar', icon: <Ban size={14} />, variant: 'destructive', onClick: () => console.log('Cancel reservation', res.id) }
                             ]}
                         />
                     </td>

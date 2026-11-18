@@ -53,7 +53,7 @@ export default async function AdminLoanDetailsPage({ params }: Props) {
   const isOverdue = isLoanOverdue(loan);
 
   return (
-    <div className="container mx-auto max-w-3xl px-4 py-8">
+    <div className="w-full max-w-3xl mx-auto">
       <Link
         href="/admin/emprestimos"
         className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"

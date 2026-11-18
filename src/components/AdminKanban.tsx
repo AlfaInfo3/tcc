@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 
 // Types definition
@@ -332,9 +333,9 @@ export default function AdminKanban() {
               {renderColumnContent(columnId, column, false)}
               {column.id === 'returned' && (
                   <div className="mt-2 text-center">
-                    <a href="/admin/reservas" className="text-sm text-primary hover:align-top hover:underline">
+                    <Link href="/admin/reservas" className="text-sm text-primary hover:align-top hover:underline">
                         Histórico Completo →
-                    </a>
+                    </Link>
                   </div>
               )}
             </div>

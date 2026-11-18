@@ -1,6 +1,7 @@
 import { SearchInput } from '@/components/ui/search-input';
 import { prisma } from '@/lib/prisma';
-import { ShieldCheck, Plus, Mail, UserCog, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
+import Link from 'next/link';
+import { ShieldCheck, Plus, Mail, UserCog, Pencil } from 'lucide-react';
 import { TableActions } from '@/components/ui/table-actions';
 
 async function getUsers(query?: string) {
@@ -27,7 +28,7 @@ export default async function AdminUsersPage(props: {
   const users = await getUsers(query);
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
+    <div className="w-full max-w-7xl mx-auto">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
         <div>
@@ -40,10 +41,10 @@ export default async function AdminUsersPage(props: {
         </div>
         
          <div className="flex items-center gap-3">
-             <a href="/admin/users/novo" className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2.5 rounded-lg border border-transparent font-medium transition-all shadow-sm">
+             <Link href="/admin/users/novo" className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2.5 rounded-lg border border-transparent font-medium transition-all shadow-sm">
             <Plus size={18} />
             Novo Usuário
-          </a>
+          </Link>
         </div>
       </div>
 
@@ -114,7 +115,6 @@ export default async function AdminUsersPage(props: {
                         <TableActions 
                             actions={[
                                 { label: 'Editar', icon: <Pencil size={14} />, href: `/admin/users/${user.id}` },
-                                // { label: 'Excluir', icon: <Trash2 size={14} />, variant: 'destructive', onClick: () => console.log('Delete user', user.id) }
                             ]}
                         />
                       </td>
@@ -126,9 +126,9 @@ export default async function AdminUsersPage(props: {
                             <ShieldCheck className="mx-auto h-12 w-12 text-muted-foreground/50 mb-3" />
                             <h3 className="text-lg font-medium text-foreground">Nenhum usuário encontrado</h3>
                             <p className="mt-1 text-sm text-muted-foreground">Adicione administradores para gerenciar o sistema.</p>
-                             <a href="/admin/users/novo" className="mt-4 inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg text-sm border border-transparent font-medium transition-all shadow-sm">
+                             <Link href="/admin/users/novo" className="mt-4 inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg text-sm border border-transparent font-medium transition-all shadow-sm">
                                  Adicionar Usuário
-                            </a>
+                            </Link>
                         </td>
                     </tr>
                 )}

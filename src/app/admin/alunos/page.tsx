@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
-import { Plus, Search, Filter, MoreHorizontal, GraduationCap, Medal, Trophy, Pencil, Trash2 } from 'lucide-react';
+import Link from 'next/link';
+import { Plus, GraduationCap, Medal, Trophy, Pencil } from 'lucide-react';
 import { TableActions } from '@/components/ui/table-actions';
 
 export const dynamic = 'force-dynamic';
@@ -43,11 +44,10 @@ export default async function AdminStudentsPage(props: {
 }) {
   const searchParams = await props.searchParams;
   const query = searchParams?.q || '';
-  console.log('Students Search Query:', query);
   const students = await getStudents(query);
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
+    <div className="w-full max-w-7xl mx-auto">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
         <div>
@@ -60,10 +60,10 @@ export default async function AdminStudentsPage(props: {
         </div>
         
         <div className="flex items-center gap-3">
-             <a href="/admin/alunos/novo" className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2.5 rounded-lg border border-transparent font-medium transition-all shadow-sm">
+             <Link href="/admin/alunos/novo" className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2.5 rounded-lg border border-transparent font-medium transition-all shadow-sm">
             <Plus size={18} />
             Adicionar Aluno
-          </a>
+          </Link>
         </div>
       </div>
 
@@ -170,7 +170,6 @@ export default async function AdminStudentsPage(props: {
                             <TableActions 
                                 actions={[
                                     { label: 'Detalhes', icon: <Pencil size={14} />, href: `/admin/alunos/${student.id}` },
-                                    // { label: 'Excluir', icon: <Trash2 size={14} />, variant: 'destructive', onClick: () => console.log('Delete student', student.id) } 
                                 ]}
                             />
                         </td>
@@ -183,9 +182,9 @@ export default async function AdminStudentsPage(props: {
                             <GraduationCap className="mx-auto h-12 w-12 text-neutral-300 mb-3" />
                             <h3 className="text-lg font-medium text-foreground">Nenhum aluno encontrado</h3>
                             <p className="mt-1 text-sm text-muted-foreground">Cadastre os alunos para acompanhar empréstimos e ranking.</p>
-                             <a href="/admin/alunos/novo" className="mt-4 inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg text-sm border border-transparent font-medium transition-all shadow-sm">
+                             <Link href="/admin/alunos/novo" className="mt-4 inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg text-sm border border-transparent font-medium transition-all shadow-sm">
                                  Cadastrar Aluno
-                            </a>
+                            </Link>
                         </td>
                     </tr>
                 )}

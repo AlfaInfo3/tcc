@@ -38,7 +38,7 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="flex items-center justify-center">
       <div className="max-w-md w-full rounded-lg shadow-md p-8 border border-border">
         <div className="flex flex-col items-center mb-6">
           <div className="mb-3 flex items-center justify-center">

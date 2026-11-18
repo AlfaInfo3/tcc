@@ -92,7 +92,8 @@ export function EditBookClientView({ id, initialBook, initialGenres }: EditBookC
       }
     } catch (err) {
       console.error('Erro ao acessar câmera:', err);
-      alert('Não foi possível acessar a câmera. Verifique as permissões.');
+      setNotification({ type: 'error', message: 'Não foi possível acessar a câmera. Verifique as permissões.' });
+      setTimeout(() => setNotification(null), 4000);
       setIsCapturingCamera(false);
     }
   };
@@ -202,10 +203,12 @@ export function EditBookClientView({ id, initialBook, initialGenres }: EditBookC
         router.refresh();
       } else {
         const err = await res.json();
-        alert(err.error || 'Erro ao excluir livro.');
+        setNotification({ type: 'error', message: err.error || 'Erro ao excluir livro.' });
+        setTimeout(() => setNotification(null), 4000);
       }
-    } catch (e) {
-      alert('Erro ao excluir livro.');
+    } catch {
+      setNotification({ type: 'error', message: 'Erro ao excluir livro.' });
+      setTimeout(() => setNotification(null), 4000);
     } finally {
       setDeleting(false);
     }
@@ -252,11 +255,13 @@ export function EditBookClientView({ id, initialBook, initialGenres }: EditBookC
         }, 1000);
       } else {
         const err = await res.json();
-        alert(err.error || 'Erro ao atualizar livro');
+        setNotification({ type: 'error', message: err.error || 'Erro ao atualizar livro.' });
+        setTimeout(() => setNotification(null), 4000);
       }
     } catch (error) {
       console.error('Erro ao salvar:', error);
-      alert('Erro ao atualizar livro.');
+      setNotification({ type: 'error', message: 'Erro ao atualizar livro.' });
+      setTimeout(() => setNotification(null), 4000);
     } finally {
       setSaving(false);
     }

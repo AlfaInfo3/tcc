@@ -54,6 +54,9 @@ export default function NewBookPage() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
 
+  // Inline feedback (replaces native alert dialogs)
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
   // Search/Autocomplete State
   const [suggestions, setSuggestions] = useState<BookSearchResult[]>([]);
   const [loadingSearch, setLoadingSearch] = useState(false);
@@ -137,7 +140,10 @@ export default function NewBookPage() {
       }
     } catch (err) {
       console.error('Error opening camera:', err);
-      alert('Não foi possível acessar a câmera. Você também pode carregar uma imagem do seu dispositivo.');
+      setFeedback({
+        type: 'error',
+        message: 'Não foi possível acessar a câmera. Você também pode carregar uma imagem do seu dispositivo.',
+      });
       setIsCapturingPhoto(false);
     }
   };
@@ -172,11 +178,12 @@ export default function NewBookPage() {
     e.preventDefault();
 
     if (!formData.title.trim() || !formData.author.trim()) {
-      alert('Título e Autor são obrigatórios');
+      setFeedback({ type: 'error', message: 'Título e autor são obrigatórios.' });
       return;
     }
 
     setSaving(true);
+    setFeedback(null);
     try {
       let finalCoverUrl = customCoverDataUrl || formData.coverUrl;
 
@@ -223,18 +230,18 @@ export default function NewBookPage() {
           });
           setCustomCoverDataUrl(null);
           setCoverFile(null);
-          alert('Livro cadastrado com sucesso! Pronto para cadastrar o próximo.');
+          setFeedback({ type: 'success', message: 'Livro cadastrado com sucesso! Pronto para cadastrar o próximo.' });
         } else {
           router.push('/admin/livros');
           router.refresh();
         }
       } else {
         const errData = await response.json();
-        alert(`Erro ao salvar: ${errData.error || 'Erro desconhecido'}`);
+        setFeedback({ type: 'error', message: `Erro ao salvar: ${errData.error || 'Erro desconhecido'}` });
       }
     } catch (error) {
       console.error('Error saving book:', error);
-      alert('Erro de conexão ao salvar livro.');
+      setFeedback({ type: 'error', message: 'Erro de conexão ao salvar livro.' });
     } finally {
       setSaving(false);
     }
@@ -243,7 +250,7 @@ export default function NewBookPage() {
   const activeCover = customCoverDataUrl || (coverFile ? URL.createObjectURL(coverFile) : null) || formData.coverUrl;
 
   return (
-    <div className="min-h-screen bg-slate-50/60 p-4 sm:p-6 md:p-8 font-['Quicksand',sans-serif]">
+    <div className="w-full bg-slate-50/60 font-['Quicksand',sans-serif]">
       <div className="max-w-6xl mx-auto space-y-6">
         
         {/* ── TOP NAV BAR ─────────────────────────────────────── */}
@@ -527,6 +534,17 @@ export default function NewBookPage() {
             </div>
 
             {/* Form Action Buttons */}
+            {feedback && (
+              <p
+                className={`rounded-2xl border px-4 py-3 text-xs font-semibold ${
+                  feedback.type === 'success'
+                    ? 'border-green-200 bg-green-50 text-green-700'
+                    : 'border-red-200 bg-red-50 text-red-700'
+                }`}
+              >
+                {feedback.message}
+              </p>
+            )}
             <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center gap-3">
               <button
                 type="submit"
