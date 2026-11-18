@@ -42,6 +42,7 @@ export default function AdminKanban() {
   });
   
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
   // Mobile Tab State
   const [activeTab, setActiveTab] = useState('reserved');
@@ -168,6 +169,7 @@ export default function AdminKanban() {
   };
 
   const processMove = async (itemId: string, fromStatus: string, toStatus: string, extraData?: any) => {
+    setError(null);
     try {
         const res = await fetch('/api/kanban/move', {
             method: 'POST',
@@ -186,7 +188,7 @@ export default function AdminKanban() {
         fetchData(); 
     } catch (e) {
         console.error(e);
-        alert('Erro ao salvar movimentação. Recarregando...');
+        setError('Não foi possível salvar a movimentação. Os dados foram recarregados.');
         fetchData();
     }
   };
@@ -266,7 +268,14 @@ export default function AdminKanban() {
                     <p className="text-xs text-muted-foreground/70 mt-2">{item.date}</p>
 
                     {/* MOBILE ACTION BUTTONS (ALWAYS VISIBLE) */}
-                    <div className="mt-3 pt-3 border-t border-border flex justify-end">
+                    <div className="mt-3 pt-3 border-t border-border flex flex-wrap items-center justify-between gap-2">
+                        <Link
+                            href={item.type === 'reservation' ? `/admin/reservas/${item.id}` : `/admin/emprestimos/${item.id}`}
+                            className="text-xs font-medium text-primary hover:underline"
+                        >
+                            Ver detalhes
+                        </Link>
+                        <div className="flex items-center gap-1.5">
                         {columnId === 'reserved' && (
                             <button 
                                 onClick={() => handleMoveValues(item.id, 'reserved', 'active')}
@@ -283,6 +292,7 @@ export default function AdminKanban() {
                                 Devolver →
                             </button>
                         )}
+                        </div>
                     </div>
                     </div>
                 )}
@@ -296,6 +306,14 @@ export default function AdminKanban() {
 
   return (
     <div>
+      {error && (
+        <div
+          role="alert"
+          className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400"
+        >
+          {error}
+        </div>
+      )}
       <DragDropContext onDragEnd={onDragEnd}>
         {/* --- MOBILE VIEW (TABS) --- */}
         <div className="md:hidden">

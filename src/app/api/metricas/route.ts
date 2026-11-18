@@ -10,72 +10,61 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Get counts for different metrics
-    const totalBooks = await prisma.book.count();
-    const totalLoans = await prisma.loan.count();
-    const activeLoans = await prisma.loan.count({
-      where: { status: 'active' }
-    });
+    const now = new Date();
 
-    // Calculate overdue loans (loans that are active but past due date)
+    // Counts
+    const totalTitles = await prisma.book.count();
+    const copiesAggregation = await prisma.book.aggregate({ _sum: { quantity: true } });
+    const totalItems = copiesAggregation._sum.quantity ?? 0;
+
+    const totalLoans = await prisma.loan.count();
+    const activeLoans = await prisma.loan.count({ where: { status: 'active' } });
+
+    // Overdue = marcado como atrasado ou ativo com devolução vencida
     const overdueLoans = await prisma.loan.count({
       where: {
-        status: 'active',
-        dueDate: { lt: new Date() }
-      }
+        OR: [
+          { status: 'overdue' },
+          { status: 'active', dueDate: { lt: now } },
+        ],
+      },
     });
 
-    const reservations = await prisma.reservation.count();
+    // Reservas que ainda aguardam retirada (não contam histórico)
+    const reservations = await prisma.reservation.count({ where: { status: 'reserved' } });
 
-    // Get most popular books based on number of loans
-    const mostPopularBooks = await prisma.book.groupBy({
-      by: ['id', 'title'],
-      _count: {
-        id: true
-      },
-      orderBy: {
-        _count: {
-          id: 'desc'
-        }
-      },
+    const borrowedBooks = activeLoans;
+    const availableBooks = Math.max(0, totalItems - activeLoans - reservations);
+
+    // Obras mais emprestadas (contagem real por empréstimo)
+    const popularGroups = await prisma.loan.groupBy({
+      by: ['bookId'],
+      _count: { bookId: true },
+      orderBy: { _count: { bookId: 'desc' } },
       take: 5,
-      where: {
-        loans: {
-          some: {}
-        }
-      }
-    }).then(results =>
-      results.map(result => ({
-        id: result.id,
-        title: result.title,
-        loans: result._count.id
-      }))
-    );
-
-    // Aggregations for more accurate numbers
-    const totalBooksAggregation = await prisma.book.aggregate({
-      _sum: {
-        quantity: true
-      }
     });
 
-    const activeLoansCount = await prisma.loan.count({
-      where: { status: 'active' }
+    const popularTitles = await prisma.book.findMany({
+      where: { id: { in: popularGroups.map((group) => group.bookId) } },
+      select: { id: true, title: true },
     });
 
-    const availableBooks = totalBooksAggregation._sum.quantity || 0;
-    const totalItems = availableBooks + activeLoansCount;
+    const mostPopularBooks = popularGroups.map((group) => ({
+      id: group.bookId,
+      title: popularTitles.find((book) => book.id === group.bookId)?.title || 'Título removido',
+      loans: group._count.bookId,
+    }));
 
     const metrics = {
-      totalTitles: totalBooks, // Distinct book titles
-      totalItems: totalItems, // Total physical copies (in stock + borrowed)
-      availableBooks: availableBooks, // Currently on shelf
-      borrowedBooks: activeLoansCount,
+      totalTitles,
+      totalItems,
+      availableBooks,
+      borrowedBooks,
       totalLoans,
-      activeLoans: activeLoansCount,
+      activeLoans,
       overdueLoans,
       reservations,
-      mostPopularBooks
+      mostPopularBooks,
     };
 
     return NextResponse.json(metrics);
