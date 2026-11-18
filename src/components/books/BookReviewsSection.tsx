@@ -1,9 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { 
   StarIcon, 
-  Comment01Icon, 
   CheckmarkCircle02Icon, 
   Alert02Icon, 
   LoaderCircleIcon, 
@@ -55,6 +54,15 @@ export function BookReviewsSection({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const closeTimeoutRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (closeTimeoutRef.current !== null) {
+        window.clearTimeout(closeTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Stats calculation
   const totalReviews = reviews.length;
@@ -126,13 +134,14 @@ export function BookReviewsSection({
       setStudentClass('');
       setRating(5);
       
-      setTimeout(() => {
+      closeTimeoutRef.current = window.setTimeout(() => {
         setIsFormOpen(false);
         setSuccessMessage('');
+        closeTimeoutRef.current = null;
       }, 2500);
 
-    } catch (err: any) {
-      setErrors({ submit: err.message || 'Falha ao enviar avaliação.' });
+    } catch (err) {
+      setErrors({ submit: err instanceof Error ? err.message : 'Falha ao enviar avaliação.' });
     } finally {
       setIsSubmitting(false);
     }
@@ -408,6 +417,7 @@ export function BookReviewsSection({
                     const dateStr = new Date(rev.createdAt).toLocaleDateString('pt-BR', {
                       day: '2-digit',
                       month: 'short',
+                      timeZone: 'America/Sao_Paulo',
                     });
 
                     const initials = rev.studentName

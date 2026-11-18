@@ -5,8 +5,6 @@ import { Book } from '@/types/book';
 import { ModernBookCover, BookHeader, BookTitle, BookDescription } from '@/cuicui/other/books/modern-book-cover/modern-book-cover';
 import { Book01Icon } from '@hugeicons/core-free-icons';
 import { HugeIcon } from '@/components/ui/HugeIcon';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 
 interface BookCardProps {
   book: Omit<Book, 'id'> & { id: string | number };
@@ -16,8 +14,6 @@ interface BookCardProps {
 }
 
 export function BookCard({ book, onReserve, adminMode, dark = false }: BookCardProps) {
-  const router = useRouter();
-  const [isNavigating, setIsNavigating] = useState(false);
   const isAvailable = book.quantity > 0;
   
   // Consistent color mapping based on title
@@ -25,19 +21,11 @@ export function BookCard({ book, onReserve, adminMode, dark = false }: BookCardP
   const colorIndex = (book.title || 'A').charCodeAt(0) % colors.length;
   const bookColor = colors[colorIndex];
 
-  const handleCardClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    e.preventDefault();
-    setIsNavigating(true);
-    setTimeout(() => {
-      router.push(href);
-    }, 450); // Wait for 3D rotation animation before route transition
-  };
-
   const href = adminMode ? `/admin/livros/${book.id}` : `/livros/${book.id}`;
 
   return (
     <div className="flex flex-col items-center group/card h-full w-full select-none">
-      <Link href={href} onClick={(e) => handleCardClick(e, href)} className="shrink-0 relative">
+      <Link href={href} className="shrink-0 relative">
         <div className="relative transform transition-transform duration-300 group-hover/card:-translate-y-2">
           
           {/* Desktop 3D cover (size md = 160px width) */}
@@ -46,7 +34,6 @@ export function BookCard({ book, onReserve, adminMode, dark = false }: BookCardP
               size="md"
               color={bookColor}
               coverImage={book.coverUrl}
-              forceRotate={isNavigating}
             >
               <BookHeader>
                 <HugeIcon icon={Book01Icon} size={20} />
@@ -62,7 +49,6 @@ export function BookCard({ book, onReserve, adminMode, dark = false }: BookCardP
               size="sm"
               color={bookColor}
               coverImage={book.coverUrl}
-              forceRotate={isNavigating}
             >
               <BookHeader>
                 <HugeIcon icon={Book01Icon} size={16} />

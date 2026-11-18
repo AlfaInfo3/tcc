@@ -1,5 +1,6 @@
 import React from 'react';
 import { Calendar, BookOpen, Clock, CheckCircle2, Bookmark, AlertTriangle } from 'lucide-react';
+import { formatDateBR } from '@/lib/format';
 
 interface HistoryItem {
   id?: string;
@@ -63,7 +64,7 @@ export function CurrentLoansSection({ loans }: { loans: HistoryItem[] }) {
                     {loan.dueDate && (
                       <span className="text-[10px] font-bold text-muted-foreground flex items-center gap-1">
                         <Calendar size={10} />
-                        {new Date(loan.dueDate).toLocaleDateString('pt-BR')}
+                        {formatDateBR(loan.dueDate)}
                       </span>
                     )}
                   </div>
@@ -114,7 +115,7 @@ export function HistoryFeed({ items }: { items: HistoryItem[] }) {
               <p className="text-xs text-muted-foreground">{config.label}</p>
             </div>
             <span className="text-[10px] font-bold text-muted-foreground whitespace-nowrap">
-              {new Date(item.createdAt || item.loanDate || Date.now()).toLocaleDateString('pt-BR')}
+              {formatDateBR(item.createdAt || item.loanDate || new Date())}
             </span>
           </div>
         );

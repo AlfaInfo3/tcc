@@ -12,7 +12,7 @@ export interface FilterState {
 
 interface FiltersPanelProps {
   filters: FilterState;
-  onFilterChange: (key: keyof FilterState, value: any) => void;
+  onFilterChange: (key: keyof FilterState, value: FilterState[keyof FilterState]) => void;
   genreCounts?: { name: string; count: number }[];
   totalBooksCount?: number;
   availableCount?: number;

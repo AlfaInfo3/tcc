@@ -1,4 +1,7 @@
 // src/app/(public)/livros/[id]/page.tsx
+import { cache } from 'react';
+import { notFound } from 'next/navigation';
+import type { Book } from '@prisma/client';
 import { ReserveForm } from '@/components/ReserveForm';
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
@@ -27,10 +30,7 @@ export async function generateMetadata(props: {
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await props.params;
-  const book = await prisma.book.findUnique({
-    where: { id },
-    select: { title: true, author: true, description: true }
-  });
+  const book = await getBook(id);
 
   if (!book) {
     return {
@@ -44,8 +44,8 @@ export async function generateMetadata(props: {
   };
 }
 
-async function getBook(bookId: string) {
-  const book = await prisma.book.findUnique({
+const getBook = cache(async (bookId: string) => {
+  return prisma.book.findUnique({
     where: { id: bookId },
     include: {
       loans: {
@@ -59,13 +59,11 @@ async function getBook(bookId: string) {
       }
     }
   });
+});
 
-  return book;
-}
-
-async function getRelatedBooks(currentBookId: string, genres: string[]) {
+async function getRelatedBooks(currentBookId: string, genres: string[]): Promise<Book[]> {
   // 1. Busca primeiro por obras do mesmo gênero
-  let related: any[] = [];
+  let related: Book[] = [];
   if (genres && genres.length > 0) {
     related = await prisma.book.findMany({
       where: {
@@ -102,44 +100,23 @@ export default async function BookDetailPage({
   const book = await getBook(id);
 
   if (!book) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#060F33] via-[#0B1B5C] to-[#040924] px-4 py-20 font-['Quicksand',sans-serif]">
-        <div className="text-center max-w-md bg-white/95 backdrop-blur-md p-8 rounded-3xl border border-white/20 shadow-2xl space-y-5 text-slate-800">
-          <div className="size-16 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto shadow-inner">
-            <HugeIcon icon={BookOpen01Icon} size={32} />
-          </div>
-          <div className="space-y-2">
-            <h1 className="text-2xl font-black text-slate-900">Livro não encontrado</h1>
-            <p className="text-sm text-slate-600">
-              O título solicitado não foi localizado em nosso acervo ou pode ter sido desativado temporariamente.
-            </p>
-          </div>
-          <Link
-            href="/livros"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black text-xs transition-all shadow-md hover:shadow-lg"
-          >
-            <HugeIcon icon={ArrowLeft01Icon} size={16} />
-            Voltar ao Catálogo
-          </Link>
-        </div>
-      </div>
-    );
+    notFound();
   }
 
   // Calculate copies available (subtract active loans and active reservations)
-  const activeLoansCount = book.loans ? book.loans.length : 0;
-  const activeResCount = (book as any).reservations ? (book as any).reservations.length : 0;
+  const activeLoansCount = book.loans.length;
+  const activeResCount = book.reservations.length;
   const availableCopies = Math.max(0, book.quantity - activeLoansCount - activeResCount);
   const isAvailable = availableCopies > 0;
 
   // Calculate review stats
-  const reviews = (book as any).reviews || [];
+  const reviews = book.reviews;
   const totalReviews = reviews.length;
   const averageRating = totalReviews > 0
-    ? Number((reviews.reduce((acc: number, r: any) => acc + r.rating, 0) / totalReviews).toFixed(1))
+    ? Number((reviews.reduce((acc, review) => acc + review.rating, 0) / totalReviews).toFixed(1))
     : 5.0;
 
-  const serializedReviews = reviews.map((r: any) => ({
+  const serializedReviews = reviews.map((r) => ({
     id: r.id,
     bookId: r.bookId,
     studentName: r.studentName,

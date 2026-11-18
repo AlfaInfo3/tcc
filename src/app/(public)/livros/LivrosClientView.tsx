@@ -66,7 +66,7 @@ export function LivrosClientView({ initialBooks }: LivrosClientViewProps) {
 
   // Filter & Sort logic
   const filteredBooks = useMemo(() => {
-    let list = books.filter((book) => {
+    const list = books.filter((book) => {
       // 1. Search filter (case & accent insensitive)
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().trim();
@@ -157,7 +157,7 @@ export function LivrosClientView({ initialBooks }: LivrosClientViewProps) {
     }
   };
 
-  const handleFilterChange = (key: keyof FilterState, value: any) => {
+  const handleFilterChange = (key: keyof FilterState, value: FilterState[keyof FilterState]) => {
     setFilters((prev) => ({
       ...prev,
       [key]: value,
@@ -202,7 +202,7 @@ export function LivrosClientView({ initialBooks }: LivrosClientViewProps) {
   };
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-[#060F33] via-[#0B1B5C] to-[#040924] p-3 sm:p-4 md:p-6 font-['Quicksand',sans-serif] text-slate-800 antialiased relative">
+    <div className="min-h-dvh w-full bg-gradient-to-br from-[#060F33] via-[#0B1B5C] to-[#040924] p-3 sm:p-4 md:p-6 font-['Quicksand',sans-serif] text-slate-800 antialiased relative lg:h-dvh lg:overflow-hidden">
       
       {/* ── MOBILE HEADER BAR (< md) ───────────────────── */}
       <div className="flex md:hidden items-center justify-between gap-3 mb-3 bg-white/10 backdrop-blur-md p-3 rounded-2xl border border-white/15 text-white">
@@ -241,7 +241,7 @@ export function LivrosClientView({ initialBooks }: LivrosClientViewProps) {
       </div>
 
       {/* ── MAIN APP FRAME (DESKTOP / MOBILE RESPONSIVE) ───────── */}
-      <div className="flex items-start gap-4 lg:gap-5 h-auto lg:h-[calc(100vh-32px)] max-w-[1720px] mx-auto">
+      <div className="flex items-start gap-4 lg:gap-5 h-auto lg:h-full max-w-[1720px] mx-auto">
         
         {/* 1. Left Nav Rail (~76px, hidden on small screens) */}
         <div className="hidden md:flex shrink-0">

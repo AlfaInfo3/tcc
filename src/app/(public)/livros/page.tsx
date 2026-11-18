@@ -1,10 +1,9 @@
 import { prisma } from '@/lib/prisma';
 import { LivrosClientView } from './LivrosClientView';
-import { BookItem } from '@/components/faithful-books/BookCardWithHover';
+import type { BookItem } from '@/components/faithful-books/BookCardWithHover';
 import type { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: 'Acervo de Livros',
@@ -12,33 +11,32 @@ export const metadata: Metadata = {
 };
 
 export default async function LivrosPage() {
-  // Direct PostgreSQL query using Prisma
   const rawBooks = await prisma.book.findMany({
     orderBy: {
       createdAt: 'desc',
     },
     include: {
       loans: {
-        where: { status: 'active' }
+        where: { status: 'active' },
       },
       reservations: {
-        where: { status: 'reserved' }
+        where: { status: 'reserved' },
       },
       reviews: {
-        select: { rating: true }
-      }
-    }
+        select: { rating: true },
+      },
+    },
   });
 
   const books: BookItem[] = rawBooks.map((b) => {
-    const activeLoans = b.loans ? b.loans.length : 0;
-    const activeRes = b.reservations ? b.reservations.length : 0;
+    const activeLoans = b.loans.length;
+    const activeRes = b.reservations.length;
     const available = Math.max(0, b.quantity - activeLoans - activeRes);
-    const reviews = (b as any).reviews || [];
-    const totalReviews = reviews.length;
-    const avgRating = totalReviews > 0
-      ? Number((reviews.reduce((acc: number, r: any) => acc + r.rating, 0) / totalReviews).toFixed(1))
-      : 5.0;
+    const totalReviews = b.reviews.length;
+    const avgRating =
+      totalReviews > 0
+        ? Number((b.reviews.reduce((acc, review) => acc + review.rating, 0) / totalReviews).toFixed(1))
+        : 5.0;
 
     return {
       id: b.id,
@@ -51,9 +49,10 @@ export default async function LivrosPage() {
       quantity: b.quantity,
       availableCopies: available,
       rating: avgRating,
-      ratingsCount: totalReviews > 0
-        ? `${totalReviews} ${totalReviews === 1 ? 'avaliação' : 'avaliações'}`
-        : `${b.quantity} exemplares`,
+      ratingsCount:
+        totalReviews > 0
+          ? `${totalReviews} ${totalReviews === 1 ? 'avaliação' : 'avaliações'}`
+          : `${b.quantity} exemplares`,
       createdAt: b.createdAt.toISOString(),
     };
   });
