@@ -107,8 +107,15 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Erro durante o login:', error);
+    const isConfigError =
+      error instanceof Error && error.message.includes('SESSION_SECRET');
     return NextResponse.json(
-      { success: false, error: 'Erro interno do servidor' },
+      {
+        success: false,
+        error: isConfigError
+          ? 'Erro de configuração: defina SESSION_SECRET com pelo menos 32 caracteres no servidor.'
+          : 'Erro interno do servidor',
+      },
       { status: 500 }
     );
   }
