@@ -1,15 +1,37 @@
-import AdminSidebar from "./Adminsidebar";
+import { cookies, headers } from 'next/headers';
+import { redirect } from 'next/navigation';
+import { prisma } from '@/lib/prisma';
+import { verifySignedSessionToken } from '@/lib/security';
+import AdminSidebar from './Adminsidebar';
 
-
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = (await headers()).get('x-pathname') ?? '';
+  const isAuthPage = pathname.startsWith('/admin/auth');
+
+  if (!isAuthPage) {
+    const token = (await cookies()).get('admin_token')?.value;
+    const verification = verifySignedSessionToken(token, 'admin');
+
+    if (!verification.valid || !verification.payload) {
+      redirect('/admin/auth');
+    }
+
+    const user = await prisma.adminUser.findUnique({
+      where: { id: verification.payload.sub },
+      select: { isActive: true },
+    });
+
+    if (!user || !user.isActive) {
+      redirect('/admin/auth');
+    }
+  }
+
   return (
-    <div 
-      className="flex flex-col md:flex-row h-screen w-full bg-gray-100 dark:bg-neutral-800 md:bg-[var(--sidebar)] dark:md:bg-[var(--sidebar)] overflow-hidden"
-    >
+    <div className="flex flex-col md:flex-row h-screen w-full bg-gray-100 dark:bg-neutral-800 md:bg-[var(--sidebar)] dark:md:bg-[var(--sidebar)] overflow-hidden">
       {/* Sidebar (Top header on mobile, left bar on desktop) */}
       <AdminSidebar />
 

@@ -18,7 +18,7 @@ export default function NewAdminUserPage() {
     setLoading(true);
 
     try {
-        const res = await fetch('/api/admin/users/create', {
+        const res = await fetch('/api/admin/users', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formData)
@@ -81,7 +81,7 @@ export default function NewAdminUserPage() {
                 onChange={e => setFormData({...formData, role: e.target.value})}
             >
                 <option value="admin">Administrador (Bibliotecário)</option>
-                <option value="manager">Gerente (Supervisão)</option>
+                <option value="super_admin">Super Administrador</option>
             </select>
         </div>
 

@@ -1,7 +1,13 @@
 import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
+import { requireAdmin } from '@/lib/auth-api';
 
 export async function POST(request: Request) {
+  const session = await requireAdmin();
+  if (!session) {
+    return NextResponse.json({ error: 'Acesso não autorizado' }, { status: 401 });
+  }
+
   try {
     const { studentId, bookId, days, type } = await request.json();
 
@@ -38,7 +44,8 @@ export async function POST(request: Request) {
 
     return NextResponse.json(result);
 
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message || 'Erro ao criar empréstimo' }, { status: 500 });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Erro ao criar empréstimo';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

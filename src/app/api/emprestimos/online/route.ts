@@ -1,8 +1,14 @@
 import { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { requireAdmin } from '@/lib/auth-api';
 
 export async function POST(request: NextRequest) {
+  const session = await requireAdmin(request);
+  if (!session) {
+    return NextResponse.json({ error: 'Acesso não autorizado' }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
 

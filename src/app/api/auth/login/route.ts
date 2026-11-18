@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcrypt';
 import { cookies } from 'next/headers';
 import { createSignedSessionToken } from '@/lib/security';
+import { getClientIp, rateLimit, resetRateLimit } from '@/lib/rate-limit';
 
 export async function POST(request: NextRequest) {
   try {
@@ -25,10 +26,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const normalizedEmail = email.toLowerCase().trim();
+    const rateLimitKey = `admin-login:${getClientIp(request)}:${normalizedEmail}`;
+    const limit = rateLimit(rateLimitKey, 5, 60_000);
+    if (!limit.allowed) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Muitas tentativas de login. Tente novamente em ${limit.retryAfterSeconds}s.`,
+        },
+        { status: 429 }
+      );
+    }
+
     // Busca o usuário no banco de dados
     const adminUser = await prisma.adminUser.findUnique({
       where: {
-        email: email,
+        email: normalizedEmail,
         isActive: true
       }
     });
@@ -50,6 +64,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    resetRateLimit(rateLimitKey);
+
     // Gera token de sessão criptograficamente assinado (HMAC-SHA256)
     const signedToken = createSignedSessionToken(adminUser.id, 'admin', 60 * 60 * 24 * 7);
 
@@ -68,6 +84,7 @@ export async function POST(request: NextRequest) {
       token: signedToken,
       userId: adminUser.id,
       userName: adminUser.name,
+      role: adminUser.role,
       message: 'Login realizado com sucesso'
     });
   } catch (error) {

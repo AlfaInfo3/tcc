@@ -2,10 +2,17 @@ import { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcrypt';
+import { requireAdmin } from '@/lib/auth-api';
+
+const ALLOWED_ROLES = ['admin', 'super_admin'];
 
 export async function GET(request: NextRequest) {
+  const session = await requireAdmin(request);
+  if (!session) {
+    return NextResponse.json({ error: 'Acesso não autorizado' }, { status: 401 });
+  }
+
   try {
-    // Buscar todos os usuários administradores
     const adminUsers = await prisma.adminUser.findMany({
       select: {
         id: true,
@@ -13,11 +20,11 @@ export async function GET(request: NextRequest) {
         email: true,
         role: true,
         isActive: true,
-        createdAt: true
+        createdAt: true,
       },
       orderBy: {
-        createdAt: 'desc'
-      }
+        createdAt: 'desc',
+      },
     });
 
     return NextResponse.json(adminUsers);
@@ -31,11 +38,23 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const session = await requireAdmin(request);
+  if (!session) {
+    return NextResponse.json({ error: 'Acesso não autorizado' }, { status: 401 });
+  }
+
+  // Only super admins may create administrators.
+  if (session.role !== 'super_admin') {
+    return NextResponse.json(
+      { error: 'Apenas super administradores podem criar usuários' },
+      { status: 403 }
+    );
+  }
+
   try {
     const body = await request.json();
     const { name, email, password, role = 'admin' } = body;
 
-    // Validações
     if (!name || !email || !password) {
       return NextResponse.json(
         { error: 'Nome, email e senha são obrigatórios' },
@@ -51,29 +70,27 @@ export async function POST(request: NextRequest) {
     }
 
     if (typeof email !== 'string' || !/^\S+@\S+\.\S+$/.test(email)) {
+      return NextResponse.json({ error: 'Email inválido' }, { status: 400 });
+    }
+
+    if (typeof password !== 'string' || password.length < 8) {
       return NextResponse.json(
-        { error: 'Email inválido' },
+        { error: 'Senha deve ter pelo menos 8 caracteres' },
         { status: 400 }
       );
     }
 
-    if (typeof password !== 'string' || password.length < 6) {
-      return NextResponse.json(
-        { error: 'Senha deve ter pelo menos 6 caracteres' },
-        { status: 400 }
-      );
-    }
-
-    if (role && !['admin', 'super_admin'].includes(role)) {
+    if (typeof role !== 'string' || !ALLOWED_ROLES.includes(role)) {
       return NextResponse.json(
         { error: 'Perfil inválido. Use "admin" ou "super_admin"' },
         { status: 400 }
       );
     }
 
-    // Verificar se o email já existe
+    const normalizedEmail = email.toLowerCase().trim();
+
     const existingUser = await prisma.adminUser.findUnique({
-      where: { email }
+      where: { email: normalizedEmail },
     });
 
     if (existingUser) {
@@ -83,17 +100,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Hash da senha
+    // Always bcrypt: this matches the bcrypt.compare used by the login route.
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Criar o novo usuário administrador
     const newUser = await prisma.adminUser.create({
       data: {
         name: name.trim(),
-        email: email.toLowerCase().trim(),
+        email: normalizedEmail,
         password: hashedPassword,
         role,
-        isActive: true
+        isActive: true,
       },
       select: {
         id: true,
@@ -101,8 +117,8 @@ export async function POST(request: NextRequest) {
         email: true,
         role: true,
         isActive: true,
-        createdAt: true
-      }
+        createdAt: true,
+      },
     });
 
     return NextResponse.json(newUser, { status: 201 });

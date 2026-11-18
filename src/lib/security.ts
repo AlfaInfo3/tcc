@@ -1,15 +1,7 @@
 import crypto from 'crypto';
+import { getSessionSecret, type SessionPayload } from './session';
 
-interface SessionPayload {
-  sub: string;
-  role: 'admin' | 'student';
-  exp: number; // Unix timestamp in seconds
-  iat: number; // Unix timestamp in seconds
-}
-
-// In production, SESSION_SECRET should be set in .env.
-// In development, provide a stable fallback secret so dev sessions function smoothly.
-const SECRET = process.env.SESSION_SECRET || 'dev-insecure-secret-key-change-in-production-min32chars';
+export type { SessionPayload };
 
 /**
  * Creates a cryptographically signed session token (HMAC-SHA256).
@@ -30,7 +22,7 @@ export function createSignedSessionToken(
 
   const payloadEncoded = Buffer.from(JSON.stringify(payload)).toString('base64url');
   const signature = crypto
-    .createHmac('sha256', SECRET)
+    .createHmac('sha256', getSessionSecret())
     .update(payloadEncoded)
     .digest('base64url');
 
@@ -58,7 +50,7 @@ export function verifySignedSessionToken(
 
   // Verify HMAC signature using timingSafeEqual to protect against timing attacks
   const expectedSignature = crypto
-    .createHmac('sha256', SECRET)
+    .createHmac('sha256', getSessionSecret())
     .update(payloadEncoded)
     .digest('base64url');
 

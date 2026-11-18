@@ -3,16 +3,62 @@ import { cookies } from 'next/headers';
 import { verifySignedSessionToken } from './security';
 import { prisma } from './prisma';
 
+export interface AdminSession {
+  userId: string;
+  role: string;
+}
+
+async function resolveAdminToken(req?: NextRequest): Promise<string | undefined> {
+  if (req) {
+    const authHeader = req.headers.get('authorization');
+    if (authHeader?.startsWith('Bearer ')) {
+      return authHeader.substring(7);
+    }
+  }
+
+  const cookieStore = await cookies();
+  return cookieStore.get('admin_token')?.value;
+}
+
 /**
- * Checks if the incoming request is authenticated as an admin.
- * Cryptographically verifies 'admin_token' signature and active status.
+ * Validates the admin session token (signature, role, expiry) and confirms the
+ * admin still exists and is active in the database.
  *
- * Usage:
- * if (!await isAuthenticated(request)) {
- *   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
- * }
+ * Returns the session ({ userId, role }) or null when unauthorized.
+ */
+export async function requireAdmin(req?: NextRequest): Promise<AdminSession | null> {
+  const token = await resolveAdminToken(req);
+  if (!token) return null;
+
+  const verification = verifySignedSessionToken(token, 'admin');
+  if (!verification.valid || !verification.payload) return null;
+
+  try {
+    const user = await prisma.adminUser.findUnique({
+      where: { id: verification.payload.sub },
+      select: { id: true, role: true, isActive: true },
+    });
+
+    if (!user || !user.isActive) return null;
+
+    return { userId: user.id, role: user.role };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Boolean compatibility helper built on top of requireAdmin.
  */
 export async function isAuthenticated(req?: NextRequest): Promise<boolean> {
+  return (await requireAdmin(req)) !== null;
+}
+
+/**
+ * Validates a student profile session token.
+ * Returns the profile id or null when unauthorized.
+ */
+export async function requireStudent(req?: NextRequest): Promise<{ profileId: string } | null> {
   let token: string | undefined;
 
   if (req) {
@@ -24,28 +70,13 @@ export async function isAuthenticated(req?: NextRequest): Promise<boolean> {
 
   if (!token) {
     const cookieStore = await cookies();
-    token = cookieStore.get('admin_token')?.value;
+    token = cookieStore.get('student_session')?.value;
   }
 
-  if (!token) {
-    return false;
-  }
+  if (!token) return null;
 
-  // 1. Verify cryptographic session token
-  const verification = verifySignedSessionToken(token, 'admin');
-  if (verification.valid && verification.payload) {
-    // Verify that the user still exists and isActive in database
-    try {
-      const user = await prisma.adminUser.findUnique({
-        where: { id: verification.payload.sub, isActive: true },
-        select: { id: true, role: true }
-      });
-      return !!user;
-    } catch {
-      // In case database connection fails or fallback
-      return false;
-    }
-  }
+  const verification = verifySignedSessionToken(token, 'student');
+  if (!verification.valid || !verification.payload) return null;
 
-  return false;
+  return { profileId: verification.payload.sub };
 }

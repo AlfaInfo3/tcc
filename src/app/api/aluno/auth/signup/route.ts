@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
+import { hashPassword } from '@/lib/password';
 
 function normalize(str: string) {
     return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
@@ -58,9 +59,8 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'Este aluno já possui um perfil gamificado.' }, { status: 409 });
     }
 
-    // 5. Create Profile
-    // Hash password (basic demo hashing, normally use bcrypt)
-    const passwordHash = crypto.createHash('sha256').update(password).digest('hex');
+    // 5. Create Profile with a bcrypt hash
+    const passwordHash = await hashPassword(password);
 
     const profile = await prisma.studentProfile.create({
       data: {

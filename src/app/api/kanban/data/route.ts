@@ -1,8 +1,14 @@
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { requireAdmin } from '@/lib/auth-api';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const session = await requireAdmin(request);
+  if (!session) {
+    return NextResponse.json({ error: 'Acesso não autorizado' }, { status: 401 });
+  }
+
   try {
     // 1. Fetch pending reservations (Solicitações)
     const reservations = await prisma.reservation.findMany({

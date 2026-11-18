@@ -1,14 +1,16 @@
 import { prisma } from '@/lib/prisma';
 import { NextResponse, NextRequest } from 'next/server';
 import crypto from 'crypto';
-import { isAuthenticated } from '@/lib/auth-api';
+import { requireAdmin } from '@/lib/auth-api';
+import { hashPassword } from '@/lib/password';
 
 function normalize(str: string) {
     return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
 }
 
 export async function POST(request: NextRequest) {
-  if (!await isAuthenticated(request)) {
+  const session = await requireAdmin(request);
+  if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -63,12 +65,11 @@ export async function POST(request: NextRequest) {
 
     // 4. Create Profile (if requested)
     if (username && password) {
-         const passwordHash = crypto.createHash('sha256').update(password).digest('hex');
          await prisma.studentProfile.create({
              data: {
                  studentId: student.id,
                  username,
-                 password: passwordHash,
+                 password: await hashPassword(password),
                  xp: 0,
                  level: 1
              }
@@ -84,12 +85,13 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
-    if (!await isAuthenticated(request)) {
+    const session = await requireAdmin(request);
+    if (!session) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     try {
-        const { id, name, class: className } = await request.json();
+        const { id, name, class: className, username, password } = await request.json();
     
         if (!id || !name || !className) {
             return NextResponse.json({ error: 'Dados inválidos' }, { status: 400 });
@@ -100,15 +102,67 @@ export async function PUT(request: NextRequest) {
         await prisma.student.update({
             where: { id },
             data: {
-                name,
-                class: className,
+                name: name.trim(),
+                class: className.trim(),
                 normalizedName
             }
         });
+
+        // Optional profile maintenance: change username and/or reset password.
+        if (username || password) {
+            const profile = await prisma.studentProfile.findUnique({
+                where: { studentId: id }
+            });
+
+            if (profile) {
+                const profileData: { username?: string; password?: string } = {};
+
+                if (username && username !== profile.username) {
+                    const existingUsername = await prisma.studentProfile.findUnique({
+                        where: { username }
+                    });
+                    if (existingUsername && existingUsername.id !== profile.id) {
+                        return NextResponse.json(
+                            { error: 'Nome de usuário já está em uso.' },
+                            { status: 409 }
+                        );
+                    }
+                    profileData.username = username;
+                }
+
+                if (password) {
+                    if (typeof password !== 'string' || password.length < 6) {
+                        return NextResponse.json(
+                            { error: 'A senha deve ter pelo menos 6 caracteres.' },
+                            { status: 400 }
+                        );
+                    }
+                    profileData.password = await hashPassword(password);
+                }
+
+                if (Object.keys(profileData).length > 0) {
+                    await prisma.studentProfile.update({
+                        where: { id: profile.id },
+                        data: profileData
+                    });
+                }
+            } else if (username && password) {
+                await prisma.studentProfile.create({
+                    data: {
+                        studentId: id,
+                        username,
+                        password: await hashPassword(password),
+                        xp: 0,
+                        level: 1
+                    }
+                });
+            }
+        }
     
         return NextResponse.json({ success: true });
     
       } catch (error) {
+        console.error('Erro ao atualizar aluno:', error);
         return NextResponse.json({ error: 'Erro ao atualizar' }, { status: 500 });
       }
 }
