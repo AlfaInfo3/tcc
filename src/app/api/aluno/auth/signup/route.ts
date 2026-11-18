@@ -1,11 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
-import crypto from 'crypto';
 import { hashPassword } from '@/lib/password';
-
-function normalize(str: string) {
-    return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-}
+import { findOrCreateStudent } from '@/lib/students';
 
 export async function POST(req: Request) {
   try {
@@ -24,31 +20,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Usuário já existe' }, { status: 409 });
     }
 
-    // 2. Normalize and Find Student (Smart Link)
-    const normalizedName = normalize(name);
-    
-    let student = await prisma.student.findFirst({
-      where: {
-        normalizedName,
-        class: {
-          equals: className.trim(),
-          mode: 'insensitive'
-        }
-      }
-    });
-
-    // 3. Create Student if not exists
-    if (!student) {
-      const codeHash = crypto.createHash('md5').update(`${normalizedName}-${className.trim()}-${Date.now()}`).digest('hex').substring(0, 8);
-      student = await prisma.student.create({
-        data: {
-          name: name.trim(),
-          class: className.trim(),
-          normalizedName,
-          codeHash
-        }
-      });
-    }
+    // 2. Localiza o aluno pelo nome/turma normalizados ou cria o cadastro.
+    const { student } = await findOrCreateStudent(name, className);
 
     // 4. Check if student already has a profile
     const existingLink = await prisma.studentProfile.findUnique({

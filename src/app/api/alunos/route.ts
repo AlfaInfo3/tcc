@@ -1,20 +1,8 @@
 import { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import crypto from 'crypto';
 import { requireAdmin } from '@/lib/auth-api';
-
-function normalize(str: string) {
-  return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
-}
-
-function generateCodeHash(name: string, className: string) {
-  return crypto
-    .createHash('md5')
-    .update(`${name}-${className}-${Date.now()}`)
-    .digest('hex')
-    .substring(0, 8);
-}
+import { findOrCreateStudent } from '@/lib/students';
 
 export async function GET(req: NextRequest) {
   const session = await requireAdmin(req);
@@ -48,27 +36,14 @@ export async function POST(req: NextRequest) {
 
     const name = data.name.trim();
     const className = data.class.trim();
-    const normalizedName = normalize(name);
+    const { student, created } = await findOrCreateStudent(name, className);
 
-    const existingStudent = await prisma.student.findFirst({
-        where: {
-          normalizedName,
-          class: { equals: className, mode: 'insensitive' }
-        }
-    });
-
-    if (existingStudent) {
-        return NextResponse.json({ error: 'Estudante já cadastrado nesta turma.' }, { status: 409 });
+    if (!created) {
+      return NextResponse.json(
+        { error: 'Estudante já cadastrado nesta turma.', student },
+        { status: 409 }
+      );
     }
-
-    const student = await prisma.student.create({
-      data: {
-        name,
-        class: className,
-        normalizedName,
-        codeHash: generateCodeHash(normalizedName, className)
-      },
-    });
 
     return NextResponse.json(student, { status: 201 });
   } catch (error) {

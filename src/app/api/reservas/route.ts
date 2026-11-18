@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { normalizeString } from '@/lib/utils/string';
-import crypto from 'crypto';
+import { findOrCreateStudent } from '@/lib/students';
+import { revalidateTag } from 'next/cache';
 
 export async function POST(req: NextRequest) {
   try {
@@ -61,36 +61,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 3. Smart Student identification or auto-registration
-    const normalizedName = normalizeString(name);
-    const cleanClass = className.trim();
-
-    let student = await prisma.student.findFirst({
-      where: {
-        normalizedName: normalizedName,
-        class: {
-          equals: cleanClass,
-          mode: 'insensitive'
-        }
-      }
-    });
-
-    if (!student) {
-      const codeHash = crypto
-        .createHash('md5')
-        .update(`${normalizedName}-${cleanClass}-${Date.now()}`)
-        .digest('hex')
-        .substring(0, 8);
-
-      student = await prisma.student.create({
-        data: {
-          name: name.trim(),
-          class: cleanClass,
-          normalizedName,
-          codeHash
-        }
-      });
-    }
+    // 3. Identificação inteligente ou cadastro automático do aluno
+    const { student } = await findOrCreateStudent(name, className);
 
     // 4. Verify if student already has a pending reservation for this book
     const existingReservation = await prisma.reservation.findFirst({
@@ -132,6 +104,8 @@ export async function POST(req: NextRequest) {
         }
       }
     });
+
+    revalidateTag('public-books', 'default');
 
     return NextResponse.json(
       {
