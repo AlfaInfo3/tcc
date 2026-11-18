@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { 
   Cancel01Icon, 
@@ -110,11 +111,14 @@ export function ReserveModal({ book, isOpen, onClose, onSuccess }: ReserveModalP
 
         {/* Modal Header with Book Preview */}
         <div className="flex items-start gap-4 pb-5 border-b border-slate-100 pr-8">
-          <div className="w-16 h-22 rounded-xl overflow-hidden shrink-0 bg-slate-900 border border-slate-200 shadow-md">
-            <img
+          <div className="relative w-16 h-22 rounded-xl overflow-hidden shrink-0 bg-slate-900 border border-slate-200 shadow-md">
+            <Image
               src={book.coverUrl || 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=600'}
-              alt={book.title}
-              className="w-full h-full object-cover"
+              alt={`Capa de ${book.title}`}
+              fill
+              sizes="64px"
+              unoptimized
+              className="object-cover"
             />
           </div>
           <div className="min-w-0">

@@ -1,4 +1,4 @@
-import { Trophy, Book, Flame, Star, Award, Target } from 'lucide-react';
+import { Trophy, Book, Flame, Star, Award } from 'lucide-react';
 
 const badgeIcons: Record<string, React.ReactNode> = {
   first_read: <Book className="text-white" size={24} />,

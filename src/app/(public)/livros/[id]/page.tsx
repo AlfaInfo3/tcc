@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import type { Book } from '@prisma/client';
 import { ReserveForm } from '@/components/ReserveForm';
 import { prisma } from '@/lib/prisma';
+import Image from 'next/image';
 import Link from 'next/link';
 import { BookCard } from '@/components/books/book-card';
 import { BookReviewsSection } from '@/components/books/BookReviewsSection';
@@ -217,10 +218,12 @@ export default async function BookDetailPage({
                     <div className="absolute left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-black/30 via-white/20 to-transparent z-10 pointer-events-none" />
                     
                     {book.coverUrl ? (
-                      <img
+                      <Image
                         src={book.coverUrl}
                         alt={`Capa do livro ${book.title}`}
-                        className="w-full h-full object-cover"
+                        fill
+                        sizes="(max-width: 768px) 70vw, 270px"
+                        className="object-cover"
                       />
                     ) : (
                       <div className="w-full h-full flex flex-col justify-between p-6 bg-gradient-to-br from-blue-900 to-slate-900 text-white">

@@ -12,8 +12,7 @@ import {
   Search01Icon, 
   PencilEdit02Icon, 
   ArrowUpRight01Icon, 
-  Cancel01Icon,
-  SparklesIcon
+  Cancel01Icon
 } from '@hugeicons/core-free-icons';
 import { HugeIcon } from '@/components/ui/HugeIcon';
 import { BookCard } from '@/components/books/book-card';

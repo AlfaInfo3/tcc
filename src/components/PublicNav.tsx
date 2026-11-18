@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import CardNav from "@/components/CardNav";
 
 const publicItems = [
@@ -8,7 +9,7 @@ const publicItems = [
     bgColor: "#1e40af",
     textColor: "#ffffff",
     links: [
-      { label: "Página Inicial", href: "/", ariaLabel: "Home" },
+      { label: "Página Inicial", href: "/", ariaLabel: "Página Inicial" },
       { label: "O Colégio", href: "/sobre", ariaLabel: "Sobre Nós" },
     ]
   },
@@ -40,7 +41,7 @@ export function PublicNav() {
         <CardNav 
           logo={
             <div className="flex items-center justify-center p-2">
-               <img src="/logo/laurentao-logo.svg" alt="Logo Laurentino" className="h-14 md:h-16 w-auto" />
+               <Image src="/logo/laurentao-logo.svg" alt="Logo Laurentino" width={180} height={64} unoptimized className="h-14 md:h-16 w-auto" />
              </div>
           }
           items={publicItems}

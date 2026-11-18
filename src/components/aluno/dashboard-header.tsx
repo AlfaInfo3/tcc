@@ -1,6 +1,6 @@
 'use client';
 
-import { LogOut, Settings } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import { XpBadge } from './xp-progress';
 import { OwlMascotSmall } from './owl-mascot';
 
@@ -16,7 +16,6 @@ interface DashboardHeaderProps {
 export function DashboardHeader({
   username,
   studentName,
-  level,
   xp,
   streak,
   onLogout,

@@ -30,7 +30,7 @@ export default function AdminLoginPage() {
         const data = await res.json();
         setError(data.error || 'Falha no login');
       }
-    } catch (err) {
+    } catch {
       setError('Erro de conexão');
     } finally {
       setLoading(false);

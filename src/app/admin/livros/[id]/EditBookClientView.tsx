@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import { 
   ArrowLeft01Icon, 
   Delete02Icon, 
@@ -18,10 +17,8 @@ import {
   CheckmarkCircle02Icon, 
   Image01Icon, 
   BookOpen01Icon, 
-  Tick01Icon, 
   Cancel01Icon, 
-  TranslateIcon, 
-  SparklesIcon 
+  TranslateIcon 
 } from '@hugeicons/core-free-icons';
 import { HugeIcon } from '@/components/ui/HugeIcon';
 import { ModernBookCover, BookHeader, BookTitle, BookDescription } from '@/cuicui/other/books/modern-book-cover/modern-book-cover';
@@ -58,12 +55,12 @@ export function EditBookClientView({ id, initialBook, initialGenres }: EditBookC
   const [urlInput, setUrlInput] = useState(initialBook.coverUrl || '');
 
   // Camera capture
-  const [isCapturingCamera, setIsCapturingCamera] = useState(false);
+  const [, setIsCapturingCamera] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
 
   // Genres handling
-  const [existingGenres, setExistingGenres] = useState<string[]>(initialGenres);
+  const [existingGenres] = useState<string[]>(initialGenres);
   const [genreInput, setGenreInput] = useState('');
   const [showGenreSuggestions, setShowGenreSuggestions] = useState(false);
 

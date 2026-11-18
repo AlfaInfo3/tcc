@@ -1,11 +1,48 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { Modal } from '@/components/ui/modal';
 
 // Types definition
+interface KanbanRawBook {
+  title: string | null;
+}
+
+interface KanbanRawStudent {
+  name: string;
+}
+
+interface KanbanRawReservation {
+  id: string;
+  bookId: string;
+  studentId: string;
+  createdAt: string;
+  loanType?: string | null;
+  book?: KanbanRawBook | null;
+  student?: KanbanRawStudent | null;
+}
+
+interface KanbanRawLoan {
+  id: string;
+  bookId: string;
+  studentId: string;
+  dueDate: string;
+  returnDate?: string | null;
+  loanType?: string | null;
+  book?: KanbanRawBook | null;
+  student?: KanbanRawStudent | null;
+}
+
+interface KanbanApiResponse {
+  reservations: KanbanRawReservation[];
+  activeLoans: KanbanRawLoan[];
+  returnedLoans: KanbanRawLoan[];
+}
+
+type KanbanRawItem = KanbanRawReservation | KanbanRawLoan;
+
 interface KanbanItem {
   id: string;
   type: 'reservation' | 'loan';
@@ -15,7 +52,7 @@ interface KanbanItem {
   status: string;
   bookId: string;
   studentId: string;
-  data: any; // Raw object
+  data: KanbanRawItem;
 }
 
 interface Column {
@@ -24,17 +61,17 @@ interface Column {
   items: KanbanItem[];
 }
 
+/** Exibe datas no formato pt-BR sem deslocar o dia por causa do fuso. */
+function formatDate(dateString: string | null | undefined) {
+    if (!dateString) return 'Data inválida';
+    const date = new Date(dateString);
+    const day = date.getUTCDate().toString().padStart(2, '0');
+    const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
+    const year = date.getUTCFullYear();
+    return `${day}/${month}/${year}`;
+}
+
 export default function AdminKanban() {
-  // Helper to fix timezone issues by appending T12:00:00 if standard date
-  const formatDate = (dateString: string) => {
-      if (!dateString) return 'Data inv\u00E1lida';
-      const date = new Date(dateString);
-      // Force display using UTC components to avoid "previous day" issue
-      const day = date.getUTCDate().toString().padStart(2, '0');
-      const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
-      const year = date.getUTCFullYear();
-      return `${day}/${month}/${year}`;
-  };
   const [columns, setColumns] = useState<Record<string, Column>>({
     reserved: { id: 'reserved', title: 'Solicitações (Reservas)', items: [] },
     active: { id: 'active', title: 'Emprestados (Ativos)', items: [] },
@@ -52,17 +89,13 @@ export default function AdminKanban() {
   const [pendingMove, setPendingMove] = useState<{itemId: string, fromId: string, toId: string, dueDate: string} | null>(null);
   const [dueDate, setDueDate] = useState('');
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const res = await fetch('/api/kanban/data');
-      const data = await res.json();
+      const data: KanbanApiResponse = await res.json();
 
       // Transform API data to Kanban columns
-      const reservedItems: KanbanItem[] = data.reservations.map((r: any) => ({
+      const reservedItems: KanbanItem[] = data.reservations.map((r) => ({
         id: r.id,
         type: 'reservation',
         title: r.book?.title || 'Livro Desconhecido',
@@ -74,7 +107,7 @@ export default function AdminKanban() {
         data: r
       }));
 
-      const activeItems: KanbanItem[] = data.activeLoans.map((l: any) => ({
+      const activeItems: KanbanItem[] = data.activeLoans.map((l) => ({
         id: l.id,
         type: 'loan',
         title: l.book?.title || 'Livro Desconhecido',
@@ -86,7 +119,7 @@ export default function AdminKanban() {
         data: l
       }));
 
-      const returnedItems: KanbanItem[] = data.returnedLoans.map((l: any) => ({
+      const returnedItems: KanbanItem[] = data.returnedLoans.map((l) => ({
         id: l.id,
         type: 'loan',
         title: l.book?.title || 'Livro Desconhecido',
@@ -108,7 +141,11 @@ export default function AdminKanban() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   // --- UNIFIED MOVE HANDLER (Everything goes through here) ---
   const handleMoveValues = (itemId: string, fromId: string, toId: string) => {
@@ -168,7 +205,12 @@ export default function AdminKanban() {
      });
   };
 
-  const processMove = async (itemId: string, fromStatus: string, toStatus: string, extraData?: any) => {
+  const processMove = async (
+    itemId: string,
+    fromStatus: string,
+    toStatus: string,
+    extraData?: { dueDate?: string }
+  ) => {
     setError(null);
     try {
         const res = await fetch('/api/kanban/move', {

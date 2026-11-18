@@ -5,7 +5,7 @@ interface XpProgressProps {
   showLabel?: boolean;
 }
 
-export function XpProgress({ currentXp, nextLevelXp, level, showLabel = true }: XpProgressProps) {
+export function XpProgress({ currentXp, level, showLabel = true }: XpProgressProps) {
   const progress = Math.min(100, ((currentXp % 100) / 100) * 100);
   const xpInCurrentLevel = currentXp % 100;
 

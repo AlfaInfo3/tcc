@@ -1,5 +1,6 @@
 'use client';
 
+import Image from "next/image";
 import React, { useState } from "react";
 import { Icon } from "@iconify/react";
 import { PublicNav } from "@/components/PublicNav";
@@ -212,9 +213,12 @@ export default function MatriculasPage() {
             {/* ── COLUNA DA DIREITA (FOTO DOS ESTUDANTES COM CARD AMARELO) ─ */}
             <div className="lg:col-span-5 relative">
               <div className="relative rounded-3xl overflow-hidden bg-slate-50 border border-slate-100 shadow-[0_20px_50px_rgba(0,0,0,0.06)]">
-                <img
+                <Image
                   src="/Imagens/matriculas-hero-students.jpg"
                   alt="Estudantes uniformizados do Colégio Estadual Laurentino Martins"
+                  width={1024}
+                  height={1024}
+                  sizes="(max-width: 1024px) 100vw, 40vw"
                   className="w-full h-auto object-cover block"
                 />
 

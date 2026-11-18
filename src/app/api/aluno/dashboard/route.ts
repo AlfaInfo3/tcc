@@ -1,9 +1,10 @@
 import { prisma } from '@/lib/prisma';
+import type { Book } from '@prisma/client';
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { verifySignedSessionToken } from '@/lib/security';
 
-export async function GET(req: Request) {
+export async function GET() {
   try {
     const cookieStore = await cookies();
     const sessionToken = cookieStore.get('student_session')?.value;
@@ -83,7 +84,7 @@ export async function GET(req: Request) {
     const topGenre = Object.entries(genreCounts).sort((a,b) => b[1] - a[1])[0]?.[0];
 
     // 4. Fetch recommendations
-    let recommendations: any[] = [];
+    let recommendations: Book[] = [];
     if (topGenre) {
         // Get IDs of read books to exclude
         const readBookIds = profile.student.loans.map(l => l.bookId);

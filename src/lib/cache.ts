@@ -1,9 +1,9 @@
-const cache = new Map<string, any>();
+const cache = new Map<string, unknown>();
 
-export function getCache(key: string) {
-  return cache.get(key);
+export function getCache<T = unknown>(key: string): T | undefined {
+  return cache.get(key) as T | undefined;
 }
 
-export function setCache(key: string, value: any) {
+export function setCache(key: string, value: unknown) {
   cache.set(key, value);
 }

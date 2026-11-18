@@ -29,10 +29,13 @@ export function BookCardHorizontal({ book }: BookCardHorizontalProps) {
       {/* Capa */}
       <div className="absolute inset-x-0 inset-y-0 h-full">
           {book.coverUrl ? (
-            <img
+            <Image
                 src={book.coverUrl}
-                alt={book.title}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                alt={`Capa de ${book.title}`}
+                fill
+                sizes="130px"
+                unoptimized
+                className="object-cover transition-transform duration-500 group-hover:scale-110"
             />
           ) : (
              <div className="w-full h-full flex flex-col items-center justify-center bg-muted text-muted-foreground p-2 text-center">

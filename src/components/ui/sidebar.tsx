@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import React, { useState, createContext, useContext, useRef } from "react";
 import { AnimatePresence, motion } from "motion/react";
@@ -136,9 +137,12 @@ export const MobileSidebar = ({
       >
         <div className="flex items-center gap-2.5">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center">
-            <img
+            <Image
               src="/logo/laurentao-logo-b.svg"
               alt="Logo Laurentino"
+              width={36}
+              height={36}
+              unoptimized
               className="h-8 w-8 shrink-0 object-contain"
             />
           </div>
@@ -173,9 +177,12 @@ export const MobileSidebar = ({
             >
               <div className="flex items-center justify-between pb-4 border-b border-white/15">
                 <div className="flex items-center gap-2.5">
-                  <img
+                  <Image
                     src="/logo/laurentao-logo-b.svg"
                     alt="Logo Laurentino"
+                    width={36}
+                    height={36}
+                    unoptimized
                     className="h-8 w-8 shrink-0 object-contain"
                   />
                   <span className="font-bold text-xl text-white tracking-tight">Biblioteca</span>
@@ -215,7 +222,7 @@ export const SidebarLink = ({
   link: Links;
   className?: string;
 }) => {
-  const { open, setOpen, animate } = useSidebar();
+  const { open, animate } = useSidebar();
   return (
     <Link
       href={link.href}

@@ -1,4 +1,5 @@
 import { Icon } from "@iconify/react";
+import Image from "next/image";
 import { PublicNav } from "@/components/PublicNav";
 import Link from "next/link";
 import { LiquidGlassFooter } from "@/components/LiquidGlassFooter";
@@ -94,9 +95,12 @@ export default function SobrePage() {
             {/* Imagem do Colégio (Direita) */}
             <div className="lg:col-span-7">
               <div className="rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-200/90 shadow-xl bg-slate-100 relative">
-                <img
-                  src="https://www.rvcfm.com.br/images/2025/11/20251113173318_l_WhatsAppImage2025-11-13at14.15.401.jpg"
+                <Image
+                  src="/Imagens/fachada-laurentino.jpg"
                   alt="Fachada do Colégio Estadual Laurentino Martins em Goianésia-GO"
+                  width={1080}
+                  height={608}
+                  sizes="(max-width: 1024px) 100vw, 55vw"
                   className="w-full h-[280px] sm:h-[390px] object-cover"
                 />
               </div>

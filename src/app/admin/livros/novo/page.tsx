@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { 
   ArrowLeft, 
   Sparkles, 
@@ -15,8 +16,6 @@ import {
   Minus, 
   BookOpen, 
   Loader2, 
-  CheckCircle2, 
-  AlertCircle,
   Image as ImageIcon
 } from 'lucide-react';
 import { BookSearchResult } from '@/lib/book-search';
@@ -342,8 +341,8 @@ export default function NewBookPage() {
                       className="p-3 hover:bg-blue-50/80 cursor-pointer transition-colors flex items-center gap-3.5"
                     >
                       {book.coverUrl ? (
-                        <div className="w-10 h-14 rounded-lg overflow-hidden bg-slate-100 shrink-0 border border-slate-200">
-                          <img src={book.coverUrl} alt={book.title} className="w-full h-full object-cover" />
+                        <div className="relative w-10 h-14 rounded-lg overflow-hidden bg-slate-100 shrink-0 border border-slate-200">
+                          <Image src={book.coverUrl} alt={book.title} fill sizes="40px" className="object-cover" />
                         </div>
                       ) : (
                         <div className="w-10 h-14 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
@@ -588,7 +587,7 @@ export default function NewBookPage() {
               <div className="relative w-44 h-64 rounded-2xl overflow-hidden shadow-xl bg-slate-100 border border-slate-200 flex items-center justify-center group mb-4">
                 {activeCover ? (
                   <>
-                    <img src={activeCover} alt="Capa" className="w-full h-full object-cover" />
+                    <Image src={activeCover} alt="Capa do livro" fill sizes="176px" className="object-cover" />
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                       <button
                         type="button"

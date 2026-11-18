@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
     const details = await OpenLibraryService.getBookDetails(key);
     setCache(cacheKey, details);
     return NextResponse.json(details);
-  } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch details' }, { status: 500 });
+  } catch {
+    return NextResponse.json({ error: 'Falha ao buscar detalhes' }, { status: 500 });
   }
 }

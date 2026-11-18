@@ -1,13 +1,16 @@
+import Image from 'next/image';
 import { BookOpen, ChevronRight } from 'lucide-react';
 
+export interface BookRecommendation {
+  id: string;
+  title: string;
+  author: string;
+  coverUrl?: string;
+  genre?: string;
+}
+
 interface BookRecommendationCardProps {
-  book: {
-    id: string;
-    title: string;
-    author: string;
-    coverUrl?: string;
-    genre?: string;
-  };
+  book: BookRecommendation;
   index?: number;
 }
 
@@ -20,7 +23,7 @@ export function BookRecommendationCard({ book, index = 0 }: BookRecommendationCa
       {/* Cover */}
       <div className="w-14 h-20 rounded-xl bg-gradient-to-br from-secondary/20 to-purple/20 border-2 border-border flex items-center justify-center flex-shrink-0 overflow-hidden">
         {book.coverUrl ? (
-          <img src={book.coverUrl} alt={book.title} className="w-full h-full object-cover" />
+          <Image src={book.coverUrl} alt={`Capa de ${book.title}`} width={56} height={80} sizes="56px" unoptimized className="w-full h-full object-cover" />
         ) : (
           <BookOpen className="text-secondary" size={24} />
         )}
@@ -47,7 +50,7 @@ export function BookRecommendationList({
   books,
   title = 'Próxima Leitura',
 }: {
-  books: any[];
+  books: BookRecommendation[];
   title?: string;
 }) {
   if (!books || books.length === 0) return null;

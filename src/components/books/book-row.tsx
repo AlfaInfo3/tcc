@@ -3,9 +3,17 @@ import { ArrowLeft01Icon, ArrowRight01Icon } from '@hugeicons/core-free-icons';
 import { HugeIcon } from '@/components/ui/HugeIcon';
 import { BookCardHorizontal } from "./book-card-horizontal";
 
+interface BookRowItem {
+    id: string | number;
+    title: string;
+    author: string;
+    coverUrl?: string;
+    quantity: number;
+}
+
 interface BookRowProps {
     title: string;
-    books: any[]; // defining loose type for now to match dashboard data
+    books: BookRowItem[];
 }
 
 export function BookRow({ title, books }: BookRowProps) {

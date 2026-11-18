@@ -79,7 +79,7 @@ export function StudentForm({ onSubmit }: StudentFormProps) {
       setTimeout(() => {
         setSuccessMessage('');
       }, 3000);
-    } catch (error) {
+    } catch {
       setErrors({ submit: 'Erro ao cadastrar aluno. Por favor, tente novamente.' });
     } finally {
       setIsSubmitting(false);

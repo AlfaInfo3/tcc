@@ -1,7 +1,7 @@
 'use client';
 
+import Image from 'next/image';
 import React, { useState } from 'react';
-import Link from 'next/link';
 import { PublicNav } from '@/components/PublicNav';
 import { LiquidGlassFooter } from '@/components/LiquidGlassFooter';
 import {
@@ -97,10 +97,12 @@ export default function ContatoPage() {
             {/* Lado Direito: Fotografia da Fachada Laurentino Martins */}
             <div className="lg:col-span-5 relative">
               <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden border-2 border-white/10 shadow-2xl bg-blue-950/40 aspect-[4/3] sm:aspect-[16/11] max-w-lg mx-auto lg:max-w-none">
-                <img
+                <Image
                   src="/Imagens/fachada-laurentino.jpg"
                   alt="Fachada do Colégio Estadual Laurentino Martins"
-                  className="w-full h-full object-cover object-center saturate-[1.1] hover:scale-105 transition-transform duration-700 ease-out"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 40vw"
+                  className="object-cover object-center saturate-[1.1] hover:scale-105 transition-transform duration-700 ease-out"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0B2545]/40 via-transparent to-transparent pointer-events-none" />
               </div>

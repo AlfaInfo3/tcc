@@ -7,7 +7,6 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import { 
   Search, 
   X, 
-  Filter, 
   SlidersHorizontal, 
   Calendar, 
   BookOpen, 
@@ -83,7 +82,7 @@ export default function PublicBookList({ books }: PublicBookListProps) {
 
   // Filter & Sort logic
   const filteredBooks = useMemo(() => {
-    let result = books.filter(book => {
+    const result = books.filter(book => {
       // 1. Text Search (title, author, genre)
       const q = searchQuery.toLowerCase().trim();
       const matchesSearch = !q || 

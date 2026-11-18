@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { itemId, fromStatus, toStatus, loanDate, dueDate, returnDate } = body;
+    const { itemId, fromStatus, toStatus, dueDate } = body;
 
     if (!itemId || typeof itemId !== 'string' || !fromStatus || !toStatus) {
       return NextResponse.json({ error: 'itemId, fromStatus e toStatus são obrigatórios' }, { status: 400 });

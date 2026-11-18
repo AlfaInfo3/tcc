@@ -45,7 +45,7 @@ export function LightWavesBackground({
   const containerRef = useRef<HTMLDivElement>(null)
   const wavesRef = useRef<Wave[]>([])
   const animationRef = useRef<number>(0)
-  const startTimeRef = useRef(Date.now())
+  const startTimeRef = useRef<number>(0)
 
   const initWaves = useCallback(
     (height: number) => {
@@ -88,6 +88,7 @@ export function LightWavesBackground({
       initWaves(height)
     }
     updateSize()
+    startTimeRef.current = Date.now()
 
     const ro = new ResizeObserver(updateSize)
     ro.observe(container)

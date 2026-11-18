@@ -15,7 +15,6 @@ export function getNextLevelXp(level: number): number {
 export function getLevelProgress(xp: number): number {
     const level = calculateLevel(xp);
     const currentLevelBase = (level - 1) * 100;
-    const nextLevelTarget = level * 100;
     const currentXpInLevel = xp - currentLevelBase;
     
     // Percentage

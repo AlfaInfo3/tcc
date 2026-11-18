@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
@@ -116,10 +117,13 @@ export const ModernBookCover = ({
         >
           {coverImage ? (
             <div className="absolute inset-0 z-1">
-              <img
+              <Image
                 src={coverImage}
-                alt="Cover"
-                className="w-full h-full object-fill rounded-[inherit]"
+                alt="Capa do livro"
+                fill
+                sizes="(max-width: 768px) 40vw, 160px"
+                unoptimized
+                className="object-fill rounded-[inherit]"
               />
               {/* Realistic Spine Hinge / Crease along left edge */}
               <div 

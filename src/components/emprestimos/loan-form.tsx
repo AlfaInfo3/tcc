@@ -71,7 +71,7 @@ export function LoanForm({ onSubmit }: LoanFormProps) {
       setTimeout(() => {
         setSuccessMessage('');
       }, 3000);
-    } catch (error) {
+    } catch {
       setErrors({ submit: 'Erro ao registrar empréstimo. Por favor, tente novamente.' });
     } finally {
       setIsSubmitting(false);

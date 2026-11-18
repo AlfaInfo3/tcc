@@ -38,8 +38,6 @@ async function runAllTests() {
 
   let adminCookie = '';
   let studentCookie = '';
-  let testBookId = null;
-  let testStudentId = null;
   let testLoanId = null;
   let testReservationId = null;
 
@@ -98,9 +96,7 @@ async function runAllTests() {
     const data = await res.json();
     assert(Array.isArray(data.books || data), 'Esperado lista de livros');
     const books = Array.isArray(data) ? data : data.books;
-    if (books.length > 0) {
-      testBookId = books[0].id;
-    }
+    assert(books.length > 0, 'Esperado ao menos um livro no catálogo');
   });
 
   await test('API GET /api/livros/search-local com busca vazia e termo', async () => {
@@ -213,9 +209,7 @@ async function runAllTests() {
     const data = await res.json();
     assert(Array.isArray(data.students || data), 'Esperado lista de alunos');
     const students = Array.isArray(data) ? data : data.students;
-    if (students.length > 0) {
-      testStudentId = students[0].id;
-    }
+    assert(students.length > 0, 'Esperado ao menos um aluno cadastrado');
   });
 
   // ------------------------------------------------------------------

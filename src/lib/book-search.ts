@@ -48,8 +48,8 @@ export async function translateToPortuguese(text: string): Promise<string> {
     const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=pt&dt=t&q=${encodeURIComponent(text.slice(0, 2500))}`;
     const response = await axios.get(url, { timeout: 4500 });
     if (response.data && Array.isArray(response.data[0])) {
-      const translated = response.data[0]
-        .map((segment: any) => segment[0])
+      const translated = (response.data[0] as unknown[])
+        .map((segment) => (Array.isArray(segment) ? segment[0] : ''))
         .filter(Boolean)
         .join('');
       if (translated && translated.trim().length > 0) {
@@ -73,7 +73,7 @@ export function normalizeIsbn(raw: string): string {
 /**
  * High-resolution cover extractor from Google Books volume imageLinks.
  */
-function extractGoogleCoverUrl(imageLinks?: any): string | undefined {
+function extractGoogleCoverUrl(imageLinks?: Record<string, string | undefined>): string | undefined {
   if (!imageLinks) return undefined;
   const bestUrl =
     imageLinks.extraLarge ||
@@ -114,7 +114,7 @@ async function searchGoogleBooks(query: string, isIsbn = false): Promise<BookSea
     for (const item of items) {
       const info = item.volumeInfo || {};
       const rawIsbns = info.industryIdentifiers || [];
-      const isbnObj = rawIsbns.find((id: any) => id.type === 'ISBN_13') || rawIsbns.find((id: any) => id.type === 'ISBN_10') || rawIsbns[0];
+      const isbnObj = rawIsbns.find((id: { type?: string }) => id.type === 'ISBN_13') || rawIsbns.find((id: { type?: string }) => id.type === 'ISBN_10') || rawIsbns[0];
       const isbn = isbnObj ? isbnObj.identifier : '';
 
       let year: number | undefined;
@@ -191,7 +191,7 @@ async function searchBrasilApi(isbn: string): Promise<BookSearchResult | null> {
  */
 async function searchOpenLibrary(query: string, isIsbn = false): Promise<BookSearchResult[]> {
   try {
-    const params: any = {
+    const params: { limit: number; fields: string; isbn?: string; q?: string } = {
       limit: isIsbn ? 1 : 5,
       fields: 'key,title,author_name,cover_i,first_publish_year,isbn,subject',
     };

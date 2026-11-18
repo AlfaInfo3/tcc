@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { 
   BarcodeScanIcon, 
@@ -11,11 +12,9 @@ import {
   Upload01Icon, 
   PlusSignIcon, 
   MinusSignIcon, 
-  BookOpen01Icon, 
   CheckmarkCircle02Icon, 
   Alert02Icon,
   ReloadIcon,
-  CameraOff01Icon
 } from '@hugeicons/core-free-icons';
 import { HugeIcon } from '@/components/ui/HugeIcon';
 import { Modal } from '@/components/ui/modal';
@@ -448,10 +447,13 @@ export function QuickBookRegisterModal({ isOpen, onClose, onBookCreated }: Quick
                 {/* Book Cover Box */}
                 <div className="shrink-0 flex flex-col items-center">
                   <div className="relative w-28 h-40 rounded-xl overflow-hidden shadow-md bg-slate-200 border border-slate-300">
-                    <img
+                    <Image
                       src={customCover || bookData.coverUrl || 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=600&auto=format&fit=crop&q=80'}
-                      alt={bookData.title}
-                      className="w-full h-full object-cover"
+                      alt={`Capa de ${bookData.title}`}
+                      fill
+                      sizes="112px"
+                      unoptimized
+                      className="object-cover"
                     />
                     {isCoverApproved && (
                       <div className="absolute top-1.5 right-1.5 bg-emerald-500 text-white rounded-full p-0.5 shadow-sm">

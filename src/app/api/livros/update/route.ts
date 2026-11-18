@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+import type { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { isAuthenticated } from '@/lib/auth-api';
 
@@ -31,22 +32,19 @@ export async function PUT(request: NextRequest) {
     }
     
     // Prepare update data (only defined fields)
-    const updateData: any = {};
+    const updateData: Prisma.BookUpdateInput = {};
     if (title) updateData.title = title.trim();
     if (author !== undefined) updateData.author = author ? author.trim() : null;
     if (coverUrl !== undefined) updateData.coverUrl = coverUrl;
     if (description !== undefined) updateData.description = description ? description.trim() : null;
     if (publishedAt !== undefined) updateData.publishedAt = publishedAt;
     if (quantity !== undefined) updateData.quantity = quantity;
-    if (quantity !== undefined) updateData.quantity = quantity;
     if (genre !== undefined) {
-         // If legacy 'genre' is sent, we ignore or warn? 
-         // But better to expect 'genres'. 
-         // Let's assume frontend sends 'genres'.
+         // Campo legado: o formulário atual envia `genres`.
     }
     if (body.genres !== undefined) {
-        if (Array.isArray(body.genres) && body.genres.every((g: any) => typeof g === 'string')) {
-            updateData.genres = body.genres;
+        if (Array.isArray(body.genres) && body.genres.every((g: unknown) => typeof g === 'string')) {
+            updateData.genres = body.genres as string[];
         }
     }
 

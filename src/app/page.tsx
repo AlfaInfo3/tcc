@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { BookOpen01Icon } from "@hugeicons/core-free-icons";
 import { HugeIcon } from "@/components/ui/HugeIcon";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { PublicNav } from "@/components/PublicNav";
 import { AccordionGallery, AccordionGalleryItem } from "@/components/AccordionGallery";
 import Carousel, { SlideData } from "@/components/ui/carousel";
@@ -278,10 +278,13 @@ export default function SchoolLandingPage() {
         >
           {/* Background Image with Layered Gradients */}
           <div className="absolute inset-0 z-0">
-            <img 
-              src="https://www.rvcfm.com.br/images/2025/11/20251113173318_l_WhatsAppImage2025-11-13at14.15.401.jpg" 
-              alt="Colégio Estadual Laurentino Martins" 
-              className="hero-bg-img w-full h-full object-cover scale-105 saturate-[1.12] opacity-90"
+            <Image
+              src="/Imagens/fachada-laurentino.jpg"
+              alt="Fachada do Colégio Estadual Laurentino Martins"
+              fill
+              priority
+              sizes="100vw"
+              className="hero-bg-img object-cover scale-105 saturate-[1.12] opacity-90"
             />
             {/* 3) Light overall tint rgba(11,27,92,.35) */}
             <div className="absolute inset-0 bg-[#0B1B5C]/35 pointer-events-none" />
@@ -364,9 +367,12 @@ export default function SchoolLandingPage() {
               
               {/* Image Side: Estudante em momento de leitura */}
               <div className="flex-1 w-full relative flex justify-center items-end min-h-[420px] mt-10 lg:mt-0">
-                <img 
+                <Image 
                   src="/Imagens/garoto.png" 
                   alt="Estudante em momento de leitura" 
+                  width={1210}
+                  height={1444}
+                  sizes="(max-width: 640px) 90vw, 480px"
                   className="sobre-student-img max-h-[400px] sm:max-h-[480px] w-auto object-contain drop-shadow-[0_20px_35px_rgba(0,0,0,0.18)] relative z-0"
                 />
               </div>

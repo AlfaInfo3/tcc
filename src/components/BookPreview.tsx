@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useState } from 'react';
 import { OpenLibraryBook } from '@/types/book';
 
@@ -26,9 +27,13 @@ export function BookPreview({ book, onSelect }: BookPreviewProps) {
   return (
     <div className="border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
       {book.coverUrl && (
-        <img 
+        <Image 
           src={book.coverUrl} 
           alt={book.title} 
+          width={400}
+          height={300}
+          sizes="(max-width: 768px) 100vw, 320px"
+          unoptimized
           className="w-full h-48 object-cover rounded mb-3"
         />
       )}

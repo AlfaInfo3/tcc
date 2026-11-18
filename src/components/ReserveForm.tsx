@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { BookmarkCheck01Icon, LoaderCircleIcon } from '@hugeicons/core-free-icons';
 import { HugeIcon } from '@/components/ui/HugeIcon';
@@ -18,6 +18,15 @@ export function ReserveForm({ bookId }: ReserveFormProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const redirectTimeoutRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (redirectTimeoutRef.current !== null) {
+        window.clearTimeout(redirectTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -70,11 +79,17 @@ export function ReserveForm({ bookId }: ReserveFormProps) {
       setFormData({ name: '', className: '' });
       setSuccessMessage('Reserva realizada com sucesso! Retire seu exemplar na biblioteca.');
 
-      setTimeout(() => {
+      redirectTimeoutRef.current = window.setTimeout(() => {
         router.push('/livros');
+        redirectTimeoutRef.current = null;
       }, 2500);
-    } catch (err: any) {
-      setErrors({ submit: err.message || 'Erro ao realizar a reserva. Por favor, tente novamente ou procure a secretaria.' });
+    } catch (err) {
+      setErrors({
+        submit:
+          err instanceof Error && err.message
+            ? err.message
+            : 'Erro ao realizar a reserva. Por favor, tente novamente ou procure a secretaria.',
+      });
     } finally {
       setIsSubmitting(false);
     }

@@ -1,4 +1,5 @@
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import React, { useLayoutEffect, useRef, useState, useCallback } from 'react';
+import Image from 'next/image';
 import { gsap } from 'gsap';
 // Use Iconify for consistent icons
 import { Icon } from '@iconify/react';
@@ -36,8 +37,6 @@ const CardNav: React.FC<CardNavProps> = ({
   ease = 'power3.out',
   baseColor = '#fff',
   menuColor,
-  buttonBgColor,
-  buttonTextColor
 }) => {
   const [isHamburgerOpen, setIsHamburgerOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -45,7 +44,7 @@ const CardNav: React.FC<CardNavProps> = ({
   const cardsRef = useRef<HTMLDivElement[]>([]);
   const tlRef = useRef<gsap.core.Timeline | null>(null);
 
-  const calculateHeight = () => {
+  const calculateHeight = useCallback(() => {
     const navEl = navRef.current;
     if (!navEl) return 260;
 
@@ -63,7 +62,8 @@ const CardNav: React.FC<CardNavProps> = ({
         contentEl.style.position = 'static';
         contentEl.style.height = 'auto';
 
-        contentEl.offsetHeight;
+        // Força o reflow antes de medir a altura do conteúdo.
+        contentEl.getBoundingClientRect();
 
         const topBar = 60;
         const padding = 16;
@@ -78,9 +78,9 @@ const CardNav: React.FC<CardNavProps> = ({
       }
     }
     return 260;
-  };
+  }, []);
 
-  const createTimeline = () => {
+  const createTimeline = useCallback(() => {
     const navEl = navRef.current;
     if (!navEl) return null;
 
@@ -98,7 +98,7 @@ const CardNav: React.FC<CardNavProps> = ({
     tl.to(cardsRef.current, { y: 0, opacity: 1, duration: 0.4, ease, stagger: 0.08 }, '-=0.1');
 
     return tl;
-  };
+  }, [ease, calculateHeight]);
 
   useLayoutEffect(() => {
     const tl = createTimeline();
@@ -108,7 +108,7 @@ const CardNav: React.FC<CardNavProps> = ({
       tl?.kill();
       tlRef.current = null;
     };
-  }, [ease, items]);
+  }, [ease, items, createTimeline]);
 
   useLayoutEffect(() => {
     const handleResize = () => {
@@ -135,7 +135,7 @@ const CardNav: React.FC<CardNavProps> = ({
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [isExpanded]);
+  }, [isExpanded, createTimeline, calculateHeight]);
 
   const toggleMenu = () => {
     const tl = tlRef.current;
@@ -187,7 +187,7 @@ const CardNav: React.FC<CardNavProps> = ({
 
           <div className="logo-container flex items-center md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 order-1 md:order-0">
             {typeof logo === 'string' ? (
-              <img src={logo} alt={logoAlt} className="logo h-[28px]" />
+              <Image src={logo} alt={logoAlt} width={120} height={40} unoptimized className="logo h-[28px] w-auto" />
             ) : (
               logo
             )}
