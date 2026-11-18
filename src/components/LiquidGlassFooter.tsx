@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -8,9 +8,6 @@ import {
   CallIcon,
   InstagramIcon,
   WhatsappIcon,
-  Mail01Icon,
-  ArrowRight01Icon,
-  CheckmarkCircle02Icon,
 } from '@hugeicons/core-free-icons';
 import { HugeIcon } from '@/components/ui/HugeIcon';
 
@@ -19,19 +16,6 @@ interface LiquidGlassFooterProps {
 }
 
 export function LiquidGlassFooter({ onNavigate }: LiquidGlassFooterProps) {
-  const [email, setEmail] = useState('');
-  const [subscribed, setSubscribed] = useState(false);
-
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-    setSubscribed(true);
-    setTimeout(() => {
-      setEmail('');
-      setSubscribed(false);
-    }, 4000);
-  };
-
   const handleLinkClick = (id: string, e: React.MouseEvent) => {
     e.preventDefault();
     if (onNavigate) {
@@ -86,40 +70,6 @@ export function LiquidGlassFooter({ onNavigate }: LiquidGlassFooterProps) {
               <p className="text-sm text-slate-600 leading-relaxed max-w-md 2xl:max-w-xl">
                 Educação pública de excelência em Goianésia-GO. Nosso compromisso é formar cidadãos conscientes e preparados para o futuro.
               </p>
-
-              {/* Newsletter Form */}
-              <div className="pt-2">
-                <p className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2.5">
-                  Comunicados & Avisos Escolares
-                </p>
-                {subscribed ? (
-                  <div className="flex items-center gap-2 p-3 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold">
-                    <HugeIcon icon={CheckmarkCircle02Icon} size={16} className="text-emerald-600" />
-                    <span>Inscrição confirmada com sucesso!</span>
-                  </div>
-                ) : (
-                  <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-2 max-w-md 2xl:max-w-xl">
-                    <div className="relative flex-1">
-                      <HugeIcon icon={Mail01Icon} size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
-                      <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="Seu e-mail institucional..."
-                        required
-                        className="w-full pl-11 pr-4 py-3 rounded-full bg-slate-50 hover:bg-slate-100/70 focus:bg-white border border-slate-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-sm text-slate-900 placeholder:text-slate-500 outline-none transition-all shadow-2xs"
-                      />
-                    </div>
-                    <button
-                      type="submit"
-                      className="px-6 py-3 rounded-full bg-blue-700 hover:bg-blue-800 active:scale-95 text-white font-bold text-xs tracking-wider uppercase transition-all shadow-sm shadow-slate-900/15 flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
-                    >
-                      <span>Inscrever</span>
-                      <HugeIcon icon={ArrowRight01Icon} size={14} />
-                    </button>
-                  </form>
-                )}
-              </div>
             </div>
 
             {/* Col 2: Navigation Columns (7 cols) */}
