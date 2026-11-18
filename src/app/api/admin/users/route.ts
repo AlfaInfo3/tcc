@@ -43,12 +43,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Acesso não autorizado' }, { status: 401 });
   }
 
-  // Only super admins may create administrators.
-  if (session.role !== 'super_admin') {
-    return NextResponse.json(
-      { error: 'Apenas super administradores podem criar usuários' },
-      { status: 403 }
-    );
+  // Admins ativos podem criar usuários; apenas super admins podem criar outros super admins.
+  if (session.role !== 'super_admin' && session.role !== 'admin') {
+    return NextResponse.json({ error: 'Acesso não autorizado' }, { status: 403 });
   }
 
   try {
@@ -87,6 +84,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Admins comuns não podem elevar o próprio nível de acesso.
+    const finalRole = session.role === 'super_admin' ? role : 'admin';
+    if (role === 'super_admin' && finalRole !== role) {
+      return NextResponse.json(
+        { error: 'Apenas super administradores podem criar super administradores' },
+        { status: 403 }
+      );
+    }
+
     const normalizedEmail = email.toLowerCase().trim();
 
     const existingUser = await prisma.adminUser.findUnique({
@@ -108,7 +114,7 @@ export async function POST(request: NextRequest) {
         name: name.trim(),
         email: normalizedEmail,
         password: hashedPassword,
-        role,
+        role: finalRole,
         isActive: true,
       },
       select: {

@@ -1,16 +1,24 @@
 import { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import bcrypt from 'bcrypt';
 import { cookies } from 'next/headers';
 import { createSignedSessionToken } from '@/lib/security';
+import { verifyPassword, hashPassword } from '@/lib/password';
 import { getClientIp, rateLimit, resetRateLimit } from '@/lib/rate-limit';
 
 export async function POST(request: NextRequest) {
+  let body: { email?: unknown; password?: unknown };
   try {
-    const body = await request.json();
-    const { email, password } = body;
+    body = await request.json();
+  } catch {
+    return NextResponse.json(
+      { success: false, error: 'Requisição inválida' },
+      { status: 400 }
+    );
+  }
+  const { email, password } = body;
 
+  try {
     // Validações
     if (!email || !password) {
       return NextResponse.json(
@@ -54,14 +62,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verifica a senha (assumindo que ela está armazenada como hash no banco)
-    const isValidPassword = await bcrypt.compare(password, adminUser.password);
+    // Verifica a senha com suporte a hashes SHA-256 legados.
+    const { valid: isValidPassword, needsRehash } = await verifyPassword(
+      password,
+      adminUser.password
+    );
 
     if (!isValidPassword) {
       return NextResponse.json(
         { success: false, error: 'Credenciais inválidas' },
         { status: 401 }
       );
+    }
+
+    if (needsRehash) {
+      await prisma.adminUser.update({
+        where: { id: adminUser.id },
+        data: { password: await hashPassword(password) },
+      });
     }
 
     resetRateLimit(rateLimitKey);

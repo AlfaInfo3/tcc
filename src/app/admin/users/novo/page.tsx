@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Loader2, UserPlus } from 'lucide-react';
@@ -17,6 +17,14 @@ export default function NewAdminUserPage() {
   });
   const [loading, setLoading] = useState(false);
   const [feedback, setFeedback] = useState<Feedback>(null);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/admin/auth/me')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { role?: string } | null) => setIsSuperAdmin(data?.role === 'super_admin'))
+      .catch(() => setIsSuperAdmin(false));
+  }, []);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -122,7 +130,7 @@ export default function NewAdminUserPage() {
             onChange={(event) => setFormData({ ...formData, role: event.target.value })}
           >
             <option value="admin">Administrador (Bibliotecário)</option>
-            <option value="super_admin">Super Administrador</option>
+            {isSuperAdmin && <option value="super_admin">Super Administrador</option>}
           </select>
         </div>
 
