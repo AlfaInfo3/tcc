@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "postinstall": "prisma generate",
-    "test:flows": "node scripts/test-e2e-flows.mjs"
+    "test:flows": "node scripts/test-e2e-flows.mjs",
+    "validate:routes": "node scripts/validate-routes.mjs"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",

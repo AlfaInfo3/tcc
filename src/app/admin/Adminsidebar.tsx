@@ -34,12 +34,12 @@ export default function AdminSidebar() {
   }
   const links = [
     {
-      label: 'DashBoard',
+      label: 'Dashboard',
       href: '/admin/dashboard',
       icon: <HugeIcon icon={DashboardSquare01Icon} size={20} />
     },
     {
-      label: 'Ver livros',
+      label: 'Livros',
       href: '/admin/livros',
       icon: <HugeIcon icon={LibraryIcon} size={20} />
     },
@@ -54,12 +54,12 @@ export default function AdminSidebar() {
       icon: <HugeIcon icon={UserIcon} size={20} />,
     },
     {
-      label: 'Emprestimos',
+      label: 'Empréstimos',
       href: '/admin/emprestimos',
       icon: <HugeIcon icon={Book01Icon} size={20} />,
     },
     {
-        label: 'Usuario',
+        label: 'Usuários',
         href: '/admin/users',
         icon: <HugeIcon icon={ShieldCheckIcon} size={20} />,
     },

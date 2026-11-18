@@ -169,7 +169,7 @@ export default async function AdminStudentsPage(props: {
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <TableActions 
                                 actions={[
-                                    { label: 'Editar', icon: <Pencil size={14} />, href: `/admin/alunos/${student.id}` },
+                                    { label: 'Detalhes', icon: <Pencil size={14} />, href: `/admin/alunos/${student.id}` },
                                     // { label: 'Excluir', icon: <Trash2 size={14} />, variant: 'destructive', onClick: () => console.log('Delete student', student.id) } 
                                 ]}
                             />
