@@ -3,8 +3,6 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { BookOpen01Icon } from "@hugeicons/core-free-icons";
-import { HugeIcon } from "@/components/ui/HugeIcon";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Button } from "@/components/ui/button";
@@ -302,7 +300,7 @@ export default function SchoolLandingPage() {
               
               {/* Badge: border border-[#60A5FA]/40, ícone e detalhes em Azul Claro */}
               <div className="hero-badge inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-[#60A5FA]/40 text-sm tracking-wide font-medium text-white shadow-sm mb-4 md:mb-5">
-                <HugeIcon icon={BookOpen01Icon} size={16} className="text-[#60A5FA]" />
+
                 <span>Tradição & Excelência em Educação Pública</span>
               </div>
 

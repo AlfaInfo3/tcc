@@ -225,10 +225,7 @@ export default function MatriculasPage() {
                 {/* Card Amarelo Sobreposto Fiel à Imagem 2 */}
                 <div className="absolute bottom-4 right-4 bg-[#fbb034] text-slate-950 px-6 py-4 rounded-xl shadow-lg border border-amber-300/40 text-left">
                   <p className="text-xl sm:text-2xl font-black leading-none tracking-tight">
-                    Desde 1978
-                  </p>
-                  <p className="text-xs font-bold text-slate-900 mt-1 leading-snug">
-                    Tradição em educação
+                  Tradição em educação
                   </p>
                 </div>
               </div>
