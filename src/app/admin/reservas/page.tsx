@@ -31,7 +31,10 @@ async function getReservations(query: string, status: ReservationStatus | '', pa
     });
   }
 
-  if (status) {
+  if (status === 'completed') {
+    // Reservas atendidas: estado atual (confirmed) e legado (completed).
+    filters.push({ status: { in: ['confirmed', 'completed'] } });
+  } else if (status) {
     filters.push({ status });
   }
 
@@ -70,6 +73,7 @@ export default async function AdminReservationsPage(props: {
     q?: string;
     status?: string;
     page?: string;
+    erro?: string;
   }>;
 }) {
   const searchParams = await props.searchParams;
@@ -95,6 +99,15 @@ export default async function AdminReservationsPage(props: {
           </p>
         </div>
       </div>
+
+      {searchParams?.erro === 'reserva-removida' && (
+        <div
+          role="status"
+          className="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-400"
+        >
+          A reserva que você tentou abrir não existe mais. Selecione uma reserva da lista abaixo.
+        </div>
+      )}
 
       {/* Filters & Search Bar Area */}
       <div className="bg-card rounded-xl border border-border shadow-sm mb-6 p-4 flex flex-col gap-4">

@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { notFound } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, BookOpen, Calendar, GraduationCap } from 'lucide-react';
 import { formatDateBR, formatDateTimeBR } from '@/lib/format';
@@ -37,7 +37,23 @@ export default async function AdminReservationDetailsPage({ params }: Props) {
     include: { book: true, student: true },
   });
 
-  if (!reservation) notFound();
+  // Reserva removida (ex.: livro excluído): volta à lista com aviso em vez de 404 cru.
+  if (!reservation) {
+    redirect('/admin/reservas?erro=reserva-removida');
+  }
+
+  // Reservas atendidas viram empréstimo: aponta para o registro correto.
+  const relatedLoan =
+    reservation.status === 'confirmed' || reservation.status === 'completed'
+      ? await prisma.loan.findFirst({
+          where: {
+            studentId: reservation.studentId,
+            bookId: reservation.bookId,
+          },
+          orderBy: { loanDate: 'desc' },
+          select: { id: true, status: true },
+        })
+      : null;
 
   return (
     <div className="w-full max-w-3xl mx-auto">
@@ -63,6 +79,20 @@ export default async function AdminReservationDetailsPage({ params }: Props) {
           {STATUS_LABELS[reservation.status] ?? reservation.status}
         </span>
       </div>
+
+      {relatedLoan && (
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm dark:border-green-800 dark:bg-green-900/20">
+          <span className="text-green-800 dark:text-green-400">
+            Esta reserva foi atendida e possui um empréstimo associado.
+          </span>
+          <Link
+            href={`/admin/emprestimos/${relatedLoan.id}`}
+            className="font-semibold text-green-700 underline underline-offset-4 dark:text-green-400"
+          >
+            Ver detalhes do empréstimo
+          </Link>
+        </div>
+      )}
 
       <div className="grid gap-4 md:grid-cols-2">
         <section className="bg-card rounded-xl border border-border shadow-sm p-6">
