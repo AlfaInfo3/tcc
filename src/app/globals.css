@@ -2,8 +2,16 @@
 
 @plugin "tailwindcss-animate";
 
+@font-face {
+  font-family: 'Quicksand';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/Quicksand-latin.woff2') format('woff2');
+}
+
 .font-quicksand {
-  font-family: var(--font-quicksand), sans-serif;
+  font-family: 'Quicksand', sans-serif;
 }
 
 @custom-variant dark (&:where(.dark, .dark *));
