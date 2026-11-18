@@ -89,7 +89,13 @@ function buildColumns(data: KanbanApiData): Record<string, Column> {
   };
 }
 
-export default function AdminKanban({ initialData }: { initialData?: KanbanApiData }) {
+export default function AdminKanban({
+  initialData,
+  onMutated,
+}: {
+  initialData?: KanbanApiData;
+  onMutated?: () => void;
+}) {
   const [columns, setColumns] = useState<Record<string, Column>>(
     () =>
       initialData
@@ -228,7 +234,8 @@ export default function AdminKanban({ initialData }: { initialData?: KanbanApiDa
         if (!res.ok) throw new Error('Falha ao mover');
         
         // Refresh data to ensure all IDs are correct
-        fetchData(); 
+        fetchData();
+        onMutated?.();
     } catch (e) {
         console.error(e);
         setError('Não foi possível salvar a movimentação. Os dados foram recarregados.');

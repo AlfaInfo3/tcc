@@ -1,14 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { BookOpen01Icon, UserGroupIcon, Alert02Icon, Clock01Icon } from '@hugeicons/core-free-icons';
 import { HugeIcon } from '@/components/ui/HugeIcon';
 import type { DashboardMetricsData } from '@/lib/dashboard-data';
 
 export default function DashboardMetrics({
   initialMetrics,
+  refreshVersion,
 }: {
   initialMetrics?: DashboardMetricsData;
+  refreshVersion?: number;
 }) {
   const [metrics, setMetrics] = useState<DashboardMetricsData | null>(initialMetrics ?? null);
   const [loading, setLoading] = useState(!initialMetrics);
@@ -26,6 +28,18 @@ export default function DashboardMetrics({
         setLoading(false);
       });
   }, [initialMetrics]);
+
+  // Recarrega os cards quando o Kanban conclui uma movimentação.
+  const lastVersionRef = useRef(refreshVersion ?? 0);
+  useEffect(() => {
+    if (refreshVersion === undefined || refreshVersion === lastVersionRef.current) return;
+    lastVersionRef.current = refreshVersion;
+
+    fetch('/api/metricas')
+      .then((res) => res.json())
+      .then((data: DashboardMetricsData) => setMetrics(data))
+      .catch((err) => console.error('Falha ao atualizar métricas', err));
+  }, [refreshVersion]);
 
   if (loading) {
     return <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 animate-pulse">

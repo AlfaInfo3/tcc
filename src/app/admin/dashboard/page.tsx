@@ -1,7 +1,6 @@
 import Image from 'next/image';
-import AdminKanban from '@/components/AdminKanban';
 import { getDashboardMetrics, getKanbanData } from '@/lib/dashboard-data';
-import DashboardMetrics from './DashboardMetrics';
+import DashboardLive from './DashboardLive';
 
 export const dynamic = 'force-dynamic';
 
@@ -37,11 +36,7 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      <DashboardMetrics initialMetrics={metrics} />
-
-      <div className="mt-4">
-        <AdminKanban initialData={kanban} />
-      </div>
+      <DashboardLive metrics={metrics} kanban={kanban} />
     </div>
   );
 }
