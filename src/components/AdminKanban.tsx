@@ -276,8 +276,8 @@ export default function AdminKanban({
             {...provided.droppableProps}
             ref={provided.innerRef}
             className={`
-                bg-muted/50 p-4 rounded-2xl 
-                ${isMobile ? 'min-h-[300px]' : 'min-h-[500px]'}
+                bg-muted/50 p-4 rounded-2xl overflow-y-auto overscroll-contain
+                ${isMobile ? 'min-h-[220px] max-h-[45vh]' : 'min-h-[220px] max-h-[58vh]'}
                 ${snapshot.isDraggingOver ? 'bg-muted' : ''}
                 transition-colors
             `}
