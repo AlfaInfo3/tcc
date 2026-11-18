@@ -25,10 +25,18 @@ export interface BookItem {
 interface BookCardWithHoverProps {
   book: BookItem;
   defaultOpen?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
   onReserve?: (book: BookItem) => void;
 }
 
-export function BookCardWithHover({ book, defaultOpen = false, onReserve }: BookCardWithHoverProps) {
+export function BookCardWithHover({
+  book,
+  defaultOpen = false,
+  open,
+  onOpenChange,
+  onReserve,
+}: BookCardWithHoverProps) {
   const isAvailable = (book.availableCopies ?? book.quantity) > 0;
   const ratingValue = book.rating || 4.8;
   const ratingsCountLabel = book.ratingsCount || `${book.quantity} un. no acervo`;
@@ -41,8 +49,17 @@ export function BookCardWithHover({ book, defaultOpen = false, onReserve }: Book
   const href = `/livros/${book.id}`;
 
   return (
-    <div className="flex flex-col items-center group/card w-full select-none pt-2.5">
-      <HoverCard.Root openDelay={200} closeDelay={150} defaultOpen={defaultOpen}>
+    <div
+      className="flex flex-col items-center group/card w-full select-none pt-2.5"
+      onMouseEnter={() => onOpenChange?.(true)}
+    >
+      <HoverCard.Root
+        open={open}
+        defaultOpen={defaultOpen}
+        onOpenChange={onOpenChange}
+        openDelay={120}
+        closeDelay={60}
+      >
         <HoverCard.Trigger asChild>
           <Link
             href={href}
@@ -84,11 +101,13 @@ export function BookCardWithHover({ book, defaultOpen = false, onReserve }: Book
         {/* ── DESKTOP HOVER CARD OVERLAY ───────────────────────── */}
         <HoverCard.Portal>
           <HoverCard.Content
-            side="left"
-            align="center"
-            sideOffset={14}
+            side="right"
+            align="start"
+            sideOffset={10}
             avoidCollisions={true}
-            className="z-50 hidden sm:block w-[500px] max-w-[90vw] bg-white rounded-[28px] p-6 shadow-[0_20px_50px_rgba(6,15,51,0.35)] border border-blue-100 outline-none animate-in fade-in-0 zoom-in-95 duration-200 font-['Quicksand',sans-serif]"
+            collisionPadding={12}
+            className="z-[60] hidden sm:block w-[340px] max-w-[70vw] bg-white rounded-[28px] p-6 shadow-[0_20px_50px_rgba(6,15,51,0.35)] border border-blue-100 outline-none animate-in fade-in-0 zoom-in-95 duration-200 font-quicksand"
+            onPointerDownOutside={() => onOpenChange?.(false)}
           >
             <HoverCard.Arrow className="fill-white" width={18} height={10} />
 

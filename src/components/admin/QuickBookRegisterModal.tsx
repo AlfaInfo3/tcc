@@ -314,7 +314,7 @@ export function QuickBookRegisterModal({ isOpen, onClose, onBookCreated }: Quick
       isOpen={isOpen}
       onClose={onClose}
       labelledBy="quick-book-modal-title"
-      className="max-w-2xl border-slate-100 bg-white font-['Quicksand',sans-serif]"
+      className="max-w-2xl border-slate-100 bg-white font-quicksand"
     >
         {/* ── HEADER ─────────────────────────────────────────── */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-blue-900 to-indigo-900 text-white">

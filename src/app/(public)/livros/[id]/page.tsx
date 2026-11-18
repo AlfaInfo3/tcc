@@ -131,7 +131,7 @@ export default async function BookDetailPage({
   const relatedBooks = await getRelatedBooks(book.id, book.genres);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#060F33] via-[#0B1B5C] to-[#040924] font-['Quicksand',sans-serif] text-slate-800 pt-8 sm:pt-12 pb-24 antialiased">
+    <div className="min-h-screen bg-gradient-to-br from-[#060F33] via-[#0B1B5C] to-[#040924] font-quicksand text-slate-800 pt-8 sm:pt-12 pb-24 antialiased">
       
       {/* ── BREADCRUMB & VOLTAR ─────────────────────────────── */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-12 max-w-6xl mb-6">

@@ -1,6 +1,6 @@
 export default function Loading() {
   return (
-    <div className="min-h-dvh bg-gradient-to-br from-[#060F33] via-[#0B1B5C] to-[#040924] px-4 pb-24 pt-8 sm:px-6 sm:pt-12 lg:px-12 font-['Quicksand',sans-serif]">
+    <div className="min-h-dvh bg-gradient-to-br from-[#060F33] via-[#0B1B5C] to-[#040924] px-4 pb-24 pt-8 sm:px-6 sm:pt-12 lg:px-12 font-quicksand">
       <div className="mx-auto max-w-6xl space-y-6">
         <div className="h-8 w-64 animate-pulse rounded-xl bg-white/10" />
         <div className="rounded-[32px] border border-white/10 bg-white/95 p-6 sm:p-10 lg:p-12">

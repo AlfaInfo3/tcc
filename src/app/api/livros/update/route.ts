@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import type { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { isAuthenticated } from '@/lib/auth-api';
+import { revalidateTag } from 'next/cache';
 
 export async function PUT(request: NextRequest) {
   if (!await isAuthenticated(request)) {
@@ -53,6 +54,7 @@ export async function PUT(request: NextRequest) {
       data: updateData,
     });
 
+    revalidateTag('public-books', 'default');
     return NextResponse.json(updatedBook);
   } catch (error) {
     console.error('Error updating book:', error);

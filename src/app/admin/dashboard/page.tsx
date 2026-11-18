@@ -1,15 +1,24 @@
 import Image from 'next/image';
 import AdminKanban from '@/components/AdminKanban';
+import { getDashboardMetrics, getKanbanData } from '@/lib/dashboard-data';
 import DashboardMetrics from './DashboardMetrics';
 
-export default function DashboardPage() {
+export const dynamic = 'force-dynamic';
+
+export default async function DashboardPage() {
+  // Busca paralela no servidor: evita a cascata servidor → cliente → API → banco.
+  const [metrics, kanban] = await Promise.all([
+    getDashboardMetrics(),
+    getKanbanData(),
+  ]);
+
   return (
     <div className="flex flex-col gap-6">
       <div className="relative rounded-2xl overflow-hidden bg-slate-900 border border-border shadow-sm mb-2">
         <div className="absolute inset-0">
-          <Image 
-            src="/Imagens/fachada-laurentino.jpg" 
-            alt="Fachada do Colégio Estadual Laurentino Martins" 
+          <Image
+            src="/Imagens/fachada-laurentino.jpg"
+            alt="Fachada do Colégio Estadual Laurentino Martins"
             fill
             sizes="100vw"
             className="object-cover"
@@ -17,7 +26,7 @@ export default function DashboardPage() {
           <div className="absolute inset-0 bg-blue-950/70 mix-blend-multiply"></div>
           <div className="absolute inset-0 bg-linear-to-r from-blue-950/90 via-blue-900/50 to-transparent"></div>
         </div>
-        
+
         <div className="relative z-10 px-4 sm:px-8 py-6 sm:py-10 lg:py-12">
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight">
             Dashboard Administrativo
@@ -27,12 +36,11 @@ export default function DashboardPage() {
           </p>
         </div>
       </div>
-      
-      <DashboardMetrics />
-      
+
+      <DashboardMetrics initialMetrics={metrics} />
+
       <div className="mt-4">
-        {/* Kanban Board */}
-        <AdminKanban />
+        <AdminKanban initialData={kanban} />
       </div>
     </div>
   );

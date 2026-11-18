@@ -260,7 +260,7 @@ export default function NewBookPage() {
   const activeCover = customCoverDataUrl || (coverFile ? URL.createObjectURL(coverFile) : null) || formData.coverUrl;
 
   return (
-    <div className="w-full bg-slate-50/60 font-['Quicksand',sans-serif]">
+    <div className="w-full bg-slate-50/60 font-quicksand">
       <div className="max-w-6xl mx-auto space-y-6">
         
         {/* ── TOP NAV BAR ─────────────────────────────────────── */}

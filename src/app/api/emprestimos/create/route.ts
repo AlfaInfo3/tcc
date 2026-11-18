@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/auth-api';
+import { revalidateTag } from 'next/cache';
 
 export async function POST(request: Request) {
   const session = await requireAdmin();
@@ -42,6 +43,7 @@ export async function POST(request: Request) {
         });
     });
 
+    revalidateTag('public-books', 'default');
     return NextResponse.json(result);
 
   } catch (error) {

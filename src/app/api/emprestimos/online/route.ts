@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/auth-api';
+import { revalidateTag } from 'next/cache';
 
 export async function POST(request: NextRequest) {
   const session = await requireAdmin(request);
@@ -72,6 +73,7 @@ export async function POST(request: NextRequest) {
       return loan;
     });
 
+    revalidateTag('public-books', 'default');
     return NextResponse.json(newLoan, { status: 201 });
   } catch (error) {
     console.error('Error creating online loan:', error);

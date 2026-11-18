@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/auth-api';
+import { revalidateTag } from 'next/cache';
 
 export async function PUT(request: NextRequest) {
   const session = await requireAdmin(request);
@@ -76,6 +77,7 @@ export async function PUT(request: NextRequest) {
       return loan;
     });
 
+    revalidateTag('public-books', 'default');
     return NextResponse.json(returnedLoan);
   } catch (error) {
     console.error('Error processing return:', error);

@@ -4,44 +4,13 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { Modal } from '@/components/ui/modal';
+import type {
+  KanbanApiData,
+  KanbanReservation,
+  KanbanLoan,
+} from '@/lib/dashboard-data';
 
-// Types definition
-interface KanbanRawBook {
-  title: string | null;
-}
-
-interface KanbanRawStudent {
-  name: string;
-}
-
-interface KanbanRawReservation {
-  id: string;
-  bookId: string;
-  studentId: string;
-  createdAt: string;
-  loanType?: string | null;
-  book?: KanbanRawBook | null;
-  student?: KanbanRawStudent | null;
-}
-
-interface KanbanRawLoan {
-  id: string;
-  bookId: string;
-  studentId: string;
-  dueDate: string;
-  returnDate?: string | null;
-  loanType?: string | null;
-  book?: KanbanRawBook | null;
-  student?: KanbanRawStudent | null;
-}
-
-interface KanbanApiResponse {
-  reservations: KanbanRawReservation[];
-  activeLoans: KanbanRawLoan[];
-  returnedLoans: KanbanRawLoan[];
-}
-
-type KanbanRawItem = KanbanRawReservation | KanbanRawLoan;
+type KanbanRawItem = KanbanReservation | KanbanLoan;
 
 interface KanbanItem {
   id: string;
@@ -71,14 +40,63 @@ function formatDate(dateString: string | null | undefined) {
     return `${day}/${month}/${year}`;
 }
 
-export default function AdminKanban() {
-  const [columns, setColumns] = useState<Record<string, Column>>({
-    reserved: { id: 'reserved', title: 'Solicitações (Reservas)', items: [] },
-    active: { id: 'active', title: 'Emprestados (Ativos)', items: [] },
-    returned: { id: 'returned', title: 'Devolvidos (Histórico)', items: [] }
-  });
+function buildColumns(data: KanbanApiData): Record<string, Column> {
+  const reservedItems: KanbanItem[] = data.reservations.map((r) => ({
+    id: r.id,
+    type: 'reservation',
+    title: r.book?.title || 'Livro Desconhecido',
+    subtitle: r.student?.name || 'Aluno Desconhecido',
+    date: `Solicitado em: ${formatDate(r.createdAt)}`,
+    status: 'reserved',
+    bookId: r.bookId,
+    studentId: r.studentId,
+    data: r,
+  }));
+
+  const activeItems: KanbanItem[] = data.activeLoans.map((l) => ({
+    id: l.id,
+    type: 'loan',
+    title: l.book?.title || 'Livro Desconhecido',
+    subtitle: l.student?.name || 'Aluno Desconhecido',
+    date: `Devolução Prevista: ${formatDate(l.dueDate)}`,
+    status: 'active',
+    bookId: l.bookId,
+    studentId: l.studentId,
+    data: l,
+  }));
+
+  const returnedItems: KanbanItem[] = data.returnedLoans.map((l) => ({
+    id: l.id,
+    type: 'loan',
+    title: l.book?.title || 'Livro Desconhecido',
+    subtitle: l.student?.name || 'Aluno Desconhecido',
+    date: `Devolvido em: ${formatDate(l.returnDate)}`,
+    status: 'returned',
+    bookId: l.bookId,
+    studentId: l.studentId,
+    data: l,
+  }));
+
+  return {
+    reserved: { id: 'reserved', title: 'Solicitações', items: reservedItems },
+    active: { id: 'active', title: 'Emprestados', items: activeItems },
+    returned: { id: 'returned', title: 'Devolvidos', items: returnedItems },
+  };
+}
+
+export default function AdminKanban({ initialData }: { initialData?: KanbanApiData }) {
+  const [columns, setColumns] = useState<Record<string, Column>>(
+    () =>
+      initialData
+        ? buildColumns(initialData)
+        : {
+            reserved: { id: 'reserved', title: 'Solicitações (Reservas)', items: [] },
+            active: { id: 'active', title: 'Emprestados (Ativos)', items: [] },
+            returned: { id: 'returned', title: 'Devolvidos (Histórico)', items: [] },
+          }
+  );
   
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!initialData);
   const [error, setError] = useState<string | null>(null);
   
   // Mobile Tab State
@@ -92,50 +110,8 @@ export default function AdminKanban() {
   const fetchData = useCallback(async () => {
     try {
       const res = await fetch('/api/kanban/data');
-      const data: KanbanApiResponse = await res.json();
-
-      // Transform API data to Kanban columns
-      const reservedItems: KanbanItem[] = data.reservations.map((r) => ({
-        id: r.id,
-        type: 'reservation',
-        title: r.book?.title || 'Livro Desconhecido',
-        subtitle: r.student?.name || 'Aluno Desconhecido',
-        date: `Solicitado em: ${formatDate(r.createdAt)}`,
-        status: 'reserved',
-        bookId: r.bookId,
-        studentId: r.studentId,
-        data: r
-      }));
-
-      const activeItems: KanbanItem[] = data.activeLoans.map((l) => ({
-        id: l.id,
-        type: 'loan',
-        title: l.book?.title || 'Livro Desconhecido',
-        subtitle: l.student?.name || 'Aluno Desconhecido',
-        date: `Devolu\u00E7\u00E3o Prevista: ${formatDate(l.dueDate)}`,
-        status: 'active',
-        bookId: l.bookId,
-        studentId: l.studentId,
-        data: l
-      }));
-
-      const returnedItems: KanbanItem[] = data.returnedLoans.map((l) => ({
-        id: l.id,
-        type: 'loan',
-        title: l.book?.title || 'Livro Desconhecido',
-        subtitle: l.student?.name || 'Aluno Desconhecido',
-        date: `Devolvido em: ${formatDate(l.returnDate)}`,
-        status: 'returned',
-        bookId: l.bookId,
-        studentId: l.studentId,
-        data: l
-      }));
-
-      setColumns({
-        reserved: { id: 'reserved', title: 'Solicitações', items: reservedItems },
-        active: { id: 'active', title: 'Emprestados', items: activeItems },
-        returned: { id: 'returned', title: 'Devolvidos', items: returnedItems }
-      });
+      const data: KanbanApiData = await res.json();
+      setColumns(buildColumns(data));
     } catch (error) {
       console.error(error);
     } finally {
@@ -144,8 +120,8 @@ export default function AdminKanban() {
   }, []);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    if (!initialData) fetchData();
+  }, [fetchData, initialData]);
 
   // --- UNIFIED MOVE HANDLER (Everything goes through here) ---
   const handleMoveValues = (itemId: string, fromId: string, toId: string) => {

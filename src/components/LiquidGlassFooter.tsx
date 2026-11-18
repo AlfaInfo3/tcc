@@ -7,7 +7,6 @@ import {
   Location01Icon,
   CallIcon,
   InstagramIcon,
-  Facebook01Icon,
   WhatsappIcon,
   Mail01Icon,
   ArrowRight01Icon,
@@ -225,14 +224,6 @@ export function LiquidGlassFooter({ onNavigate }: LiquidGlassFooterProps) {
                 className="size-10 rounded-full bg-slate-50 hover:bg-blue-50 border border-slate-200 flex items-center justify-center text-slate-600 hover:text-blue-700 transition-all hover:scale-105 shadow-2xs"
               >
                 <HugeIcon icon={InstagramIcon} size={16} />
-              </a>
-
-              <a
-                href="#"
-                title="Facebook oficial"
-                className="size-10 rounded-full bg-slate-50 hover:bg-blue-50 border border-slate-200 flex items-center justify-center text-slate-600 hover:text-blue-700 transition-all hover:scale-105 shadow-2xs"
-              >
-                <HugeIcon icon={Facebook01Icon} size={16} />
               </a>
 
               <a

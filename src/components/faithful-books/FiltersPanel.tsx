@@ -45,7 +45,7 @@ export function FiltersPanel({
   const hasAnyFilter = Boolean(filters.genre || filters.published || filters.availableOnly);
 
   return (
-    <aside className="w-full lg:w-[220px] shrink-0 bg-white/95 backdrop-blur-md rounded-[26px] p-5 shadow-xl border border-white/30 overflow-y-auto max-h-full scrollbar-thin select-none text-[12px] font-['Quicksand',sans-serif]">
+    <aside className="w-full lg:w-[220px] shrink-0 bg-white/95 backdrop-blur-md rounded-[26px] p-5 shadow-xl border border-white/30 overflow-y-auto max-h-full scrollbar-thin select-none text-[12px] font-quicksand">
       {/* Header */}
       <div className="flex items-center justify-between gap-2 mb-4 text-slate-900 border-b border-slate-100 pb-3">
         <div className="flex items-center gap-2">

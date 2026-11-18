@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useDeferredValue } from 'react';
 import { NavRail } from '@/components/faithful-books/NavRail';
 import { FiltersPanel, FilterState } from '@/components/faithful-books/FiltersPanel';
 import { TopBar } from '@/components/faithful-books/TopBar';
@@ -19,6 +19,7 @@ export function LivrosClientView({ initialBooks }: LivrosClientViewProps) {
   const [books, setBooks] = useState<BookItem[]>(initialBooks);
   const [activeTab, setActiveTab] = useState('books');
   const [searchQuery, setSearchQuery] = useState('');
+  const deferredSearch = useDeferredValue(searchQuery);
   const [sortBy, setSortBy] = useState('az');
   const [filters, setFilters] = useState<FilterState>({});
   const [selectedLetter, setSelectedLetter] = useState<string | null>(null);
@@ -27,6 +28,9 @@ export function LivrosClientView({ initialBooks }: LivrosClientViewProps) {
   // Reserve Modal State
   const [reserveBook, setReserveBook] = useState<BookItem | null>(null);
   const [isReserveOpen, setIsReserveOpen] = useState(false);
+
+  // Apenas um preview de livro pode ficar aberto por vez.
+  const [openHoverId, setOpenHoverId] = useState<string | null>(null);
 
   const gridContainerRef = useRef<HTMLDivElement>(null);
 
@@ -68,8 +72,8 @@ export function LivrosClientView({ initialBooks }: LivrosClientViewProps) {
   const filteredBooks = useMemo(() => {
     const list = books.filter((book) => {
       // 1. Search filter (case & accent insensitive)
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase().trim();
+      if (deferredSearch.trim()) {
+        const q = deferredSearch.toLowerCase().trim();
         const matches =
           book.title.toLowerCase().includes(q) ||
           book.author.toLowerCase().includes(q) ||
@@ -135,7 +139,7 @@ export function LivrosClientView({ initialBooks }: LivrosClientViewProps) {
     });
 
     return list;
-  }, [books, searchQuery, filters, sortBy, activeTab, selectedLetter]);
+  }, [books, deferredSearch, filters, sortBy, activeTab, selectedLetter]);
 
   // Unique available letters from books
   const availableLetters = useMemo(() => {
@@ -202,7 +206,7 @@ export function LivrosClientView({ initialBooks }: LivrosClientViewProps) {
   };
 
   return (
-    <div className="min-h-dvh w-full bg-gradient-to-br from-[#060F33] via-[#0B1B5C] to-[#040924] p-3 sm:p-4 md:p-6 font-['Quicksand',sans-serif] text-slate-800 antialiased relative lg:h-dvh lg:overflow-hidden">
+    <div className="min-h-dvh w-full bg-gradient-to-br from-[#060F33] via-[#0B1B5C] to-[#040924] p-3 sm:p-4 md:p-6 font-quicksand text-slate-800 antialiased relative lg:h-dvh lg:overflow-hidden">
       
       {/* ── MOBILE HEADER BAR (< md) ───────────────────── */}
       <div className="flex md:hidden items-center justify-between gap-3 mb-3 bg-white/10 backdrop-blur-md p-3 rounded-2xl border border-white/15 text-white">
@@ -316,6 +320,7 @@ export function LivrosClientView({ initialBooks }: LivrosClientViewProps) {
           {/* Book Grid Area */}
           <div 
             ref={gridContainerRef}
+            onScroll={() => setOpenHoverId(null)}
             className="flex-1 overflow-y-auto pr-1 sm:pr-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] min-h-[500px]"
           >
             {filteredBooks.length === 0 ? (
@@ -338,7 +343,8 @@ export function LivrosClientView({ initialBooks }: LivrosClientViewProps) {
                   <BookCardWithHover
                     key={book.id}
                     book={book}
-                    defaultOpen={false}
+                    open={openHoverId === book.id}
+                    onOpenChange={(isOpen) => setOpenHoverId(isOpen ? book.id : null)}
                     onReserve={handleOpenReserve}
                   />
                 ))}

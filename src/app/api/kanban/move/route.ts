@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/auth-api';
+import { revalidateTag } from 'next/cache';
 
 export async function POST(req: NextRequest) {
   const session = await requireAdmin(req);
@@ -67,6 +68,7 @@ export async function POST(req: NextRequest) {
         }
       });
 
+      revalidateTag('public-books', 'default');
       return NextResponse.json({ success: true, loan });
     }
 
@@ -116,6 +118,7 @@ export async function POST(req: NextRequest) {
         // Don't fail the return if XP fails
       }
 
+      revalidateTag('public-books', 'default');
       return NextResponse.json({ success: true, loan });
     }
 

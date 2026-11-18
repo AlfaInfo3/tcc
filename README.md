@@ -49,7 +49,16 @@ Sistema de biblioteca escolar com catálogo público, reservas, empréstimos, ga
    ADMIN_EMAIL=admin@escola.local ADMIN_PASSWORD="senha-forte-aqui" npx tsx scripts/create-admin.ts
    ```
 
-5. Inicie o servidor de desenvolvimento:
+5. (Opcional) Unifique alunos duplicados. O script **simula por padrão** e só altera o banco com `--apply`:
+
+   ```bash
+   npx tsx scripts/merge-duplicate-students.ts            # mostra o que seria mesclado
+   npx tsx scripts/merge-duplicate-students.ts --apply    # aplica após backup
+   ```
+
+   A mesclagem escolhe o cadastro com perfil gamificado/mais histórico como sobrevivente e transfere empréstimos, reservas, XP e badges antes de remover os duplicados.
+
+6. Inicie o servidor de desenvolvimento:
 
    ```bash
    npm run dev
@@ -84,3 +93,10 @@ Sistema de biblioteca escolar com catálogo público, reservas, empréstimos, ga
 - Datas exibidas sempre via `formatDateBR` / `formatDateTimeBR` (fuso `America/Sao_Paulo`).
 - Cores e superfícies usando os tokens do Tailwind (`bg-card`, `border-border`, `text-foreground`), com suporte a tema escuro.
 - Imagens com `next/image`; imagens institucionais ficam em `public/Imagens`.
+
+## Identidade de alunos e desempenho
+
+- Nome e turma são normalizados em `src/lib/students.ts` (caixa, acentos, espaços e `º`/`°`). As rotas de cadastro, signup e reserva usam `findOrCreateStudent`: uma transação serializável localiza o aluno existente ou cria um registro com `codeHash` determinístico, evitando duplicatas por requisições concorrentes.
+- `/livros` usa cache com revalidação de 30s e agregações paralelas; as rotas que alteram livros, reservas e empréstimos invalidam a tag `public-books`.
+- O preview ao passar o mouse sobre um livro é controlado pelo catálogo: apenas um fica aberto, fecha ao sair do card ou rolar a lista e tem largura reduzida para não cobrir os livros vizinhos.
+

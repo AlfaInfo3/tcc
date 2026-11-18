@@ -61,7 +61,7 @@ export function TopBar({
   };
 
   return (
-    <div className="flex flex-col gap-3 text-xs font-['Quicksand',sans-serif] mb-4 select-none">
+    <div className="flex flex-col gap-3 text-xs font-quicksand mb-4 select-none">
       {/* Upper row: Search & Action buttons */}
       <div className="flex flex-wrap items-center justify-between gap-2.5">
         

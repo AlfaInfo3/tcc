@@ -97,7 +97,7 @@ export function ReserveModal({ book, isOpen, onClose, onSuccess }: ReserveModalP
       isOpen={isOpen}
       onClose={handleClose}
       labelledBy="reserve-modal-title"
-      className="max-w-lg bg-white p-6 text-slate-800 shadow-2xl sm:p-8 font-['Quicksand',sans-serif]"
+      className="max-w-lg bg-white p-6 text-slate-800 shadow-2xl sm:p-8 font-quicksand"
     >
       {/* Close Button */}
         <button

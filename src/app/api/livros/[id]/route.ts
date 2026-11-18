@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { revalidateTag } from 'next/cache';
 
 export async function GET(
   request: NextRequest,
@@ -62,6 +63,7 @@ export async function DELETE(
         });
     });
 
+    revalidateTag('public-books', 'default');
     return NextResponse.json({ message: 'Book deleted successfully' });
   } catch (error) {
     console.error('Error deleting book:', error);

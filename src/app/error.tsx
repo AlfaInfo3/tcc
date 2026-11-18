@@ -12,7 +12,7 @@ export default function GlobalError({
   console.error('Erro não tratado na aplicação:', error);
 
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-background px-6 py-12 font-['Quicksand',sans-serif]">
+    <div className="flex min-h-dvh items-center justify-center bg-background px-6 py-12 font-quicksand">
       <div className="w-full max-w-md rounded-3xl border border-border bg-card p-8 text-center shadow-lg">
         <div className="mx-auto mb-5 flex size-14 items-center justify-center rounded-2xl bg-destructive/10 text-destructive">
           <span aria-hidden="true" className="text-3xl font-bold">!</span>

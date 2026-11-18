@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { isAuthenticated } from '@/lib/auth-api';
+import { revalidateTag } from 'next/cache';
 
 export async function POST(req: NextRequest) {
   if (!await isAuthenticated(req)) {
@@ -81,6 +82,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    revalidateTag('public-books', 'default');
     return NextResponse.json(book, { status: 201 });
   } catch (error) {
     console.error('Error creating book:', error);

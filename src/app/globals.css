@@ -1,7 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @plugin "tailwindcss-animate";
+
+.font-quicksand {
+  font-family: var(--font-quicksand), sans-serif;
+}
 
 @custom-variant dark (&:where(.dark, .dark *));
 

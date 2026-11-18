@@ -3,22 +3,18 @@
 import { useEffect, useState } from 'react';
 import { BookOpen01Icon, UserGroupIcon, Alert02Icon, Clock01Icon } from '@hugeicons/core-free-icons';
 import { HugeIcon } from '@/components/ui/HugeIcon';
+import type { DashboardMetricsData } from '@/lib/dashboard-data';
 
-interface Metrics {
-  totalTitles: number;
-  totalItems: number;
-  availableBooks: number;
-  borrowedBooks: number;
-  activeLoans: number;
-  overdueLoans: number;
-  reservations: number;
-}
-
-export default function DashboardMetrics() {
-  const [metrics, setMetrics] = useState<Metrics | null>(null);
-  const [loading, setLoading] = useState(true);
+export default function DashboardMetrics({
+  initialMetrics,
+}: {
+  initialMetrics?: DashboardMetricsData;
+}) {
+  const [metrics, setMetrics] = useState<DashboardMetricsData | null>(initialMetrics ?? null);
+  const [loading, setLoading] = useState(!initialMetrics);
 
   useEffect(() => {
+    if (initialMetrics) return;
     fetch('/api/metricas')
       .then(res => res.json())
       .then(data => {
@@ -29,7 +25,7 @@ export default function DashboardMetrics() {
         console.error('Failed to load metrics', err);
         setLoading(false);
       });
-  }, []);
+  }, [initialMetrics]);
 
   if (loading) {
     return <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 animate-pulse">
