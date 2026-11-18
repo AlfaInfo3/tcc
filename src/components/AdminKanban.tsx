@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { Modal } from '@/components/ui/modal';
+import { formatBookLocation } from '@/lib/format';
 import type {
   KanbanApiData,
   KanbanReservation,
@@ -21,6 +22,7 @@ interface KanbanItem {
   status: string;
   bookId: string;
   studentId: string;
+  location: string;
   data: KanbanRawItem;
 }
 
@@ -50,6 +52,7 @@ function buildColumns(data: KanbanApiData): Record<string, Column> {
     status: 'reserved',
     bookId: r.bookId,
     studentId: r.studentId,
+    location: formatBookLocation(r.book),
     data: r,
   }));
 
@@ -62,6 +65,7 @@ function buildColumns(data: KanbanApiData): Record<string, Column> {
     status: 'active',
     bookId: l.bookId,
     studentId: l.studentId,
+    location: formatBookLocation(l.book),
     data: l,
   }));
 
@@ -74,6 +78,7 @@ function buildColumns(data: KanbanApiData): Record<string, Column> {
     status: 'returned',
     bookId: l.bookId,
     studentId: l.studentId,
+    location: formatBookLocation(l.book),
     data: l,
   }));
 
@@ -104,7 +109,15 @@ export default function AdminKanban({ initialData }: { initialData?: KanbanApiDa
 
   // Modal State
   const [showModal, setShowModal] = useState(false);
-  const [pendingMove, setPendingMove] = useState<{itemId: string, fromId: string, toId: string, dueDate: string} | null>(null);
+  const [pendingMove, setPendingMove] = useState<{
+    itemId: string;
+    fromId: string;
+    toId: string;
+    dueDate: string;
+    title: string;
+    subtitle: string;
+    location: string;
+  } | null>(null);
   const [dueDate, setDueDate] = useState('');
 
   const fetchData = useCallback(async () => {
@@ -132,7 +145,19 @@ export default function AdminKanban({ initialData }: { initialData?: KanbanApiDa
       defaultDate.setDate(defaultDate.getDate() + 7);
       const defaultDateStr = defaultDate.toISOString().split('T')[0];
 
-      setPendingMove({ itemId, fromId, toId, dueDate: '' });
+      const item = Object.values(columns)
+        .flatMap((column) => column.items)
+        .find((candidate) => candidate.id === itemId);
+
+      setPendingMove({
+        itemId,
+        fromId,
+        toId,
+        dueDate: '',
+        title: item?.title || 'Livro',
+        subtitle: item?.subtitle || 'Aluno',
+        location: item?.location || formatBookLocation(null),
+      });
       setDueDate(defaultDateStr);
       setShowModal(true);
       return; 
@@ -284,6 +309,7 @@ export default function AdminKanban({ initialData }: { initialData?: KanbanApiDa
                     <h3 className="font-semibold text-foreground pr-16">{item.title}</h3>
                     <p className="text-sm text-muted-foreground">{item.subtitle}</p>
                     <p className="text-xs text-muted-foreground/70 mt-2">{item.date}</p>
+                    <p className="text-[11px] font-medium text-primary mt-1">Local: {item.location}</p>
 
                     {/* MOBILE ACTION BUTTONS (ALWAYS VISIBLE) */}
                     <div className="mt-3 pt-3 border-t border-border flex flex-wrap items-center justify-between gap-2">
@@ -387,8 +413,24 @@ export default function AdminKanban({ initialData }: { initialData?: KanbanApiDa
         labelledBy="kanban-loan-title"
         className="max-w-sm border-border bg-card p-6 shadow-xl"
       >
-        <h3 id="kanban-loan-title" className="text-lg font-bold mb-4">Confirmar empréstimo</h3>
-        <p className="text-muted-foreground mb-4">Data de devolução (opcional):</p>
+        <h3 id="kanban-loan-title" className="text-lg font-bold mb-3">Confirmar empréstimo</h3>
+
+        <div className="mb-4 space-y-1.5 rounded-xl border border-border bg-muted/40 p-3 text-sm">
+          <p>
+            <span className="text-muted-foreground">Livro: </span>
+            <strong className="text-foreground">{pendingMove?.title}</strong>
+          </p>
+          <p>
+            <span className="text-muted-foreground">Aluno: </span>
+            <strong className="text-foreground">{pendingMove?.subtitle}</strong>
+          </p>
+          <p>
+            <span className="text-muted-foreground">Localização: </span>
+            <strong className="text-primary">{pendingMove?.location}</strong>
+          </p>
+        </div>
+
+        <p className="text-muted-foreground mb-2 text-sm">Data de devolução (opcional):</p>
         <input 
             type="date"
             value={dueDate}

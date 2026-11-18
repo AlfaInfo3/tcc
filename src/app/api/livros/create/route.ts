@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { title, author, coverUrl, description, publishedAt, quantity, genres } = body;
+    const { title, author, coverUrl, description, publishedAt, quantity, genres, corridor, shelf, shelfLevel } = body;
 
     // Validations
     if (!title || typeof title !== 'string' || title.trim().length === 0) {
@@ -70,6 +70,16 @@ export async function POST(req: NextRequest) {
         );
     }
 
+    const locationFields = { corridor, shelf, shelfLevel };
+    for (const [field, value] of Object.entries(locationFields)) {
+      if (value !== undefined && value !== null && typeof value !== 'string') {
+        return NextResponse.json(
+          { error: `${field} deve ser um texto` },
+          { status: 400 }
+        );
+      }
+    }
+
     const book = await prisma.book.create({
       data: {
         title: title.trim(),
@@ -78,7 +88,10 @@ export async function POST(req: NextRequest) {
         description: description ? description.trim() : null,
         publishedAt: publishedAt || null,
         quantity: quantity !== undefined ? quantity : 1,
-        genres: genres || []
+        genres: genres || [],
+        corridor: corridor?.trim() || null,
+        shelf: shelf?.trim() || null,
+        shelfLevel: shelfLevel?.trim() || null,
       },
     });
 

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Loader2 } from 'lucide-react';
-import { formatDateBR } from '@/lib/format';
+import { formatDateBR, formatBookLocation } from '@/lib/format';
 
 function previewDueDate(days: number) {
   return formatDateBR(new Date(Date.now() + days * 24 * 60 * 60 * 1000));
@@ -21,6 +21,9 @@ interface Book {
   title: string;
   author: string;
   quantity: number;
+  corridor?: string | null;
+  shelf?: string | null;
+  shelfLevel?: string | null;
 }
 
 type Feedback = { type: 'error'; message: string } | null;
@@ -277,6 +280,9 @@ export default function NewLoanPage() {
               <div className="min-w-0">
                 <p className="font-semibold text-green-900 dark:text-green-200 break-words">{selectedBook.title}</p>
                 <p className="text-sm text-green-700 dark:text-green-300">{selectedBook.author}</p>
+                <p className="mt-1 text-xs font-medium text-green-800 dark:text-green-400">
+                  Localização: {formatBookLocation(selectedBook)}
+                </p>
               </div>
               <button
                 type="button"

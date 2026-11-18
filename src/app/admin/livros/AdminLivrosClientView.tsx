@@ -28,6 +28,9 @@ export interface AdminBookItem {
   publishedAt?: number;
   quantity: number;
   createdAt: string;
+  corridor?: string | null;
+  shelf?: string | null;
+  shelfLevel?: string | null;
 }
 
 interface AdminLivrosClientViewProps {

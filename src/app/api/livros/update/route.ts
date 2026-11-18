@@ -12,7 +12,7 @@ export async function PUT(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { id, title, author, coverUrl, description, publishedAt, quantity, genre } = body;
+    const { id, title, author, coverUrl, description, publishedAt, quantity, genre, corridor, shelf, shelfLevel } = body;
 
     if (!id) {
       return NextResponse.json({ error: 'ID do livro é obrigatório' }, { status: 400 });
@@ -40,6 +40,16 @@ export async function PUT(request: NextRequest) {
     if (description !== undefined) updateData.description = description ? description.trim() : null;
     if (publishedAt !== undefined) updateData.publishedAt = publishedAt;
     if (quantity !== undefined) updateData.quantity = quantity;
+    for (const [field, value] of Object.entries({ corridor, shelf, shelfLevel })) {
+      if (value !== undefined && value !== null && typeof value !== 'string') {
+        return NextResponse.json({ error: `${field} deve ser um texto` }, { status: 400 });
+      }
+    }
+
+    if (corridor !== undefined) updateData.corridor = corridor?.trim() || null;
+    if (shelf !== undefined) updateData.shelf = shelf?.trim() || null;
+    if (shelfLevel !== undefined) updateData.shelfLevel = shelfLevel?.trim() || null;
+
     if (genre !== undefined) {
          // Campo legado: o formulário atual envia `genres`.
     }

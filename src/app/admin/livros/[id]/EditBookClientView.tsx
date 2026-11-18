@@ -32,6 +32,9 @@ export interface BookData {
   genres?: string[];
   description?: string;
   publishedAt?: number;
+  corridor?: string | null;
+  shelf?: string | null;
+  shelfLevel?: string | null;
 }
 
 interface EditBookClientViewProps {
@@ -426,6 +429,32 @@ export function EditBookClientView({ id, initialBook, initialGenres }: EditBookC
               </div>
             </div>
 
+            {/* Localização Física */}
+            <div className="pt-3 border-t border-slate-100 dark:border-neutral-700/60">
+              <label className="block text-xs font-bold text-slate-700 dark:text-neutral-300 mb-2">
+                Localização Física <span className="font-normal text-slate-400">(opcional)</span>
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {([
+                  ['corridor', 'Corredor', 'Ex.: C'],
+                  ['shelf', 'Estante', 'Ex.: 1'],
+                  ['shelfLevel', 'Prateleira', 'Ex.: 2'],
+                ] as const).map(([field, label, placeholder]) => (
+                  <div key={field} className="space-y-1.5">
+                    <label className="block text-[11px] font-semibold text-slate-500 dark:text-neutral-400">
+                      {label}
+                    </label>
+                    <input
+                      type="text"
+                      placeholder={placeholder}
+                      value={book[field] || ''}
+                      onChange={(e) => setBook({ ...book, [field]: e.target.value })}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-neutral-700 bg-slate-50 dark:bg-neutral-900 text-slate-900 dark:text-white text-sm font-semibold focus:outline-hidden focus:ring-2 focus:ring-blue-500 transition-all"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* Genres / Tags Card */}

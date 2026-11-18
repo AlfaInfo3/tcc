@@ -34,6 +34,9 @@ export default async function EditBookPage(props: {
     genres: book.genres || [],
     description: book.description || undefined,
     publishedAt: book.publishedAt || undefined,
+    corridor: book.corridor,
+    shelf: book.shelf,
+    shelfLevel: book.shelfLevel,
   };
 
   return (

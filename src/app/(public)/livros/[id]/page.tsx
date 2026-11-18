@@ -23,6 +23,7 @@ import {
   StarIcon
 } from '@hugeicons/core-free-icons';
 import { HugeIcon } from '@/components/ui/HugeIcon';
+import { formatBookLocation } from '@/lib/format';
 import type { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
@@ -352,6 +353,17 @@ export default async function BookDetailPage({
                       Empréstimo Escolar
                     </p>
                   </div>
+                </div>
+
+                {/* Localização física na biblioteca */}
+                <div className="flex flex-col gap-1.5 rounded-2xl border border-blue-100 bg-blue-50/60 p-4 sm:flex-row sm:items-center sm:justify-between">
+                  <span className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-blue-700">
+                    <HugeIcon icon={Home01Icon} size={15} />
+                    Localização na Biblioteca
+                  </span>
+                  <span className="text-sm font-black text-slate-800">
+                    {formatBookLocation(book)}
+                  </span>
                 </div>
 
                 {/* Sinopse / Resumo */}

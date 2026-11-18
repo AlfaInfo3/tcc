@@ -30,3 +30,28 @@ export function formatDateTimeBR(date: Date | string | null | undefined): string
     timeStyle: 'short',
   });
 }
+
+type BookLocation = {
+  corridor?: string | null;
+  shelf?: string | null;
+  shelfLevel?: string | null;
+};
+
+function withLabel(label: string, value?: string | null): string | null {
+  const clean = value?.trim();
+  if (!clean) return null;
+  return new RegExp(`^${label}`, 'i').test(clean) ? clean : `${label} ${clean}`;
+}
+
+/** Localização física do exemplar em texto, ex.: "Corredor C · Estante 1 · Prateleira 2". */
+export function formatBookLocation(book?: BookLocation | null): string {
+  if (!book) return 'Não informada';
+
+  const parts = [
+    withLabel('Corredor', book.corridor),
+    withLabel('Estante', book.shelf),
+    withLabel('Prateleira', book.shelfLevel),
+  ].filter((part): part is string => Boolean(part));
+
+  return parts.length ? parts.join(' · ') : 'Não informada';
+}

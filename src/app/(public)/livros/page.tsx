@@ -34,6 +34,9 @@ const getPublicBooks = unstable_cache(
           publishedAt: true,
           quantity: true,
           createdAt: true,
+          corridor: true,
+          shelf: true,
+          shelfLevel: true,
         },
       }),
       prisma.loan.groupBy({
@@ -83,10 +86,13 @@ const getPublicBooks = unstable_cache(
             ? `${totalReviews} ${totalReviews === 1 ? 'avaliação' : 'avaliações'}`
             : `${book.quantity} exemplares`,
         createdAt: book.createdAt.toISOString(),
+        corridor: book.corridor,
+        shelf: book.shelf,
+        shelfLevel: book.shelfLevel,
       };
     });
   },
-  ['public-books-v2'],
+  ['public-books-v3'],
   { revalidate: 30, tags: ['public-books'] }
 );
 

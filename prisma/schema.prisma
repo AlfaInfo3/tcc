@@ -20,6 +20,14 @@ model Book {
   quantity    Int      @default(1)
   createdAt   DateTime @default(now())
 
+  /// Localização física na biblioteca (preenchimento opcional).
+  /// Corredor onde o exemplar está guardado (ex.: C).
+  corridor    String?
+  /// Estante dentro do corredor (ex.: 1).
+  shelf       String?
+  /// Prateleira dentro da estante (ex.: 2).
+  shelfLevel  String?
+
   reservations Reservation[]
   loans       Loan[]
   reviews     Review[]

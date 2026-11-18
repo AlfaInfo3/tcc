@@ -2,7 +2,7 @@ import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, BookOpen, Calendar, GraduationCap, Tag } from 'lucide-react';
-import { formatDateBR } from '@/lib/format';
+import { formatDateBR, formatBookLocation } from '@/lib/format';
 import { ReturnLoanButton } from './ReturnLoanButton';
 
 export const dynamic = 'force-dynamic';
@@ -86,6 +86,9 @@ export default async function AdminLoanDetailsPage({ params }: Props) {
           <p className="text-lg font-semibold text-foreground break-words">{loan.book.title}</p>
           <p className="text-sm text-muted-foreground mt-1">
             {loan.book.author || 'Autor não informado'}
+          </p>
+          <p className="mt-3 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-xs font-medium text-primary">
+            Localização: {formatBookLocation(loan.book)}
           </p>
           <Link
             href={`/admin/livros/${loan.book.id}`}

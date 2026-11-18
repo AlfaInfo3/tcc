@@ -93,6 +93,7 @@ Sistema de biblioteca escolar com catálogo público, reservas, empréstimos, ga
 - Datas exibidas sempre via `formatDateBR` / `formatDateTimeBR` (fuso `America/Sao_Paulo`).
 - Cores e superfícies usando os tokens do Tailwind (`bg-card`, `border-border`, `text-foreground`), com suporte a tema escuro.
 - Imagens com `next/image`; imagens institucionais ficam em `public/Imagens`.
+- A localização física do exemplar (corredor, estante e prateleira) é opcional no cadastro/edição e aparece na ficha do acervo, nos cards/detalhes de empréstimo e no modal de confirmação do Kanban. Quando não preenchida, exibe “Não informada”.
 
 ## Identidade de alunos e desempenho
 

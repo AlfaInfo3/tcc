@@ -20,6 +20,9 @@ export interface BookItem {
   rating?: number;
   ratingsCount?: string;
   createdAt?: string;
+  corridor?: string | null;
+  shelf?: string | null;
+  shelfLevel?: string | null;
 }
 
 interface BookCardWithHoverProps {

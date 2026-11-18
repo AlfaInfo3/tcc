@@ -16,6 +16,7 @@ import {
   Minus, 
   BookOpen, 
   Loader2, 
+  MapPin,
   Image as ImageIcon
 } from 'lucide-react';
 import { BookSearchResult } from '@/lib/book-search';
@@ -38,6 +39,9 @@ export default function NewBookPage() {
     coverUrl: '',
     genres: [] as string[],
     description: '',
+    corridor: '',
+    shelf: '',
+    shelfLevel: '',
   });
 
   // Tag Input State
@@ -237,6 +241,9 @@ export default function NewBookPage() {
             coverUrl: '',
             genres: [],
             description: '',
+            corridor: '',
+            shelf: '',
+            shelfLevel: '',
           });
           setCustomCoverDataUrl(null);
           setCoverFile(null);
@@ -443,6 +450,39 @@ export default function NewBookPage() {
                   </button>
                 </div>
               </div>
+            </div>
+
+            {/* Localização física (opcional) */}
+            <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
+              <div className="mb-3 flex items-center gap-2">
+                <MapPin size={16} className="text-blue-600" />
+                <h3 className="text-xs font-black text-slate-800 uppercase tracking-wider">
+                  Localização Física <span className="font-medium normal-case tracking-normal text-slate-400">(opcional)</span>
+                </h3>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {([
+                  ['corridor', 'Corredor', 'Ex.: C'],
+                  ['shelf', 'Estante', 'Ex.: 1'],
+                  ['shelfLevel', 'Prateleira', 'Ex.: 2'],
+                ] as const).map(([field, label, placeholder]) => (
+                  <div key={field}>
+                    <label className="mb-1.5 block text-[11px] font-black text-slate-700 uppercase tracking-wider">
+                      {label}
+                    </label>
+                    <input
+                      type="text"
+                      placeholder={placeholder}
+                      value={formData[field]}
+                      onChange={(e) => setFormData({ ...formData, [field]: e.target.value })}
+                      className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-xs sm:text-sm font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all"
+                    />
+                  </div>
+                ))}
+              </div>
+              <p className="mt-2 text-[11px] text-slate-500">
+                Opcional. Livros sem localização continuam aparecendo normalmente no acervo.
+              </p>
             </div>
 
             {/* Genres Tag Input */}

@@ -14,6 +14,9 @@ export interface DashboardMetricsData {
 
 export interface KanbanBook {
   title: string | null;
+  corridor?: string | null;
+  shelf?: string | null;
+  shelfLevel?: string | null;
 }
 
 export interface KanbanStudent {

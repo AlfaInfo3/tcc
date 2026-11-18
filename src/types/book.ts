@@ -8,6 +8,9 @@ export interface Book {
   publishedAt?: number;
   quantity: number;
   createdAt: string;
+  corridor?: string | null;
+  shelf?: string | null;
+  shelfLevel?: string | null;
 }
 
 export interface Student {
